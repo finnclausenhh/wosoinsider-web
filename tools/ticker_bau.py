@@ -32,7 +32,7 @@ def main(src, out):
     assert s.count("<base ") == 1
     assert "url(fonts/" not in s
     for f in ["news.json", "spielplan.json", "inside.json", "fotos.json"]:
-        assert f'fetch("{f}"' in s, f
+        assert f'"{f}"' in s, f
     assert "—" not in s
     open(out, "w", encoding="utf8").write(s)
     print("ok", len(s))
