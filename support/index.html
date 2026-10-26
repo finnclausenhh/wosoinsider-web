@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support · WOSOINSIDER</title>
+<meta name="description" content="Kontakt und Hilfe zur App WOSOINSIDER.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>
+@font-face{font-family:'Barlow Condensed';font-weight:500;font-display:swap;src:url(/fonts/barlow-condensed-500-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-weight:500;font-display:swap;src:url(/fonts/barlow-condensed-500-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-weight:700;font-display:swap;src:url(/fonts/barlow-condensed-latin-ext-2.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-weight:700;font-display:swap;src:url(/fonts/barlow-condensed-latin-3.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-weight:800;font-display:swap;src:url(/fonts/barlow-condensed-latin-ext-4.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-weight:800;font-display:swap;src:url(/fonts/barlow-condensed-latin-5.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Inter';font-weight:400 700;font-display:swap;src:url(/fonts/inter-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Inter';font-weight:400 700;font-display:swap;src:url(/fonts/inter-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{--bg:#F4F5F7;--card:#fff;--ink:#0E1726;--muted:#596476;--line:#DCE1EA;--soft:#EEF1F6;--accent:#2F5BFF;--brand:#2F5BFF;
+--d:"Barlow Condensed","Arial Narrow",Arial,sans-serif;--b:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0E1726;--card:#16223A;--ink:#F4F5F7;--muted:#A9B4C6;--line:#2A3954;--soft:#1C2A45;--accent:#6E9BFF;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--b)}
+a{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+header{background:var(--card);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-family:var(--d);text-transform:uppercase;line-height:.82}
+.tile{width:38px;height:38px;border-radius:9px;background:var(--brand);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
+.tile b{font-weight:800;font-size:15px;letter-spacing:.5px}.tile i{font-style:normal;font-weight:500;font-size:9px;letter-spacing:.5px}
+.word{font-size:28px;letter-spacing:1.5px}.word b{font-weight:800}.word i{font-style:normal;font-weight:500;color:var(--accent)}
+nav.top{display:flex;gap:16px;font-size:14px}nav.top a{color:var(--muted);text-decoration:none}nav.top a:hover,nav.top a[aria-current]{color:var(--ink)}
+main.wrap{padding-block:28px 40px}
+.hero{display:grid;gap:14px;padding:8px 0 20px}
+.kicker{font:600 12px var(--b);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.hero h1{font-family:var(--d);font-weight:800;font-size:clamp(40px,9vw,64px);line-height:.95;margin:0;text-transform:uppercase;text-wrap:balance}
+.hero h1 span{color:var(--accent)}
+.lead{font-size:18px;max-width:58ch;margin:0}
+.store{display:inline-flex;align-items:center;gap:10px;justify-self:start;background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 16px;text-decoration:none;font-weight:600}
+.store small{display:block;font-weight:400;font-size:12px;opacity:.75}
+.store.soon{background:transparent;color:var(--ink);border:1.5px dashed var(--line)}
+.feat{display:grid;gap:12px;margin:8px 0 24px}
+@media (min-width:640px){.feat{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start}
+.card h2{font-family:var(--d);font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;margin:0}
+.card p{margin:0;font-size:15px;color:var(--muted)}
+.note{font-size:14px;color:var(--muted);max-width:65ch}
+.doc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:14px}
+.doc h1{font-family:var(--d);font-weight:800;font-size:40px;line-height:1;margin:0;text-transform:uppercase}
+.doc h2{font-family:var(--d);font-weight:700;font-size:20px;letter-spacing:.02em;text-transform:uppercase;margin:8px 0 -6px}
+.doc p,.doc ul{margin:0;max-width:68ch}.doc ul{padding-left:20px;display:grid;gap:4px}
+.doc address{font-style:normal}
+.mailbox{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;background:var(--soft);border-radius:12px;padding:14px 16px}
+.mailbox a{font-weight:600;font-size:18px;overflow-wrap:anywhere}
+details{border-top:1px solid var(--line);padding:10px 0}details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600}details p{margin:8px 0 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+footer .wrap{display:grid;gap:8px;padding-block:18px 32px}
+footer nav{display:flex;flex-wrap:wrap;gap:4px 18px}footer nav a{color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="brand" href="/" aria-label="WOSOINSIDER Startseite"><span class="tile" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span><span class="word" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span></a><nav class="top" aria-label="Hauptmenü"><a href="/support/" aria-current="page">Support</a><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a></nav></div></header>
+<main class="wrap">
+<article class="doc">
+  <h1>Support</h1>
+  <p>Fragen zur App, ein Fehler in einer Meldung oder ein Wunsch für eine neue Funktion? Eine Adresse für alles:</p>
+  <div class="mailbox"><a href="mailto:redaktion@wosoinsider.de">redaktion@wosoinsider.de</a></div>
+  <ul>
+    <li>Fragen zu WOSOINSIDER und Wünsche für neue Funktionen</li>
+    <li>Fehler in einer Meldung oder Aufstellung, neue Informationen zu Verletzungen, Sperren oder Rückkehr, bitte mit Link zur Quelle</li>
+    <li>Auskunft, Berichtigung oder Löschung personenbezogener Daten sowie Fragen zu Bild- und Markenrechten</li>
+  </ul>
+  <h2>Häufige Fragen</h2>
+  <div><details><summary>Was kostet WOSOINSIDER?</summary><p>Nichts. Die App ist kostenlos, ohne Werbung und ohne Abo.</p></details><details><summary>Brauche ich ein Konto?</summary><p>Nein. Die App funktioniert ohne Anmeldung. Ihre Vereinsauswahl bleibt nur auf Ihrem Gerät.</p></details><details><summary>Wie aktuell sind die Meldungen?</summary><p>Neue Meldungen kommen mehrmals täglich, an Spieltagen stündlich. Offizielle Aufstellungen erscheinen etwa 60 Minuten vor Anpfiff.</p></details><details><summary>Woher kommen die Inhalte?</summary><p>Aus öffentlich zugänglichen Quellen wie Vereinsseiten, DFB, Sportschau und regionalen Medien. Ein KI-System fasst sie zusammen, jede Meldung verlinkt ihre Quelle. Mehr dazu unter <a href="/ki-hinweis/">KI-Hinweis &amp; Methodik</a>.</p></details><details><summary>Ist WOSOINSIDER ein Angebot von Kickbase?</summary><p>Nein. WOSOINSIDER ist unabhängig und nicht mit Kickbase, dem DFB oder den Vereinen verbunden.</p></details><details><summary>Die App zeigt keine neuen Inhalte. Was tun?</summary><p>Prüfen Sie die Internetverbindung und öffnen Sie die App neu. Hilft das nicht, schreiben Sie uns mit Gerät und iOS-Version.</p></details></div>
+  <p class="note">Die Postanschrift steht im <a href="/impressum/">Impressum</a>.</p>
+</article>
+</main>
+<footer><div class="wrap"><nav aria-label="Rechtliches"><a href="/">Start</a><a href="/support/">Support</a><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a><a href="/ki-hinweis/">KI-Hinweis &amp; Methodik</a></nav>
+<span>WOSOINSIDER ist ein unabhängiges Angebot und nicht mit Kickbase, dem DFB oder den Vereinen verbunden. Inhalte werden mit KI erstellt.</span></div></footer>
+</body>
+</html>
