@@ -9,6 +9,8 @@ import json, sys, os, shutil, re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from legal_bau import to_html
 
+ZAEHLER = "<script>\n" + open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "zaehler.js"), encoding="utf8").read() + "</script>"
+
 MAIL = "redaktion@wosoinsider.de"
 
 FONTS = """@font-face{font-family:'Barlow Condensed';font-weight:500;font-display:swap;src:url(/fonts/barlow-condensed-500-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
@@ -82,6 +84,7 @@ def page(path, title, desc, body):
 {FONTS}
 {CSS}
 </style>
+{ZAEHLER}
 </head>
 <body>
 <header><div class="wrap"><a class="brand" href="/" aria-label="WOSOINSIDER Startseite"><span class="tile" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span><span class="word" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span></a><nav class="top" aria-label="Hauptmenü">{nav}</nav></div></header>

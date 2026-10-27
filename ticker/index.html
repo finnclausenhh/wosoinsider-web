@@ -8,7 +8,67 @@
 (function(){ var r = history.replaceState.bind(history);
   history.replaceState = function(s, t, u){ return r(s, t, u == null ? u : new URL(u, location.href).href); }; })();
 </script>
-<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>
+// Reichweitenmessung mit GoatCounter (ohne Cookies, ohne Skript von Dritten, ohne Gerätespeicher).
+// Sendet nur Pfad, Titel, Referrer und Kampagnen-Parameter (z. B. ?utm_source=instagram) als Zählpixel.
+// Zählt nur auf wosoinsider.de, nicht im Artifact, lokal oder in Vorschauen.
+(function () {
+  var GC = "https://wosoinsider.goatcounter.com/count";
+  if (!/(^|\.)wosoinsider\.de$/.test(location.hostname)) { window.wiZaehl = function () {}; return; }
+  function z(p, t, ev) {
+    var q = "p=" + encodeURIComponent(p);
+    if (t) q += "&t=" + encodeURIComponent(t);
+    if (ev) q += "&e=true";
+    else {
+      if (document.referrer) q += "&r=" + encodeURIComponent(document.referrer);
+      if (location.search) q += "&q=" + encodeURIComponent(location.search);
+    }
+    q += "&rnd=" + Math.random().toString(36).slice(2);
+    try { new Image().src = GC + "?" + q; } catch (e) {}
+  }
+  window.wiZaehl = z;
+  function seite() { z(location.pathname, document.title, false); }
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", seite) : seite();
+})();
+// Ereignisse im Ticker: geöffnete Meldungen (plus Spielerin und Verein), Reiter, Spiele, Analyse.
+// Braucht zaehler.js davor. Liest news.json über die base-Adresse (fbl-daten), nur für Überschrift, Spielerin, Verein.
+(function () {
+  var NEWS = null;
+  function slug(s) {
+    return String(s).toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+  function laden() {
+    if (!NEWS) NEWS = fetch("news.json").then(function (r) { return r.json(); })
+      .then(function (d) { var m = {}; (d.meldungen || []).forEach(function (x) { m[x.id] = x; }); return m; })
+      .catch(function () { NEWS = null; return {}; });
+    return NEWS;
+  }
+  function meldung(id) {
+    laden().then(function (m) {
+      var x = m[id];
+      if (!x) { wiZaehl("meldung/" + id, null, true); return; }
+      wiZaehl("meldung/" + id, x.headline, true);
+      if (x.spielerin) wiZaehl("spielerin/" + slug(x.spielerin), x.spielerin + (x.verein ? " (" + x.verein + ")" : ""), true);
+      if (x.verein) wiZaehl("verein/" + slug(x.verein), x.verein, true);
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var x = e.target.closest && e.target.closest("[data-id],[data-punkt],[data-tab],[data-tabgo],[data-game],[data-ana]");
+    if (!x) return;
+    var d = x.dataset;
+    if (d.tab || d.tabgo) wiZaehl("reiter/" + (d.tab || d.tabgo), null, true);
+    else if (d.game) wiZaehl("spiel/" + d.game, null, true);
+    else if (d.ana !== undefined) wiZaehl("inside/analyse", "Analyse", true);
+    else meldung(d.id || d.punkt);
+  }, true);
+  // Direktlink auf eine Meldung (wosoinsider.de/ticker/#id), z. B. aus Instagram
+  var h = decodeURIComponent(location.hash.slice(1));
+  if (h && !/^(spielplan|inside|analyse|impressum|datenschutz|kontakt|so-entsteht)$/.test(h)) meldung(h);
+  else if (h) wiZaehl("reiter/" + h, null, true);
+})();
+</script>
+</head><body>
 <title>WOSOINSIDER</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>/* Schriften lokal aus dem Artifact, keine Verbindung zu Google */
@@ -479,11 +539,16 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 
   // ---------------- Bilder
   const istSpielerin = m => POS.includes(m.pos || "");
-  const bildPfad = m => m.foto ? ((FOTOS[m.spielerin] || {}).portrait || m.foto) : null;
+  const bildPfad = m => { const f = FOTOS[m.spielerin] || {}; return f.portrait || m.foto || f.datei || null; };
+  // Bildnachweis: Vereinsfreigabe (z. B. Portraits des HSV) ohne Lizenzlink, sonst Urheber und Lizenz
+  const freigabe = f => !f.lizenz_url && !String(f.lizenz || "").startsWith("CC");
+  const nachweis = f => !f || !f.autor ? "" : freigabe(f) ? `Foto: ${esc(f.autor)}` : `Foto: ${esc(f.autor)}${f.lizenz ? `, ${esc(f.lizenz)}` : ""}`;
+  const quelleURL = f => f && /^https?:/.test(f.quelle || "") ? f.quelle : null;
   function bild(m, g){
     const r = g > 70 ? 11 : 8, k = KURZ[m.verein], f = bildPfad(m);
     const box = (inner, bg) => `<div class="bild" style="width:${g}px;height:${g}px;border-radius:${r}px;${bg ? `background:${bg}` : ""}" aria-hidden="true">${inner}</div>`;
-    if (f) return box(`<img class="f" src="${esc(f)}" alt="" loading="lazy" onerror="this.remove()">`);
+    // Vereinsfarbe als Grund, damit bei transparenten Portraits nicht die Karte durchschimmert
+    if (f) return box(`<img class="f" src="${esc(f)}" alt="" loading="lazy" onerror="this.remove()">`, KFARBE[k] || "var(--soft)");
     if (istSpielerin(m)) {
       const w = Math.round(g * .25);
       return box(SIL + (m.nr ? `<span class="nr" style="font-size:${Math.round(g * .21)}px">${esc(m.nr)}</span>` : "")
@@ -590,12 +655,16 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
           ${st ? `<div class="mk-st">${plakette(meldungsStatus(m), 28)}<span>${st[2]}</span></div>` : ""}</div>
           <h1 class="disp" style="font-size:30px">${esc(m.headline)}</h1><div class="dat">${esc(lang(m.zeit))}</div></div>
           <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>`;
-    const fc = m.foto_credit;
+    // Nachweis zum gezeigten Foto: Eintrag aus fotos.json hat Vorrang, sonst der Nachweis aus der Meldung
+    const fi = FOTOS[m.spielerin], fc = m.foto_credit;
+    const credit = fi && fi.datei && nachweis(fi)
+      ? (!freigabe(fi) && quelleURL(fi) ? `<a href="${esc(quelleURL(fi))}" target="_blank" rel="noopener">${nachweis(fi)}, Wikimedia Commons</a>` : nachweis(fi))
+      : fc && fc.autor ? (fc.url ? `<a href="${esc(fc.url)}" target="_blank" rel="noopener">Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}, Wikimedia Commons</a>` : `Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}`) : "";
     $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${kbBox(m.kickbase)}
       ${m.instagram ? `<a href="${esc(m.instagram)}" target="_blank" rel="noopener" style="font-size:14px">Instagram-Profil von ${esc(m.spielerin)}</a>` : ""}
       ${(m.quellen || []).length ? `<div class="src">${kap("Quellen")}${m.quellen.map(q => q.url ? `<a href="${esc(q.url)}" target="_blank" rel="noopener">${esc(q.name || q.url)}</a>` : `<span>${esc(q.name)}</span>`).join("")}</div>` : ""}
       ${kiHinweis()}
-      ${fc && fc.autor ? `<div class="credit">${fc.url ? `<a href="${esc(fc.url)}" target="_blank" rel="noopener">Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}, Wikimedia Commons</a>` : `Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}`}</div>` : ""}
+      ${credit ? `<div class="credit">${credit}</div>` : ""}
     </article>`;
     window.scrollTo(0, 0);
   }
@@ -780,7 +849,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
         <small>${esc(x.term ? tagDatum(x.z) : "Wochenende " + wochenende(x.z))}${w != null ? ` · ${Number(w).toFixed(1).replace(".", ",")} Gegentore pro Spiel` : ""}</small></div>${s ? `<span class="cap" style="background:${s[1]}">${s[0]}</span>` : ""}</div>`; }).join("");
     return `<article class="fk">${kopf}<div class="finh">${minutenBalken(f.s || [])}<p>${esc(f.text)}</p>
       ${geg ? `<div style="display:grid;gap:8px">${kap("Nächste Gegner")}${geg}</div>` : ""}${kbBox(f.kb)}
-      ${fo && fo.datei && fo.autor ? `<div class="credit" style="font-size:9.5px">Foto: ${esc(fo.autor)}, ${esc(fo.lizenz)}</div>` : ""}</div></article>`;
+      ${fo && fo.datei && nachweis(fo) ? `<div class="credit" style="font-size:9.5px">${nachweis(fo)}</div>` : ""}</div></article>`;
   }
   function formSektion(){
     const l = formListe(FDIR), g = FG.find(x => x[0] === FDIR);
@@ -924,7 +993,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       <h2>Verbraucherstreitbeilegung</h2>
       <p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>`,
     datenschutz: () => `<h1>Datenschutz</h1>
-      <p><b>Kurz gesagt:</b> WOSOINSIDER braucht kein Konto, setzt keine Cookies und nutzt kein Tracking, keine Analyse und keine Werbung. Personenbezogene Daten fallen nur dort an, wo Technik es zwingend verlangt (Abruf der Inhalte) oder wenn Sie uns schreiben.</p>
+      <p><b>Kurz gesagt:</b> WOSOINSIDER braucht kein Konto, setzt keine Cookies und zeigt keine Werbung. Die App enthält keine Analyse. Webseite und Webversion zählen Aufrufe anonym mit GoatCounter, ohne Cookies und ohne Speicherung von IP-Adressen (Abschnitt 6). Personenbezogene Daten fallen sonst nur dort an, wo Technik es zwingend verlangt (Abruf der Inhalte) oder wenn Sie uns schreiben.</p>
       <h2>1. Geltungsbereich</h2>
       <p>Diese Erklärung gilt für die iOS-App WOSOINSIDER, die Webseite wosoinsider.de, die Webversion des Newstickers und den E-Mail-Kontakt.</p>
       <h2>2. Verantwortlicher</h2>
@@ -933,7 +1002,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       <p>Eine Datenschutzbeauftragte oder einen Datenschutzbeauftragten müssen wir nicht benennen.</p>
       <h2>3. Die App</h2>
       <p>Die App lädt ihre Inhalte (Meldungen, Spielplan, Inside, Fotos, Logos) als Dateien von einem Server bei GitHub und speichert sie für schnelleres Laden im Zwischenspeicher Ihres Geräts. Beim Abruf übermittelt Ihr Gerät technisch notwendig seine IP-Adresse, Datum und Uhrzeit sowie die abgerufene Datei. Was GitHub damit macht, steht in Abschnitt 5. Wir selbst erhalten diese Daten nicht.</p>
-      <p>Die App enthält keine Analyse-, Werbe- oder Tracking-Werkzeuge und keine Software von Drittanbietern. Sie fragt keine Berechtigungen ab, etwa für Standort, Kontakte, Fotos oder Kamera. Links zu Quellen, Lizenzen oder Instagram öffnet sie erst, wenn Sie darauf tippen (siehe Abschnitt 9). Rechtsgrundlage für den Abruf ist unser berechtigtes Interesse, Ihnen die Inhalte auszuliefern (Art. 6 Abs. 1 lit. f DSGVO).</p>
+      <p>Die App enthält keine Analyse-, Werbe- oder Tracking-Werkzeuge und keine Software von Drittanbietern. Sie fragt keine Berechtigungen ab, etwa für Standort, Kontakte, Fotos oder Kamera. Links zu Quellen, Lizenzen oder Instagram öffnet sie erst, wenn Sie darauf tippen (siehe Abschnitt 10). Rechtsgrundlage für den Abruf ist unser berechtigtes Interesse, Ihnen die Inhalte auszuliefern (Art. 6 Abs. 1 lit. f DSGVO).</p>
       <p>Push-Mitteilungen bietet die App derzeit nicht an. Kommen sie dazu, ergänzen wir diese Erklärung vorher.</p>
       <h2>4. Speicherung auf Ihrem Gerät</h2>
       <p>Ihre Vereinsauswahl speichern App und Webversion nur lokal auf Ihrem Gerät (App: Einstellungen der App, Webversion: localStorage des Browsers). Sie wird nicht an uns übertragen. Diese Speicherung ist für die von Ihnen gewünschte Funktion unbedingt erforderlich und braucht daher keine Einwilligung (§ 25 Abs. 2 Nr. 2 TDDDG). Sie löschen sie, indem Sie die Auswahl zurücksetzen, die App löschen oder die Browserdaten entfernen. Es werden keine Cookies gesetzt.</p>
@@ -941,25 +1010,29 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       <p>Die Webseite wosoinsider.de und die Dateien für die App liegen bei GitHub Pages, einem Dienst der GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA. Beim Aufruf verarbeitet GitHub technisch notwendige Verbindungsdaten: IP-Adresse, Datum und Uhrzeit, abgerufene Datei, Browser oder App-Kennung, Betriebssystem und gegebenenfalls die zuvor besuchte Seite. Das dient der sicheren und stabilen Auslieferung (Art. 6 Abs. 1 lit. f DSGVO). Wie lange GitHub diese Daten speichert, legt GitHub selbst fest. Wir erhalten keine Logfiles und können keine Nutzerinnen oder Nutzer identifizieren.</p>
       <p>GitHub verarbeitet Daten auch in den USA. GitHub ist nach dem EU-U.S. Data Privacy Framework zertifiziert, für das ein Angemessenheitsbeschluss der EU-Kommission besteht (Art. 45 DSGVO). Weitere Informationen: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement">Datenschutzerklärung von GitHub</a>.</p>
       <p>Die Schriften werden zusammen mit der Seite ausgeliefert. Es besteht keine Verbindung zu Google Fonts oder anderen Schriftanbietern.</p>
-      <h2>6. Keine Profile, keine automatisierten Entscheidungen</h2>
+      <h2>6. Reichweitenmessung auf der Webseite (GoatCounter)</h2>
+      <p>Die Webseite wosoinsider.de und die Webversion des Newstickers zählen Seitenaufrufe und das Öffnen von Meldungen, Spielen und Reitern mit GoatCounter. Anbieter ist Martin Tournoij, Irland (<a href="https://www.goatcounter.com">goatcounter.com</a>). Dabei überträgt Ihr Browser die aufgerufene Seite oder das geöffnete Element, gegebenenfalls die zuvor besuchte Seite und Kampagnen-Angaben aus der Adresse (etwa „utm_source=instagram“), die Browser- und Betriebssystemkennung sowie technisch bedingt Ihre IP-Adresse.</p>
+      <p>GoatCounter speichert die IP-Adresse nicht. Daraus wird nur das Land abgeleitet. Zusammen mit der Browserkennung dient sie höchstens 8 Stunden im Arbeitsspeicher dazu, wiederholte Aufrufe nicht doppelt zu zählen. Gespeichert werden nur zusammengefasste Zahlen, mit denen sich keine Person erkennen lässt. Es werden keine Cookies gesetzt, kein Skript eines Drittanbieters geladen und keine Informationen auf Ihrem Gerät gespeichert oder ausgelesen. Die Server betreibt die Hetzner Online GmbH in Deutschland und Finnland.</p>
+      <p>Zweck ist zu erfahren, wie viele Menschen das Angebot nutzen und welche Themen, Spielerinnen und Vereine gefragt sind. Rechtsgrundlage ist unser berechtigtes Interesse an dieser Auswertung (Art. 6 Abs. 1 lit. f DSGVO). Sie können jederzeit widersprechen (Abschnitt 12), zum Beispiel per E-Mail; technisch verhindern Sie die Zählung mit einem Inhaltsblocker. Die App nutzt GoatCounter nicht. Weitere Informationen: <a href="https://www.goatcounter.com/help/privacy">Datenschutzerklärung von GoatCounter</a>.</p>
+      <h2>7. Keine Profile, keine automatisierten Entscheidungen</h2>
       <p>Wir bilden keine Nutzerprofile und verkaufen oder teilen keine Daten. Eine automatisierte Entscheidungsfindung nach Art. 22 DSGVO findet nicht statt.</p>
-      <h2>7. App Store</h2>
+      <h2>8. App Store</h2>
       <p>Die App laden Sie über den App Store von Apple. Dafür verarbeitet Apple Daten wie Ihre Apple-ID, Gerätekennung und Kaufhistorie in eigener Verantwortung. Wir haben darauf keinen Einfluss und erhalten keine personenbezogenen Daten von Apple. Haben Sie in den iOS-Einstellungen zugestimmt, Analysedaten mit App-Entwicklern zu teilen, stellt Apple uns anonymisierte Absturzberichte und Nutzungsstatistiken bereit. Einzelheiten stehen in der <a href="https://www.apple.com/de/legal/privacy/">Datenschutzrichtlinie von Apple</a>.</p>
-      <h2>8. Kontakt per E-Mail</h2>
+      <h2>9. Kontakt per E-Mail</h2>
       <p>Wenn Sie an <a href="mailto:redaktion@wosoinsider.de">redaktion@wosoinsider.de</a> schreiben, verarbeiten wir Ihre E-Mail-Adresse, Ihren Namen (falls angegeben) und Ihre Nachricht, um die Anfrage zu bearbeiten (Art. 6 Abs. 1 lit. b oder f DSGVO). Hinweise an die Redaktion nutzen wir für die Berichterstattung. Ihren Namen veröffentlichen wir nur mit Ihrer Zustimmung. Die Daten löschen wir, sobald die Anfrage erledigt ist und keine Aufbewahrungspflicht besteht.</p>
       <p>Das Postfach läuft über Google Workspace. Vertragspartner und Auftragsverarbeiter (Art. 28 DSGVO) ist die Google Cloud EMEA Limited, 70 Sir John Rogerson's Quay, Dublin 2, Irland. Google kann Daten auch in den USA verarbeiten. Die Google LLC ist nach dem EU-U.S. Data Privacy Framework zertifiziert, für das ein Angemessenheitsbeschluss der EU-Kommission besteht (Art. 45 DSGVO).</p>
-      <h2>9. Links zu anderen Seiten</h2>
+      <h2>10. Links zu anderen Seiten</h2>
       <p>Quellen, die Sportschau und Instagram-Profile sind verlinkt. Daten werden erst übertragen, wenn Sie einen Link antippen. Dann gilt die Datenschutzerklärung der jeweiligen Seite.</p>
-      <h2>10. Berichterstattung über Spielerinnen</h2>
+      <h2>11. Berichterstattung über Spielerinnen</h2>
       <p>Meldungen nennen Spielerinnen, Trainerinnen und Trainer im Rahmen der Sportberichterstattung (journalistische Zwecke, Art. 85 DSGVO in Verbindung mit § 23 MStV). Die redaktionelle Verantwortung trägt Finn Clausen.</p>
       <p>Für Angaben zur Gesundheit gelten feste Regeln: Wir berichten nur, was Verein, Verband oder Medien bereits veröffentlicht haben, und nur so genau, wie es für die Frage nötig ist, ob und wann eine Spielerin spielen kann. Eigene Vermutungen zu Diagnosen veröffentlichen wir nicht. Meldungen werden nach 14 Tagen aus der App entfernt.</p>
       <p>Fotos stammen von Wikimedia Commons unter freien Lizenzen oder werden mit Genehmigung genutzt. Betroffene können jederzeit unter <a href="mailto:redaktion@wosoinsider.de">redaktion@wosoinsider.de</a> eine Korrektur, die Entfernung eines Fotos oder einer Angabe verlangen. Berechtigte Anliegen setzen wir unverzüglich um.</p>
-      <h2>11. Ihre Rechte</h2>
+      <h2>12. Ihre Rechte</h2>
       <p>Sie haben das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18) und Datenübertragbarkeit (Art. 20 DSGVO). Eine Nachricht an <a href="mailto:redaktion@wosoinsider.de">redaktion@wosoinsider.de</a> genügt.</p>
       <p><b>Widerspruchsrecht:</b> Verarbeiten wir Daten auf Grundlage berechtigter Interessen (Art. 6 Abs. 1 lit. f DSGVO), können Sie aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit widersprechen (Art. 21 DSGVO). Wir verarbeiten die Daten dann nicht mehr, es sei denn, es liegen zwingende schutzwürdige Gründe vor.</p>
-      <h2>12. Beschwerderecht</h2>
+      <h2>13. Beschwerderecht</h2>
       <p>Sie können sich bei einer Datenschutz-Aufsichtsbehörde beschweren. Zuständig für uns ist das Bayerische Landesamt für Datenschutzaufsicht (BayLDA), Promenade 18, 91522 Ansbach.</p>
-      <h2>13. Stand</h2>
+      <h2>14. Stand</h2>
       <p>Oktober 2026. Ändert sich etwas an App oder Webseite, passen wir diese Erklärung an.</p>`,
     kontakt: () => `<h1>Kontakt</h1>
       <p>Eine Adresse für alles: <a href="mailto:redaktion@wosoinsider.de">redaktion@wosoinsider.de</a></p>
@@ -989,9 +1062,9 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       <p>Hinweise bitte an <a href="mailto:${mail("redaktion")}">${mail("redaktion")}</a>. Korrekturen werden in der Meldung mit dem Tag UPDATE nachgetragen.</p>`
   };
   const INFO = Object.assign({}, LEGAL, {
-    bildnachweise: () => `<h1>Bildnachweise</h1><p class="mu">Fotos von Wikimedia Commons unter freien Lizenzen, teils zugeschnitten. Vereinslogos mit Genehmigung der Vereine.</p>
+    bildnachweise: () => `<h1>Bildnachweise</h1><p class="mu">Fotos von Wikimedia Commons unter freien Lizenzen, teils zugeschnitten. Portraits des Hamburger SV mit Genehmigung des Vereins. Vereinslogos mit Genehmigung der Vereine.</p>
       ${Object.keys(FOTOS).sort((a, b) => a.localeCompare(b, "de")).map(n => { const f = FOTOS[n];
-        return `<div class="bn"><b>${esc(n)}</b><small>Foto: ${esc(f.autor || "unbekannt")}${f.lizenz ? `, ${f.lizenz_url ? `<a href="${esc(f.lizenz_url)}" target="_blank" rel="noopener">${esc(f.lizenz)}</a>` : esc(f.lizenz)}` : ""}${f.quelle ? ` · <a href="${esc(f.quelle)}" target="_blank" rel="noopener">Quelle</a>` : ""}</small></div>`; }).join("") || '<p class="mu">Wird geladen …</p>'}`,
+        return `<div class="bn"><b>${esc(n)}</b><small>Foto: ${esc(f.autor || "unbekannt")}${f.lizenz ? `, ${f.lizenz_url ? `<a href="${esc(f.lizenz_url)}" target="_blank" rel="noopener">${esc(f.lizenz)}</a>` : esc(f.lizenz)}` : ""}${quelleURL(f) ? ` · <a href="${esc(quelleURL(f))}" target="_blank" rel="noopener">Quelle</a>` : ""}</small></div>`; }).join("") || '<p class="mu">Wird geladen …</p>'}`,
     patches: () => `<h1>Patches</h1>${PATCH && (PATCH.eintraege || []).length ? PATCH.eintraege.map(e => `<div class="pv"><div class="h"><span>Version ${esc(e.version)}</span><small>${esc(e.datum)}</small></div>
       ${e.titel ? `<span class="t">${esc(e.titel)}</span>` : ""}<ul>${(e.aenderungen || []).map(a => `<li>${esc(a)}</li>`).join("")}</ul></div>`).join("") : '<p class="mu">Noch keine Patchnotes geladen.</p>'}`
   });
