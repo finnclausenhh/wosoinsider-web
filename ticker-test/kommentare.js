@@ -34,7 +34,10 @@
     WI_EIGEN: "Eigene Kommentare kannst du nicht liken oder melden.",
     WI_WEG: "Den Kommentar gibt es nicht mehr.",
     WI_LOGIN: "Verbindung fehlgeschlagen. Bitte noch einmal versuchen.",
-    WI_KEIN_MOD: "Dafür fehlen die Rechte."
+    WI_KEIN_MOD: "Dafür fehlen die Rechte.",
+    WI_NAME: "Dieser Name geht nicht. Erlaubt sind 3 bis 24 Zeichen (Buchstaben, Zahlen, Leerzeichen, - _ .), nichts mit Redaktion oder WOSOINSIDER.",
+    WI_NAME_VERGEBEN: "Diesen Namen gibt es schon. Bitte einen anderen wählen.",
+    WI_NAME_FEST: "Du hast deinen Namen schon einmal geändert. Weitere Änderungen sind nicht möglich."
   };
   var GRUENDE = [["beleidigung", "Beleidigung"], ["hass", "Hass oder Hetze"], ["spam", "Spam oder Werbung"],
                  ["falschinfo", "Falschinformation"], ["rechtswidrig", "Rechtswidriger Inhalt"], ["sonstiges", "Sonstiges"]];
@@ -102,15 +105,36 @@
     var r = k.profil && k.profil.rolle;
     return r === "admin" || r === "moderator" ? '<span class="wk-red">Redaktion</span>' : "";
   }
+  function nameFehlt() { return !S.ich || !S.ich.name_gewaehlt; }
+  function nameFeld(eltern) {
+    var id = "wk-n-" + (eltern || "h");
+    var wert = ENTWURF.name != null ? ENTWURF.name : (S.ich ? S.ich.name : "");
+    return '<div class="wk-name"><label for="' + id + '">Dein Name</label>' +
+      '<input id="' + id + '" data-kname maxlength="24" autocomplete="nickname" placeholder="z. B. Lena aus Köln" value="' + esc(wert) + '">' +
+      '<span class="wk-mu">Leer lassen = zufälliger Name wie „WoSo-Fan 1704“. Später einmal änderbar.</span></div>';
+  }
+  function namensZeile() {
+    if (!S.ich || nameFehlt()) return "";
+    if (S.nameForm) {
+      return '<form class="wk-form wk-nform" data-knamensform><div class="wk-name"><label for="wk-n-neu">Neuer Name</label>' +
+        '<input id="wk-n-neu" maxlength="24" autocomplete="nickname" value="' + esc(S.ich.name) + '"></div>' +
+        '<div class="wk-fz"><span class="wk-mu">Geht nur ein einziges Mal.</span>' +
+        '<button type="button" class="wk-link" data-kaktion="name-zu">Abbrechen</button><button type="submit" class="wk-senden">Speichern</button></div>' +
+        (S.fehler && S.fehlerAn === "name" ? '<p class="wk-fehler" role="alert">' + esc(S.fehler) + "</p>" : "") + "</form>";
+    }
+    return "";
+  }
   function formular(eltern) {
     var key = S.beitrag + "|" + (eltern || ""), wert = ENTWURF[key] || "";
     var fehlerHier = S.fehler && S.fehlerAn === (eltern || "haupt");
+    var wer = nameFehlt() ? "" : "Du schreibst als <b>" + esc(S.ich.name) + "</b>" +
+      (S.ich.name_aenderung_frei && !eltern ? ' · <button type="button" class="wk-link wk-klein" data-kaktion="name-aendern">ändern</button>' : "") + " · ";
     return '<form class="wk-form' + (eltern ? " wk-antw" : "") + '" data-kform="' + esc(eltern || "") + '">' +
+      (nameFehlt() ? nameFeld(eltern) : "") +
       '<label class="wk-sr" for="wk-t-' + esc(eltern || "h") + '">' + (eltern ? "Antwort schreiben" : "Kommentar schreiben") + "</label>" +
       '<textarea id="wk-t-' + esc(eltern || "h") + '" maxlength="' + MAX + '" rows="' + (eltern ? 2 : 3) + '" placeholder="' +
         (eltern ? "Antworten …" : "Was meinst du? Fair bleiben, Spielerinnen respektieren.") + '">' + esc(wert) + "</textarea>" +
-      '<div class="wk-fz"><span class="wk-mu">' + (S.ich ? "Du schreibst als " + esc(S.ich.name) : "Ohne Anmeldung, mit zufälligem Fan-Namen") +
-      ' · <span data-kzahl>' + wert.length + "</span>/" + MAX + "</span>" +
+      '<div class="wk-fz"><span class="wk-mu">' + wer + '<span data-kzahl>' + wert.length + "</span>/" + MAX + "</span>" +
       (eltern ? '<button type="button" class="wk-link" data-kaktion="abbrechen">Abbrechen</button>' : "") +
       '<button type="submit" class="wk-senden"' + (S.sendet ? " disabled" : "") + ">" + (S.sendet ? "Sendet …" : "Senden") + "</button></div>" +
       (fehlerHier ? '<p class="wk-fehler" role="alert">' + esc(S.fehler) + "</p>" : "") +
@@ -174,7 +198,7 @@
         '<button data-kaktion="sort" data-sort="neu" aria-pressed="' + (S.sort === "neu") + '">Neu</button>' +
         '<button data-kaktion="sort" data-sort="top" aria-pressed="' + (S.sort === "top") + '">Top</button></div>' : "") +
       "</div>";
-    h += formular(null);
+    h += namensZeile() + formular(null);
     h += '<details class="wk-regeln"' + (S.offenRegeln ? " open" : "") + '><summary>Kommentarregeln</summary>' + REGELN + "</details>";
     if (S.fehler && S.fehlerAn === null) h += '<p class="wk-fehler" role="alert">' + esc(S.fehler) + "</p>";
     if (!S.geladen) h += '<p class="wk-mu">Kommentare werden geladen …</p>';
@@ -203,13 +227,28 @@
       .then(laden);
   }
   document.addEventListener("input", function (e) {
-    var t = e.target; if (!t.closest || !t.closest("#kom form[data-kform]")) return;
+    var t = e.target;
+    if (t.matches && t.matches("#kom input[data-kname]")) { ENTWURF.name = t.value; return; }
+    if (!t.closest || !t.closest("#kom form[data-kform]")) return;
     var f = t.closest("form"), key = S.beitrag + "|" + f.dataset.kform;
     ENTWURF[key] = t.value;
     var z = f.querySelector("[data-kzahl]"); if (z) z.textContent = t.value.length;
   });
   document.addEventListener("submit", function (e) {
-    var f = e.target; if (!f.closest || !f.closest("#kom") || !f.matches("form[data-kform]")) return;
+    var f = e.target; if (!f.closest || !f.closest("#kom")) return;
+    if (f.matches("form[data-knamensform]")) {
+      e.preventDefault();
+      var neu = (f.querySelector("input").value || "").trim();
+      if (!neu || neu === S.ich.name) { S.nameForm = false; zeichnen(); return; }
+      if (!window.confirm("Name zu „" + neu + "“ ändern? Das geht nur ein einziges Mal.")) return;
+      S.fehler = ""; S.fehlerAn = null;
+      sb.rpc("name_aendern", { neu: neu }).then(function (r) {
+        if (r.error) { S.fehler = fehlertext(r.error); S.fehlerAn = "name"; return zeichnen(); }
+        S.nameForm = false; return profilLaden().then(laden);
+      });
+      return;
+    }
+    if (!f.matches("form[data-kform]")) return;
     e.preventDefault();
     if (S.sendet) return;
     var eltern = f.dataset.kform || null, key = S.beitrag + "|" + (eltern || "");
@@ -217,7 +256,16 @@
     if (text.length < 2) { S.fehler = FEHLER.WI_KURZ; S.fehlerAn = eltern || "haupt"; zeichnen(); return; }
     S.sendet = true; zeichnen();
     S.fehler = ""; S.fehlerAn = null;
+    var nameInput = f.querySelector("input[data-kname]");
+    var wunsch = nameInput ? (nameInput.value || "").trim() : null;
     sitzung()
+      .then(function () {
+        if (!nameFehlt()) return;
+        return sb.rpc("name_aendern", { neu: wunsch || S.ich.name }).then(function (r) {
+          if (r.error) throw r.error;
+          ENTWURF.name = null; return profilLaden();
+        });
+      })
       .then(function () { return sb.from("kommentar").insert({ beitrag: S.beitrag, text: text, eltern: eltern }); })
       .then(function (r) { if (r.error) throw r.error; ENTWURF[key] = ""; if (eltern) S.antwort = null; })
       .catch(function (err) { S.fehler = fehlertext(err); S.fehlerAn = eltern || "haupt"; })
@@ -257,6 +305,8 @@
       if (!window.confirm((ks.profil ? ks.profil.name : "Diese Person") + " stummschalten? Du siehst ihre Kommentare dann auf diesem Gerät nicht mehr.")) return;
       STUMM[ks.autor] = ks.profil ? ks.profil.name : ""; stummSpeichern(); zeichnen(); return;
     }
+    if (a === "name-aendern") { S.nameForm = true; S.fehler = ""; zeichnen(); var ni = document.getElementById("wk-n-neu"); if (ni) ni.focus(); return; }
+    if (a === "name-zu") { S.nameForm = false; S.fehler = ""; zeichnen(); return; }
     if (a === "stumm-aus") { STUMM = {}; stummSpeichern(); zeichnen(); return; }
     if (a === "anheften") {
       aktion(function () { return sb.rpc("anheften", { kid: id, an: b.dataset.an === "1" }); });
@@ -343,6 +393,11 @@
     ".wk-akt .wk-mod{color:var(--frag)}" +
     ".wk-melden{display:grid;gap:6px;background:var(--soft);border-radius:10px;padding:10px}" +
     ".wk-gr{display:flex;flex-wrap:wrap;gap:6px}.wk-gr button{font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 10px}" +
+    ".wk-name{display:grid;gap:4px}.wk-name label{font-size:12.5px;font-weight:600;color:var(--muted)}" +
+    ".wk-name input{box-sizing:border-box;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font:15px var(--f-body)}" +
+    ".wk-name input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}" +
+    ".wk-nform{background:var(--card);border-radius:12px;padding:10px}" +
+    ".wk-klein{font-size:12.5px;padding:0}.wk-fz .wk-mu b{color:var(--ink);font-weight:600}" +
     ".wk-pin{font:700 10px var(--f-mono);letter-spacing:.8px;text-transform:uppercase;color:var(--hell)}" +
     ".wk-stumm{margin:0;text-align:center}.wk-stumm .wk-link{font-size:12.5px}" +
     ".wk-zahl{display:inline-flex;align-items:center;gap:3px;flex:none;color:var(--muted);font-size:12px}.wk-zahl svg{width:13px;height:13px}" +

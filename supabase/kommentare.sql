@@ -64,6 +64,9 @@ create table if not exists public.profil (
   erstellt     timestamptz not null default now()
 );
 
+alter table public.profil add column if not exists name_gewaehlt boolean not null default false;
+alter table public.profil add column if not exists name_aenderungen smallint not null default 0;
+
 alter table public.profil enable row level security;
 drop policy if exists profil_lesen on public.profil;
 create policy profil_lesen on public.profil for select to anon, authenticated using (true);
@@ -71,16 +74,18 @@ revoke all on public.profil from anon, authenticated;
 -- Öffentlich nur Name und Rolle (für das Abzeichen "Redaktion")
 grant select (id, name, rolle) on public.profil to anon, authenticated;
 
--- Neuer Nutzer (auch anonym) bekommt automatisch einen Namen wie "Fan-04821"
+-- Neuer Nutzer (auch anonym) bekommt einen Platzhalternamen wie "WoSo-Fan 1704".
+-- Beim ersten Kommentar wählt er seinen Namen (oder behält diesen), danach ist genau eine Änderung möglich.
 create or replace function public.profil_anlegen() returns trigger
 language plpgsql security definer set search_path = '' as $$
 declare n text; i int := 0;
 begin
   loop
-    n := 'Fan-' || lpad(floor(random() * 100000)::int::text, 5, '0');
+    n := 'WoSo-Fan ' || case when i < 15 then lpad(floor(random() * 10000)::int::text, 4, '0')
+                                else lpad(floor(random() * 1000000)::int::text, 6, '0') end;
     exit when not exists (select 1 from public.profil where name = n);
     i := i + 1;
-    if i > 25 then n := 'Fan-' || substr(replace(new.id::text, '-', ''), 1, 10); exit; end if;
+    if i > 25 then n := 'WoSo-Fan ' || substr(replace(new.id::text, '-', ''), 1, 10); exit; end if;
   end loop;
   insert into public.profil (id, name) values (new.id, n) on conflict (id) do nothing;
   return new;
@@ -92,7 +97,7 @@ create trigger wi_profil_anlegen after insert on auth.users
 
 -- Profile für Nutzer anlegen, die es schon vor diesem Skript gab
 insert into public.profil (id, name)
-select u.id, 'Fan-' || substr(replace(u.id::text, '-', ''), 1, 10)
+select u.id, 'WoSo-Fan ' || substr(replace(u.id::text, '-', ''), 1, 10)
 from auth.users u
 where not exists (select 1 from public.profil p where p.id = u.id)
 on conflict do nothing;
@@ -443,7 +448,8 @@ create or replace function public.mein_profil() returns json
 language sql stable security definer set search_path = '' as $$
   select json_build_object('id', p.id, 'name', p.name, 'rolle', p.rolle, 'vertrauen', p.vertrauen,
                            'gesperrt_bis', p.gesperrt_bis, 'sperrgrund', p.sperrgrund,
-                           'anonym', public.ist_anonym())
+                           'anonym', public.ist_anonym(),
+                           'name_gewaehlt', p.name_gewaehlt, 'name_aenderung_frei', p.name_aenderungen < 1)
   from public.profil p where p.id = auth.uid()
 $$;
 
@@ -460,19 +466,34 @@ begin
   end if;
 end $$;
 
--- Namen ändern: nur mit echtem Konto (anonyme Nutzer behalten "Fan-xxxxx")
+-- Namen festlegen: beim ersten Kommentar frei (auch Platzhalter behalten), danach genau eine Änderung.
+-- Gilt für anonyme Profile und Konten gleich. Redaktion ohne Grenze.
 create or replace function public.name_aendern(neu text) returns text
 language plpgsql security definer set search_path = '' as $$
-declare n text := btrim(coalesce(neu, '')); f record;
+declare n text := regexp_replace(btrim(coalesce(neu, '')), '\s+', ' ', 'g'); f record; p public.profil;
 begin
   if auth.uid() is null then raise exception 'WI_LOGIN'; end if;
-  if public.ist_anonym() then raise exception 'WI_KONTO'; end if;
+  select * into p from public.profil where id = auth.uid();
+  if not found then raise exception 'WI_LOGIN'; end if;
+  if p.gesperrt_bis is not null and p.gesperrt_bis > now() then raise exception 'WI_GESPERRT'; end if;
+  if n = p.name then
+    update public.profil set name_gewaehlt = true where id = p.id;   -- Platzhalter behalten zählt als Wahl
+    return n;
+  end if;
+  if p.name_gewaehlt and p.name_aenderungen >= 1 and not public.ist_mod() then raise exception 'WI_NAME_FEST'; end if;
   if n !~ '^[A-Za-z0-9ÄÖÜäöüß][A-Za-z0-9ÄÖÜäöüß _.-]{2,23}$' then raise exception 'WI_NAME'; end if;
-  if lower(n) ~ '(wosoinsider|redaktion|admin|moderat)' and not public.ist_mod() then raise exception 'WI_NAME'; end if;
+  if not public.ist_mod() and (lower(n) ~ '(wosoinsider|woso.?inside|redaktion|admin|moderat|support|offiziell)' or lower(n) ~ '^woso.?fan') then
+    raise exception 'WI_NAME';
+  end if;
   select * into f from public.filter_treffer(n);
   if f.aktion is not null then raise exception 'WI_NAME'; end if;
-  if exists (select 1 from public.profil where lower(name) = lower(n) and id <> auth.uid()) then raise exception 'WI_NAME_VERGEBEN'; end if;
-  update public.profil set name = n where id = auth.uid();
+  if exists (select 1 from public.profil where lower(name) = lower(n) and id <> p.id) then raise exception 'WI_NAME_VERGEBEN'; end if;
+  update public.profil
+     set name = n,
+         name_aenderungen = case when p.name_gewaehlt then p.name_aenderungen + 1 else p.name_aenderungen end,
+         name_gewaehlt = true
+   where id = p.id;
+  perform public.protokoll('name', p.id::text, p.name || ' -> ' || n);
   return n;
 end $$;
 
@@ -615,8 +636,8 @@ commit;
 --   select cron.schedule('wi-aufraeumen', '17 3 * * *', 'select public.aufraeumen()');
 --
 -- Eigenes Gerät zum Redaktions-Profil machen (ID steht in der Tabelle profil,
--- dein Kommentar zeigt dir deinen Namen "Fan-xxxxx"):
---   update public.profil set rolle = 'admin', name = 'WOSOINSIDER Redaktion' where name = 'Fan-xxxxx';
+-- schreib einen Kommentar und nutze den Namen, den du dabei gewählt hast):
+--   update public.profil set rolle = 'admin', name = 'WOSOINSIDER Redaktion' where name = '<dein Name>';
 --
 -- Moderation im SQL Editor:
 --   select * from public.mod_warteschlange();
