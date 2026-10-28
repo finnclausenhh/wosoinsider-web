@@ -309,6 +309,8 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .weitere span{font-size:12px;color:var(--muted);font-weight:500}
 .nkw{background:var(--card);border-radius:14px;overflow:hidden}
 .nkw > .nk{border-radius:0}
+.um-h{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;border-top:1px solid var(--line);background:linear-gradient(rgba(47,91,255,.06),rgba(47,91,255,0));text-align:left;font-size:13px;color:inherit}
+.um-h .t{flex:1;min-width:0;font-weight:600}.um-h b{font-size:11px;color:var(--accent);white-space:nowrap}
 .um{border-top:1px solid var(--line);background:linear-gradient(rgba(47,91,255,.06),rgba(47,91,255,0));display:grid}
 .det .um{border:1px solid var(--line);border-radius:14px;background:var(--card)}
 .um-k{padding:12px 12px 2px;display:grid;gap:6px}
@@ -333,7 +335,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .uo:disabled{color:inherit;opacity:1;cursor:default}
 .ks{display:flex;gap:3px;margin-top:3px;align-items:center}
 .ks i{width:14px;height:6px;border-radius:2px;background:var(--line)}
-.ks i.b{background:var(--hell)}
+.um-leg i{background:var(--line)}.ks i.b,.um-leg i.b{background:transparent;box-shadow:inset 0 0 0 1.5px var(--hell)}.ks i.s,.um-leg i.s{background:var(--accent)}.ks i.e,.um-leg i.e{background:var(--hell)}
 .ks span{font-size:10px;color:var(--muted);margin-left:4px}
 .um-f{display:flex;justify-content:space-between;gap:8px;padding:2px 12px 12px;font-size:12px;color:var(--muted)}
 .um-w{margin:0 12px 12px;padding:10px;border-radius:10px;background:rgba(20,184,166,.12);font-size:13px;display:grid;gap:3px}
@@ -669,14 +671,41 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
   }
   // ---------------- Umfragen (umfragen.json, Stimmen in umfragen_stand.json, eigene Stimme lokal)
   const umfrageZu = mid => UM.find(u => u.meldung === mid);
+  const MIN_STIMMEN = 10;
   function umfrageAufloesung(u){
     if (!u.ende || dt(u.ende) > Date.now()) return null;
     const p = SP && alleSpiele().find(x => String(x.id) === String(u.partie));
-    const a = p && (p.heim_k === u.verein ? p.heim_aufstellung : p.gast_k === u.verein ? p.gast_aufstellung : null);
-    if (!a || a.typ !== "offiziell") return {offen: true};
-    const s = (a.startelf || []).filter(x => !u.position || x.p === u.position);
-    const tref = (u.optionen || []).find(o => o.nachname && s.some(x => String(x.voll || x.n).includes(o.nachname)));
-    return {richtig: tref ? tref.id : (u.optionen.find(o => !o.nachname) || {}).id, wer: s.map(x => x.voll || x.n).join(", ")};
+    const art = u.art || "startelf", O = u.optionen || [];
+    const seite = p && (p.heim_k === u.verein ? "heim" : p.gast_k === u.verein ? "gast" : null);
+    if (art === "startelf"){
+      const a = p && seite && p[seite + "_aufstellung"];
+      if (!a || a.typ !== "offiziell") return {offen: "Die Auflösung folgt mit der offiziellen Aufstellung."};
+      const s = (a.startelf || []).filter(x => !u.position || x.p === u.position), drin = o => o.nachname && s.some(x => String(x.voll || x.n).includes(o.nachname));
+      const tr = O.filter(drin);
+      let id;
+      if (tr.length > 1 && O.some(o => o.id === "beide")) id = "beide";
+      else if (tr.length) id = tr[0].id;
+      else id = (O.find(o => o.id === "keine") || O.find(o => !o.nachname) || {}).id;
+      const wer = u.position ? s.map(x => x.voll || x.n).join(", ") : tr.length ? tr.map(o => o.n).join(" und ") : "Keine von ihnen";
+      return {richtig: id, quelle: "Aufgelöst mit der offiziellen Aufstellung", text: `<b>${esc(wer)}</b> in der Startelf.`, label: "Stand in der Startelf"};
+    }
+    if (!p || p.status !== "beendet") return {offen: "Die Auflösung folgt nach Abpfiff."};
+    const tore = (p.tore || []).filter(t => t.art !== "Eigentor" && t.seite === seite);
+    if (art === "tore"){
+      const n = tore.filter(t => t.n === u.spielerin).length;
+      const o = O.find(o => n >= (o.von || 0) && (o.bis == null || n <= o.bis)) || {};
+      return {richtig: o.id, quelle: "Aufgelöst nach Abpfiff", text: `<b>${esc(u.spielerin)}</b> ${n ? `traf ${n === 1 ? "einmal" : n + "-mal"}` : "traf nicht"}.`, label: "Richtig"};
+    }
+    if (art === "scorer"){
+      const t = tore.some(t => t.n === u.spielerin), v = tore.some(t => t.vorlage === u.spielerin);
+      return {richtig: t ? "tor" : v ? "vorlage" : "nichts", quelle: "Aufgelöst nach Abpfiff", text: `<b>${esc(u.spielerin)}</b> ${t ? "traf" : v ? "bereitete ein Tor vor" : "blieb ohne Tor und Vorlage"}.`, label: "Richtig"};
+    }
+    if (art === "ergebnis"){
+      const e = (Array.isArray(p.ergebnis) ? p.ergebnis : String(p.ergebnis || "").match(/\d+/g) || []).map(Number);
+      if (e.length < 2) return {offen: "Die Auflösung folgt."};
+      return {richtig: e[0] > e[1] ? "heim" : e[0] < e[1] ? "gast" : "remis", quelle: "Aufgelöst nach Abpfiff", text: `Endstand <b>${e[0]}:${e[1]}</b>.`, label: "Richtig"};
+    }
+    return {offen: "Die Auflösung folgt."};
   }
   function umfrageBlock(u){
     const meine = STIMMEN[u.id], st = (UST[u.id] || {}).stimmen || {}, auf = umfrageAufloesung(u);
@@ -685,25 +714,25 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     // eigene Stimme einrechnen, solange der Zählstand älter ist als die Stimme
     if (meine && z[meine.o] != null && (!UST._stand || dt(UST._stand) < dt(meine.t))) z[meine.o]++;
     const ges = Object.values(z).reduce((a, b) => a + b, 0);
-    const pz = o => ges ? Math.round(z[o.id] / ges * 100) : 0;
+    const genug = ges >= MIN_STIMMEN, pz = o => ges ? Math.round(z[o.id] / ges * 100) : 0, zp = zeigt && genug;
     const bild = o => { const f = FOTOS[o.n] || {}, src = f.portrait || f.datei;
-      return o.logo ? `<span class="bi lg">${logo(o.logo, 30)}</span>` : src ? `<span class="bi" style="background:${KFARBE[u.verein] || "var(--soft)"}"><img src="${esc(src)}" alt="" loading="lazy"></span>` : `<span class="bi" style="background:var(--line)">?</span>`; };
+      return o.bild === false ? "" : o.logo ? `<span class="bi lg">${logo(o.logo, 30)}</span>` : src ? `<span class="bi" style="background:${KFARBE[u.verein] || "var(--soft)"}"><img src="${esc(src)}" alt="" loading="lazy"></span>` : `<span class="bi" style="background:var(--line)">?</span>`; };
     const opts = (u.optionen || []).map(o => { const mein = meine && meine.o === o.id, richtig = auf && auf.richtig === o.id;
       return `<button class="uo${mein ? " mein" : ""}${richtig ? " richtig" : ""}" data-uvote="${esc(u.id)}|${esc(o.id)}" ${zeigt ? "disabled" : ""}>
-        <span class="ubar" style="width:${zeigt ? pz(o) : 0}%"></span>${bild(o)}
-        <span class="tx"><b>${esc(o.n)}</b>${o.info ? `<small>${esc(o.info)}</small>` : ""}${o.kader ? `<span class="ks" aria-label="Kader der letzten 5 Spieltage">${[...String(o.kader)].map(c => `<i class="${c === "b" ? "b" : ""}"></i>`).join("")}<span>Sp. ${esc(u.kader_von)} bis ${Number(u.kader_von) + String(o.kader).length - 1}</span></span>` : ""}
-          ${mein ? '<span class="ck">Deine Stimme</span>' : ""}${richtig ? '<span class="ck" style="color:#22C55E">Stand in der Startelf</span>' : ""}</span>
-        ${zeigt ? `<span class="pz">${pz(o)} %</span>` : ""}</button>`; }).join("");
+        <span class="ubar" style="width:${zp ? pz(o) : 0}%"></span>${bild(o)}
+        <span class="tx"><b>${esc(o.n)}</b>${o.info ? `<small>${esc(o.info)}</small>` : ""}${o.kader ? `<span class="ks" aria-label="Kader der letzten 5 Spieltage">${[...String(o.kader)].map(c => `<i class="${"bse".includes(c) ? c : ""}"></i>`).join("")}<span>Sp. ${esc(u.kader_von)} bis ${Number(u.kader_von) + String(o.kader).length - 1}</span></span>` : ""}
+          ${mein ? '<span class="ck">Deine Stimme</span>' : ""}${richtig ? `<span class="ck" style="color:#22C55E">${esc(auf.label)}</span>` : ""}</span>
+        ${zp ? `<span class="pz">${pz(o)} %</span>` : ""}</button>`; }).join("");
     const e = u.einschaetzung, eo = e && (u.optionen || []).find(o => o.id === e.option);
     const richtigO = auf && (u.optionen || []).find(o => o.id === auf.richtig);
     return `<div class="um"><div class="um-k"><div class="z">${tag("UMFRAGE")}<span class="kap">${auf ? "beendet" : u.ende ? "bis Anpfiff " + esc(tagDatum(u.ende)) + " " + uhr(dt(u.ende)) : ""}</span></div>
       <h3>${esc(u.frage)}</h3>${u.sub ? `<div class="sub">${esc(u.sub)}</div>` : ""}</div>
-      ${(u.optionen || []).some(o => o.kader) ? '<div class="um-leg"><span><i style="background:var(--hell)"></i>auf der Bank</span><span><i style="background:var(--line)"></i>nicht im Kader</span></div>' : ""}
+      ${(() => { const k = (u.optionen || []).map(o => o.kader || "").join(""); if (!k) return ""; const l = [["s", "Startelf"], ["e", "eingewechselt"], ["b", "auf der Bank"]].filter(x => k.includes(x[0])).map(x => `<span><i class="${x[0]}"></i>${x[1]}</span>`); return `<div class="um-leg">${l.join("")}<span><i></i>nicht im Kader</span></div>`; })()}
       <div class="um-o">${opts}</div>
-      <div class="um-f"><span>${zeigt ? `${zahlDE(ges)} ${ges === 1 ? "Stimme" : "Stimmen"}` : "Tippen zum Abstimmen · Ergebnis danach"}</span><span>${zeigt && !auf && UST._stand ? "Stand " + esc(relativ(UST._stand)) : ""}</span></div>
+      <div class="um-f"><span>${zeigt ? (genug ? `${zahlDE(ges)} Stimmen` : ges ? `Noch wenige Stimmen (${zahlDE(ges)}) · Prozente ab ${MIN_STIMMEN}` : "Noch keine Stimmen") : "Tippen zum Abstimmen · Ergebnis danach"}</span><span>${zeigt && !auf && UST._stand ? "Stand " + esc(relativ(UST._stand)) : ""}</span></div>
       ${meine && !auf && eo ? `<div class="um-w"><span class="kap">Unsere Einschätzung</span><span>${stufeSym(e.stufe, 14)} <b>${esc(eo.nachname || eo.n)}</b> ${esc(STUFE[e.stufe] ? STUFE[e.stufe][2].toLowerCase() : "")}: ${esc(e.text)}</span></div>` : ""}
-      ${auf && auf.offen ? '<div class="um-a"><span class="kap">Abstimmung beendet</span><span>Die Auflösung folgt mit der offiziellen Aufstellung.</span></div>' : ""}
-      ${auf && !auf.offen && richtigO ? `<div class="um-a"><span class="kap">Aufgelöst mit der offiziellen Aufstellung</span><span><b>${esc(auf.wer)}</b> in der Startelf. ${ges ? pz(richtigO) + " % der Community lagen richtig" : "Keine Stimmen"}${eo ? (eo.id === richtigO.id ? ", unsere Einschätzung auch." : ", unsere Einschätzung nicht.") : "."}</span></div>` : ""}</div>`;
+      ${auf && auf.offen ? `<div class="um-a"><span class="kap">Abstimmung beendet</span><span>${esc(auf.offen)}</span></div>` : ""}
+      ${auf && !auf.offen && richtigO ? `<div class="um-a"><span class="kap">${auf.quelle}</span><span>${auf.text} ${genug ? pz(richtigO) + " % der Community lagen richtig" : ges ? "Zu wenige Stimmen für eine Quote" : "Keine Stimmen"}${eo ? (eo.id === richtigO.id ? ", unsere Einschätzung auch." : ", unsere Einschätzung nicht.") : "."}</span></div>` : ""}</div>`;
   }
   function list(){
     GAME = null; ARTIKEL = null;
@@ -719,7 +748,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       ? `<div class="hinw"><span>Alle Meldungen</span><button data-newsalle="0">Nur meine Vereine</button></div>`
       : !rest.length ? `<div class="leer" style="padding:28px 4px;display:grid;gap:10px;justify-items:center"><span>Keine Meldungen deiner Vereine in den letzten 14 Tagen.</span><button class="lk" data-newsalle="1">Alle zeigen</button></div>`
       : "";
-    rest.forEach(m => { if (A && dt(A.news_zeit) >= (dt(m.zeit) || 0)) { h += anaTeaser(A); A = null; } const u = m.typ !== "punkt" && umfrageZu(m.id); h += m.typ === "punkt" ? punktKarte(m) : u ? `<div class="nkw">${newsKarte(m)}${umfrageBlock(u)}</div>` : newsKarte(m); });
+    rest.forEach(m => { if (A && dt(A.news_zeit) >= (dt(m.zeit) || 0)) { h += anaTeaser(A); A = null; } const u = m.typ !== "punkt" && umfrageZu(m.id), uT = u && u.top ? u : null; h += m.typ === "punkt" ? punktKarte(m) : uT ? `<div class="nkw">${newsKarte(m)}${umfrageBlock(uT)}</div>` : u ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(u.frage)}</span><b>${STIMMEN[u.id] ? "abgestimmt" : "im Artikel"}</b></button></div>` : newsKarte(m); });
     if (A) h += anaTeaser(A);
     if (filter && rest.length) h += `<div class="hinw"><span>${alle.length - rest.length} weitere Meldungen anderer Vereine</span><button data-newsalle="1">Alle zeigen</button></div>`;
     $("#main").innerHTML = vereinsZeile() + `<div class="liste">${h}</div>`;
