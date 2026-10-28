@@ -1,6 +1,6 @@
 -- WOSOINSIDER: Namenssperre Spielerinnen (Kommentar-Namen)
 -- Erzeugt am 28.10.2026 aus fbl-daten/fotos.json (490 Namen).
--- Vollständige Namen dürfen nirgends im Kommentar-Namen stecken, Nachnamen nicht allein als Name.
+-- Vollständige Namen dürfen nirgends im Kommentar-Namen stecken, Einzelnamen und Nachnamen nicht allein als Name.
 -- Nach kommentare.sql ausführen. Bei Kaderänderungen neu erzeugen und erneut ausführen.
 insert into public.namenssperre (wort, art, info) values
   ('Achim Feifel', 'teil', 'Spielerin'),
@@ -9,7 +9,7 @@ insert into public.namenssperre (wort, art, info) values
   ('Ainhoa Alguacil', 'teil', 'Spielerin'),
   ('Akari Kurishima', 'teil', 'Spielerin'),
   ('Alan Niksic', 'teil', 'Spielerin'),
-  ('Alara', 'teil', 'Spielerin'),
+  ('Alara', 'exakt', 'Spielerin'),
   ('Alena Bienz', 'teil', 'Spielerin'),
   ('Alexander Ulbrich', 'teil', 'Spielerin'),
   ('Alexsandra Lobanova', 'teil', 'Spielerin'),
