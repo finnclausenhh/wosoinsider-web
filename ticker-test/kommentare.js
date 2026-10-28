@@ -80,7 +80,7 @@
     if (!S.beitrag) return Promise.resolve();
     var b = S.beitrag; S.laden = true;
     return sb.from("kommentar")
-      .select("id,beitrag,eltern,autor,text,status,grund,likes,angeheftet,erstellt,profil(name,rolle)")
+      .select("id,beitrag,eltern,autor,text,status,grund,likes,angeheftet,erstellt,profil:profil!kommentar_autor_fkey(name,rolle)")
       .eq("beitrag", b).order("erstellt", { ascending: false }).limit(500)
       .then(function (r) {
         if (b !== S.beitrag) return;
