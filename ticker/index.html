@@ -836,7 +836,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       <div class="dat">${esc(lang(m.zeit))}${SEL.size ? " · gefiltert auf deine Vereine" : ""}</div>
       ${(m.text || []).map(p => `<p style="font-size:16.5px">${esc(p)}</p>`).join("")}
       ${sek("Sicher aufstellen", m.sicher, "#2EB872")}${sek("Finger weg", m.finger_weg, "#E24A4A")}${sek("Günstiger Tipp", m.tipp, "#2F5BFF")}${sek("Achtung", m.achtung, "#E0962B")}
-      ${nichts && SEL.size ? '<p class="mu" style="font-size:14px">Für deine Vereine steht in dieser Ausgabe nichts. In Inside kannst du die Auswahl ändern.</p>' : ""}
+      ${nichts && SEL.size ? '<p class="mu" style="font-size:14px">Für deine Vereine steht in dieser Ausgabe nichts. Oben unter Meine Vereine kannst du die Auswahl ändern.</p>' : ""}
       ${kbBox(m.kickbase)}
       ${m.analyse_link ? '<button class="lk" style="font-weight:600;text-decoration:none;justify-self:start" data-tabgo="inside">Die Herleitung steht in Inside ›</button>' : ""}
       ${kiHinweis("Unsere Einschätzung auf Basis der Daten in Inside. Mit KI erstellt.")}`;
