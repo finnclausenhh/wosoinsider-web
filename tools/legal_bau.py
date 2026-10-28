@@ -2,7 +2,7 @@
 """Erzeugt die Rechtstexte für WOSOINSIDER aus einer Quelle:
 - legal.json für die iOS-App (Format: {key: {titel, bloecke:[{typ:h2|p|li, text}]}})
 - HTML-Bausteine für die Webversion (index.html, Objekt LEGAL)
-Stand: 27.10.2026 (Datenschutzerklärung nach Teil A des Claude Docs, ergänzt um GoatCounter)."""
+Stand: 28.10.2026 (Datenschutzerklärung nach Teil A des Claude Docs, ergänzt um GoatCounter und Umfragen)."""
 import json, re, sys
 
 MAIL = "redaktion@wosoinsider.de"
@@ -25,7 +25,7 @@ IMPRESSUM = [
     h2("Unabhängigkeit"),
     p("WOSOINSIDER ist ein unabhängiges Angebot. Es besteht keine Verbindung zu Kickbase, zum DFB, zur Google Pixel Frauen-Bundesliga oder zu den Vereinen. Genannte Marken und Namen gehören ihren jeweiligen Inhabern."),
     h2("Bild- und Datennachweise"),
-    li("Spielerinnenfotos: Wikimedia Commons unter freien Lizenzen (CC BY, CC BY-SA, CC0). Urheberin oder Urheber und Lizenz stehen im jeweiligen Artikel."),
+    li("Spielerinnenfotos: Wikimedia Commons unter freien Lizenzen (CC BY, CC BY-SA, CC0). Urheberin oder Urheber und Lizenz stehen im jeweiligen Artikel. Vereinsportraits der Spielerinnen und Funktionsteams mit Genehmigung der jeweiligen Vereine."),
     li("Vereinslogos: mit Genehmigung der jeweiligen Vereine."),
     li("Spielplan, Ergebnisse, Tore und offizielle Aufstellungen: Sportschau (ARD), verlinkt an der jeweiligen Partie."),
     li("Meldungen: zusammengefasst aus den im Artikel verlinkten Quellen."),
@@ -38,7 +38,7 @@ IMPRESSUM = [
 ]
 
 DATENSCHUTZ = [
-    p("**Kurz gesagt:** WOSOINSIDER braucht kein Konto, setzt keine Cookies und zeigt keine Werbung. Die App enthält keine Analyse. Webseite und Webversion zählen Aufrufe anonym mit GoatCounter, ohne Cookies und ohne Speicherung von IP-Adressen (Abschnitt 6). Personenbezogene Daten fallen sonst nur dort an, wo Technik es zwingend verlangt (Abruf der Inhalte) oder wenn Sie uns schreiben."),
+    p("**Kurz gesagt:** WOSOINSIDER braucht kein Konto, setzt keine Cookies und zeigt keine Werbung. Die App enthält keine Analyse. Webseite und Webversion zählen Aufrufe anonym mit GoatCounter, ohne Cookies und ohne Speicherung von IP-Adressen. Stimmen Sie in einer Umfrage ab, wird nur die gewählte Antwort gezählt, in App und Web (Abschnitt 6). Personenbezogene Daten fallen sonst nur dort an, wo Technik es zwingend verlangt (Abruf der Inhalte) oder wenn Sie uns schreiben."),
     h2("1. Geltungsbereich"),
     p("Diese Erklärung gilt für die iOS-App WOSOINSIDER, die Webseite wosoinsider.de, die Webversion des Newstickers und den E-Mail-Kontakt."),
     h2("2. Verantwortlicher"),
@@ -47,18 +47,18 @@ DATENSCHUTZ = [
     p("Eine Datenschutzbeauftragte oder einen Datenschutzbeauftragten müssen wir nicht benennen."),
     h2("3. Die App"),
     p("Die App lädt ihre Inhalte (Meldungen, Spielplan, Inside, Fotos, Logos) als Dateien von einem Server bei GitHub und speichert sie für schnelleres Laden im Zwischenspeicher Ihres Geräts. Beim Abruf übermittelt Ihr Gerät technisch notwendig seine IP-Adresse, Datum und Uhrzeit sowie die abgerufene Datei. Was GitHub damit macht, steht in Abschnitt 5. Wir selbst erhalten diese Daten nicht."),
-    p("Die App enthält keine Analyse-, Werbe- oder Tracking-Werkzeuge und keine Software von Drittanbietern. Sie fragt keine Berechtigungen ab, etwa für Standort, Kontakte, Fotos oder Kamera. Links zu Quellen, Lizenzen oder Instagram öffnet sie erst, wenn Sie darauf tippen (siehe Abschnitt 10). Rechtsgrundlage für den Abruf ist unser berechtigtes Interesse, Ihnen die Inhalte auszuliefern (Art. 6 Abs. 1 lit. f DSGVO)."),
+    p("Die App enthält keine Analyse-, Werbe- oder Tracking-Werkzeuge und keine Software von Drittanbietern. Stimmen Sie in einer Umfrage ab, sendet die App nur die gewählte Antwort zur Zählung an GoatCounter (Abschnitt 6). Sie fragt keine Berechtigungen ab, etwa für Standort, Kontakte, Fotos oder Kamera. Links zu Quellen, Lizenzen oder Instagram öffnet sie erst, wenn Sie darauf tippen (siehe Abschnitt 10). Rechtsgrundlage für den Abruf ist unser berechtigtes Interesse, Ihnen die Inhalte auszuliefern (Art. 6 Abs. 1 lit. f DSGVO)."),
     p("Push-Mitteilungen bietet die App derzeit nicht an. Kommen sie dazu, ergänzen wir diese Erklärung vorher."),
     h2("4. Speicherung auf Ihrem Gerät"),
-    p("Ihre Vereinsauswahl speichern App und Webversion nur lokal auf Ihrem Gerät (App: Einstellungen der App, Webversion: localStorage des Browsers). Sie wird nicht an uns übertragen. Diese Speicherung ist für die von Ihnen gewünschte Funktion unbedingt erforderlich und braucht daher keine Einwilligung (§ 25 Abs. 2 Nr. 2 TDDDG). Sie löschen sie, indem Sie die Auswahl zurücksetzen, die App löschen oder die Browserdaten entfernen. Es werden keine Cookies gesetzt."),
+    p("Ihre Vereinsauswahl und Ihre Stimmen in Umfragen speichern App und Webversion lokal auf Ihrem Gerät (App: Einstellungen der App, Webversion: localStorage des Browsers), damit Sie Ihre Auswahl behalten und jede Umfrage nur einmal beantworten. Die Vereinsauswahl wird nicht übertragen; wie eine Stimme gezählt wird, steht in Abschnitt 6. Diese Speicherung ist für die von Ihnen gewünschte Funktion unbedingt erforderlich und braucht daher keine Einwilligung (§ 25 Abs. 2 Nr. 2 TDDDG). Sie löschen sie, indem Sie die Auswahl zurücksetzen, die App löschen oder die Browserdaten entfernen. Es werden keine Cookies gesetzt."),
     h2("5. Webseite und Datenabruf über GitHub Pages"),
     p("Die Webseite wosoinsider.de und die Dateien für die App liegen bei GitHub Pages, einem Dienst der GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA. Beim Aufruf verarbeitet GitHub technisch notwendige Verbindungsdaten: IP-Adresse, Datum und Uhrzeit, abgerufene Datei, Browser oder App-Kennung, Betriebssystem und gegebenenfalls die zuvor besuchte Seite. Das dient der sicheren und stabilen Auslieferung (Art. 6 Abs. 1 lit. f DSGVO). Wie lange GitHub diese Daten speichert, legt GitHub selbst fest. Wir erhalten keine Logfiles und können keine Nutzerinnen oder Nutzer identifizieren."),
     p("GitHub verarbeitet Daten auch in den USA. GitHub ist nach dem EU-U.S. Data Privacy Framework zertifiziert, für das ein Angemessenheitsbeschluss der EU-Kommission besteht (Art. 45 DSGVO). Weitere Informationen: [Datenschutzerklärung von GitHub](https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement)."),
     p("Die Schriften werden zusammen mit der Seite ausgeliefert. Es besteht keine Verbindung zu Google Fonts oder anderen Schriftanbietern."),
-    h2("6. Reichweitenmessung auf der Webseite (GoatCounter)"),
-    p("Die Webseite wosoinsider.de und die Webversion des Newstickers zählen Seitenaufrufe und das Öffnen von Meldungen, Spielen und Reitern mit GoatCounter. Anbieter ist Martin Tournoij, Irland ([goatcounter.com](https://www.goatcounter.com)). Dabei überträgt Ihr Browser die aufgerufene Seite oder das geöffnete Element, gegebenenfalls die zuvor besuchte Seite und Kampagnen-Angaben aus der Adresse (etwa „utm_source=instagram“), die Browser- und Betriebssystemkennung sowie technisch bedingt Ihre IP-Adresse."),
-    p("GoatCounter speichert die IP-Adresse nicht. Daraus wird nur das Land abgeleitet. Zusammen mit der Browserkennung dient sie höchstens 8 Stunden im Arbeitsspeicher dazu, wiederholte Aufrufe nicht doppelt zu zählen. Gespeichert werden nur zusammengefasste Zahlen, mit denen sich keine Person erkennen lässt. Es werden keine Cookies gesetzt, kein Skript eines Drittanbieters geladen und keine Informationen auf Ihrem Gerät gespeichert oder ausgelesen. Die Server betreibt die Hetzner Online GmbH in Deutschland und Finnland."),
-    p("Zweck ist zu erfahren, wie viele Menschen das Angebot nutzen und welche Themen, Spielerinnen und Vereine gefragt sind. Rechtsgrundlage ist unser berechtigtes Interesse an dieser Auswertung (Art. 6 Abs. 1 lit. f DSGVO). Sie können jederzeit widersprechen (Abschnitt 12), zum Beispiel per E-Mail; technisch verhindern Sie die Zählung mit einem Inhaltsblocker. Die App nutzt GoatCounter nicht. Weitere Informationen: [Datenschutzerklärung von GoatCounter](https://www.goatcounter.com/help/privacy)."),
+    h2("6. Reichweitenmessung und Umfragen (GoatCounter)"),
+    p("Die Webseite wosoinsider.de und die Webversion des Newstickers zählen Seitenaufrufe und das Öffnen von Meldungen, Spielen und Reitern sowie Stimmen in Umfragen (nur die gewählte Antwort) mit GoatCounter. Die App überträgt an GoatCounter ausschließlich Stimmen in Umfragen, keine Aufrufe. Anbieter ist Martin Tournoij, Irland ([goatcounter.com](https://www.goatcounter.com)). Dabei überträgt Ihr Browser oder die App die aufgerufene Seite, das geöffnete Element oder die gewählte Antwort, gegebenenfalls die zuvor besuchte Seite und Kampagnen-Angaben aus der Adresse (etwa „utm_source=instagram“), die Browser- und Betriebssystemkennung sowie technisch bedingt Ihre IP-Adresse."),
+    p("GoatCounter speichert die IP-Adresse nicht. Daraus wird nur das Land abgeleitet. Zusammen mit der Browserkennung dient sie höchstens 8 Stunden im Arbeitsspeicher dazu, wiederholte Aufrufe nicht doppelt zu zählen. Gespeichert werden nur zusammengefasste Zahlen, mit denen sich keine Person erkennen lässt. GoatCounter setzt keine Cookies, es wird kein Skript eines Drittanbieters geladen, und GoatCounter speichert oder liest keine Informationen auf Ihrem Gerät. Die Server betreibt die Hetzner Online GmbH in Deutschland und Finnland."),
+    p("Zweck ist zu erfahren, wie viele Menschen das Angebot nutzen und welche Themen, Spielerinnen und Vereine gefragt sind, sowie die Ergebnisse von Umfragen anzuzeigen. Rechtsgrundlage ist unser berechtigtes Interesse an dieser Auswertung (Art. 6 Abs. 1 lit. f DSGVO). Sie können jederzeit widersprechen (Abschnitt 12), zum Beispiel per E-Mail; technisch verhindern Sie die Zählung mit einem Inhaltsblocker. Weitere Informationen: [Datenschutzerklärung von GoatCounter](https://www.goatcounter.com/help/privacy)."),
     h2("7. Keine Profile, keine automatisierten Entscheidungen"),
     p("Wir bilden keine Nutzerprofile und verkaufen oder teilen keine Daten. Eine automatisierte Entscheidungsfindung nach Art. 22 DSGVO findet nicht statt."),
     h2("8. App Store"),
