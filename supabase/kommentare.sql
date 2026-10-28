@@ -213,7 +213,7 @@ create table if not exists public.kommentar (
   beitrag    text not null check (char_length(beitrag) between 1 and 120),  -- id der Meldung aus news.json
   autor      uuid not null default auth.uid() references public.profil(id) on delete cascade,
   eltern     uuid references public.kommentar(id) on delete cascade,        -- Antwort auf (nur eine Ebene)
-  text       text not null check (char_length(text) between 1 and 1000),
+  text       text not null check (char_length(text) between 1 and 500),
   status     text not null default 'sichtbar'
              check (status in ('sichtbar', 'pruefung', 'ausgeblendet', 'geloescht')),
   grund      text,          -- Begründung bei pruefung/ausgeblendet, sieht die Autorin/der Autor
@@ -714,3 +714,7 @@ commit;
 --   select public.nutzer_sperren('<nutzer-id>', null, 'Spam');                      -- dauerhaft
 --   update public.einstellung set wert = 'nein' where schluessel = 'kommentare_an'; -- Notschalter
 --   insert into public.filterwort (wort, aktion) values ('beispiel', 'blocken');
+
+-- 28.10.2026: Höchstlänge 1000 -> 500 Zeichen (für bestehende Tabelle)
+alter table kommentar drop constraint if exists kommentar_text_check;
+alter table kommentar add constraint kommentar_text_check check (char_length(text) between 1 and 500) not valid;

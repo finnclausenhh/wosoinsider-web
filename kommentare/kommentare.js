@@ -12,7 +12,7 @@
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: "woso-konto" }
   }) : null;
 
-  var MAX = 1000, SEITE = 20;
+  var MAX = 500, SEITE = 20;
   var S = { beitrag: null, liste: [], likes: {}, ich: null, sort: "neu", zeige: SEITE, antwort: null,
             melden: null, fehler: "", fehlerAn: null, sendet: false, offenRegeln: false, laden: false, geladen: false };
   var ENTWURF = {};
@@ -132,6 +132,8 @@
   function formular(eltern) {
     var key = S.beitrag + "|" + (eltern || ""), wert = ENTWURF[key] || "";
     var fehlerHier = S.fehler && S.fehlerAn === (eltern || "haupt");
+    if (!eltern && !S.offen && !wert && !fehlerHier)
+      return '<button type="button" class="wk-zu" data-kaktion="schreiben">Kommentar schreiben …</button>';
     var wer = nameFehlt() ? "" : "Du schreibst als <b>" + esc(S.ich.name) + "</b>" +
       (S.ich.name_aenderung_frei && !eltern ? ' · <button type="button" class="wk-link wk-klein" data-kaktion="name-aendern">ändern</button>' : "") + " · ";
     return '<form class="wk-form' + (eltern ? " wk-antw" : "") + '" data-kform="' + esc(eltern || "") + '">' +
@@ -140,7 +142,7 @@
       '<textarea id="wk-t-' + esc(eltern || "h") + '" maxlength="' + MAX + '" rows="' + (eltern ? 2 : 3) + '" placeholder="' +
         (eltern ? "Antworten …" : "Was meinst du?") + '">' + esc(wert) + "</textarea>" +
       '<div class="wk-fz"><span class="wk-mu">' + wer + '<span data-kzahl>' + wert.length + "</span>/" + MAX + "</span>" +
-      (eltern ? '<button type="button" class="wk-link" data-kaktion="abbrechen">Abbrechen</button>' : "") +
+      '<button type="button" class="wk-link" data-kaktion="' + (eltern ? "abbrechen" : "zuklappen") + '">Abbrechen</button>' +
       '<button type="submit" class="wk-senden"' + (S.sendet ? " disabled" : "") + ">" + (S.sendet ? "Sendet …" : "Senden") + "</button></div>" +
       (fehlerHier ? '<p class="wk-fehler" role="alert">' + esc(S.fehler) + "</p>" : "") +
       "</form>";
@@ -271,7 +273,7 @@
         });
       })
       .then(function () { return sb.from("kommentar").insert({ beitrag: S.beitrag, text: text, eltern: eltern }); })
-      .then(function (r) { if (r.error) throw r.error; ENTWURF[key] = ""; if (eltern) S.antwort = null; })
+      .then(function (r) { if (r.error) throw r.error; ENTWURF[key] = ""; if (eltern) S.antwort = null; else S.offen = false; })
       .catch(function (err) { S.fehler = fehlertext(err); S.fehlerAn = eltern || "haupt"; })
       .then(function () { S.sendet = false; return laden(); });
   });
@@ -285,6 +287,8 @@
     if (a === "antworten") { S.antwort = S.antwort === id ? null : id; S.melden = null; zeichnen();
       var t = document.getElementById("wk-t-" + id); if (t) t.focus(); return; }
     if (a === "abbrechen") { S.antwort = null; zeichnen(); return; }
+    if (a === "schreiben") { S.offen = true; zeichnen(); var t = document.getElementById("wk-t-h"); if (t) t.focus(); return; }
+    if (a === "zuklappen") { S.offen = false; S.fehler = ""; ENTWURF[S.beitrag + "|"] = ""; zeichnen(); return; }
     if (a === "melden") { S.melden = S.melden === id ? null : id; zeichnen(); return; }
     if (a === "melden-zu") { S.melden = null; zeichnen(); return; }
     if (a === "meldegrund") {
@@ -343,7 +347,7 @@
     if (!AKTIV) return;
     var box = el(); if (!box) return;
     if (S.beitrag !== beitrag) {
-      S.beitrag = beitrag; S.liste = []; S.likes = {}; S.zeige = SEITE; S.antwort = null; S.melden = null;
+      S.beitrag = beitrag; S.liste = []; S.likes = {}; S.zeige = SEITE; S.antwort = null; S.melden = null; S.offen = false;
       S.fehler = ""; S.fehlerAn = null; S.geladen = false; S.offenRegeln = false;
     }
     zeichnen(); laden();
@@ -377,6 +381,7 @@
     ".wk-form textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}" +
     ".wk-antw textarea{min-height:48px}" +
     ".wk-fz{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}.wk-fz .wk-mu{margin-right:auto}" +
+    ".wk-zu{display:block;width:100%;text-align:left;background:var(--card);color:var(--muted);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:44px;font:15px/1.4 var(--f-body);cursor:text}" +
     ".wk-senden{background:var(--accent);color:#fff;font-weight:600;font-size:14px;border-radius:10px;padding:8px 16px;min-height:36px}" +
     ".wk-senden[disabled]{opacity:.6}" +
     ".wk-mu{color:var(--muted);font-size:12.5px}" +
