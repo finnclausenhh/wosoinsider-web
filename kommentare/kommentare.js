@@ -80,7 +80,7 @@
     if (!S.beitrag) return Promise.resolve();
     var b = S.beitrag; S.laden = true;
     return sb.from("kommentar")
-      .select("id,beitrag,eltern,autor,text,status,grund,likes,angeheftet,erstellt,profil:profil!kommentar_autor_fkey(name,rolle)")
+      .select("id,beitrag,eltern,autor,text,status,grund,likes,angeheftet,erstellt,profil:profil!kommentar_autor_fkey(name,rolle,verifiziert)")
       .eq("beitrag", b).order("erstellt", { ascending: false }).limit(500)
       .then(function (r) {
         if (b !== S.beitrag) return;
@@ -101,9 +101,13 @@
   }
 
   // ---------- Darstellung ----------
+  // Blauer Haken: Redaktion (Admin/Moderator) und verifizierte Profile
+  var HAKEN = '<svg class="wk-haken" viewBox="0 0 24 24" role="img" aria-label="Verifiziert"><title>Verifiziert</title>' +
+    '<path fill="#3B8BFF" d="M12 1.5l2.6 1.9 3.2-.2 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.2L12 22.5l-2.6-1.9-3.2.2-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.2z"/>' +
+    '<path d="M7.6 12.3l3 3 5.8-6" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   function badge(k) {
-    var r = k.profil && k.profil.rolle;
-    return r === "admin" || r === "moderator" ? '<span class="wk-red">Redaktion</span>' : "";
+    var p = k.profil || {};
+    return p.verifiziert || p.rolle === "admin" || p.rolle === "moderator" ? HAKEN : "";
   }
   function nameFehlt() { return !S.ich || !S.ich.name_gewaehlt; }
   function nameFeld(eltern) {
@@ -146,7 +150,7 @@
     var nichtOeffentlich = k.status === "pruefung" || k.status === "ausgeblendet";
     var h = '<div class="wk-k' + (istAntwort ? " wk-sub" : "") + (nichtOeffentlich ? " wk-verborgen" : "") + '">' +
       (k.angeheftet && !istAntwort ? '<div class="wk-pin">Angeheftet</div>' : "") +
-      '<div class="wk-kopf"><b>' + esc(k.profil ? k.profil.name : "Fan") + "</b>" + badge(k) +
+      '<div class="wk-kopf"><b class="wk-name-z">' + esc(k.profil ? k.profil.name : "Fan") + badge(k) + "</b>" +
       '<span class="wk-mu">' + vor(k.erstellt) + "</span></div>";
     if (nichtOeffentlich) {
       h += '<p class="wk-hinweis">' + (eigen ? "Nur für dich sichtbar. " : "Nicht öffentlich. ") + esc(k.grund || "") + "</p>";
@@ -384,7 +388,7 @@
     ".wk-k{display:grid;gap:4px}.wk-sub{margin-left:14px;padding-left:10px;border-left:2px solid var(--line)}" +
     ".wk-verborgen{opacity:.75}" +
     ".wk-kopf{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.wk-kopf b{font-size:13.5px}" +
-    ".wk-red{font:700 10px var(--f-mono);letter-spacing:.6px;text-transform:uppercase;background:var(--accent);color:#fff;border-radius:99px;padding:2px 7px}" +
+    ".wk-name-z{display:inline-flex;align-items:center;gap:4px}.wk-haken{width:15px;height:15px;flex:none}" +
     ".wk-text{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}" +
     ".wk-hinweis{margin:0;font-size:12.5px;color:var(--frag)}" +
     ".wk-akt{display:flex;gap:14px;flex-wrap:wrap}" +

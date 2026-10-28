@@ -39,6 +39,14 @@ def legal_ersetzen(s, html):
         assert n == 1, k
     return s
 
+# Kommentare (Supabase): Skripte liegen in /kommentare/ auf wosoinsider.de, Version gegen Browser-Cache hochzählen.
+KOMMENTARE_V = "4"
+def kommentare():
+    v = KOMMENTARE_V
+    return (f'<script src="https://wosoinsider.de/kommentare/supabase.js?v=2.118.0"></script>\n'
+            f'<script src="https://wosoinsider.de/kommentare/config.js?v={v}"></script>\n'
+            f'<script src="https://wosoinsider.de/kommentare/kommentare.js?v={v}"></script>\n')
+
 def main(src, out, legal=None):
     s = open(src, encoding="utf8").read()
     if legal:
@@ -49,6 +57,8 @@ def main(src, out, legal=None):
     s = s[:i] + HEAD + s[i:]
     j = s.index("</head>")
     s = s[:j] + zaehler() + s[j:]
+    k = s.rindex("</body>")
+    s = s[:k] + kommentare() + s[k:]
     # Basis-Prüfungen
     assert s.count("<base ") == 1
     assert "url(fonts/" not in s
@@ -56,6 +66,7 @@ def main(src, out, legal=None):
         assert f'"{f}"' in s, f
     assert "—" not in s
     assert s.count("goatcounter.com/count") == 1
+    assert s.count("kommentare/kommentare.js") == 1 and 'id="kom"' in s
     open(out, "w", encoding="utf8").write(s)
     print("ok", len(s))
 
