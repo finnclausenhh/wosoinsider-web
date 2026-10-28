@@ -290,8 +290,23 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .wps{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px}
 .wps::-webkit-scrollbar{display:none}
 .wp{flex:none;width:42px;height:42px;border-radius:50%;background:var(--card);display:grid;place-items:center;border:2px solid transparent}
-.wp.an{background:rgba(47,91,255,.25);border-color:var(--accent)}
-.wps.teil .wp:not(.an){opacity:.45}
+.wp img{filter:grayscale(1);opacity:.55;transition:filter .15s,opacity .15s}
+.wp.an{background:color-mix(in srgb,var(--vc) 22%,var(--card));border-color:var(--vc)}
+.wp.an img{filter:none;opacity:1}
+.vz{display:grid;gap:8px;margin:2px 0 10px}
+.vz-k{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:6px 10px;border-radius:10px;background:var(--card);font-size:13px}
+.vz-k .l{font-size:10.5px;font-weight:800;color:var(--muted);letter-spacing:.3px;white-space:nowrap}
+.vz-k .w{flex:1;min-width:0;display:flex;gap:3px;align-items:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:600}
+.vz-k .a{font-size:12px;font-weight:600;color:var(--accent);white-space:nowrap}
+.vz-o{display:grid;gap:8px;background:var(--card);border-radius:12px;padding:10px}
+.vz-o .filt-h .l{font-size:11px;font-weight:800;color:var(--muted)}
+.hinw{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:0 2px}
+.hinw button{color:var(--accent);font-weight:600;font-size:12px;padding:8px 0}
+.pr.mein{box-shadow:inset 3px 0 0 var(--vc)}
+.belh.klein{font-size:10.5px;color:var(--muted)}
+.belh.klein .kap{color:var(--muted)}
+.weitere{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;background:var(--card);font-size:14px;font-weight:600}
+.weitere span{font-size:12px;color:var(--muted);font-weight:500}
 .phl{display:block;width:100%;text-align:left;font-size:14px;padding:12px;border-radius:12px;background:rgba(47,91,255,.1);border:1px solid var(--accent)}
 .phl b{color:var(--accent)}
 .hero{background:var(--card);border-radius:14px;padding:16px;display:grid;gap:12px}
@@ -488,6 +503,9 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
   const SIL = '<svg class="sil" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="30" r="22"/><path d="M4 100c0-26 20-44 46-44s46 18 46 44z"/></svg>';
   const logo = (k, g) => k ? `<img class="lg" src="logos/${esc(k)}.png" alt="" style="width:${g}px;height:${g}px" onerror="this.style.visibility='hidden'">` : `<span style="width:${g}px;height:${g}px;display:inline-block"></span>`;
   const kname = k => KNAME[k] || k || "";
+  // Ringfarbe: Vereinsfarbe, bei sehr dunklen Farben (Frankfurt, Freiburg) hell, damit sie auf dem dunklen Grund sichtbar bleibt
+  const ring = k => { const c = KFARBE[k] || "#2F5BFF", n = parseInt(c.slice(1), 16), l = (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255));
+    return l < 60 ? "#F4F5F7" : c; };
 
   const TAGF = {TOP:["#2F5BFF","#fff"], VERLETZUNG:["#E24A4A","#fff"], SPERRE:["#9B6BE8","#fff"], "RÜCKKEHR":["#2EB872","#fff"],
     INSIDER:["#F4F5F7","#0E1726"], ANALYSE:["#F4F5F7","#0E1726"], UPDATE:["#F4F5F7","#0E1726"], PUNKT:["#2F5BFF","#fff"], "AUF DEN PUNKT":["#2F5BFF","#fff"],
@@ -534,7 +552,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
   let VIEW = "meldungen", MD = null, GAME = null, TIMER = null, SCROLL = 0, BACK = null;
   let TOREOFFEN = false, CHIPSEL = {heim:null, gast:null};
   let FDIR = "up", FIDX = 0, IMD = null, ALLCAL = false, KALINFO = null, MXINFO = null;
-  let SEL = new Set();
+  let SEL = new Set(), VZOFFEN = false, NEWSALLE = false, WEITERE = false, STDALLE = false;
   try { SEL = new Set(JSON.parse(localStorage.getItem("woso-vereine") || "[]")); } catch(e) {}
   const saveSel = () => { try { localStorage.setItem("woso-vereine", JSON.stringify([...SEL])); } catch(e) {} };
   const zeigen = (...ks) => !SEL.size || ks.some(k => k && SEL.has(k));
@@ -605,17 +623,33 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       <div class="z2"><h3>${esc(A.titel)}</h3>${A.verein ? logo(A.verein, 44) : ""}</div></div>
       <div class="ana-b">${unten}<span class="go">Analyse lesen ›</span></div></button>`;
   }
+  // Meldung gehört zu meinen Vereinen: eigener Verein, Gegner bei Aufstellungen, Liga-Meldungen (ohne Verein oder Spielansetzung) immer
+  function meineMeldung(m){
+    if (m.typ === "punkt") return true;
+    const k = KURZ[m.verein];
+    // Aufstellungen tragen pos "Spielansetzung", deshalb zuerst prüfen: zeigen, wenn einer der beiden Vereine gewählt ist
+    if (m.aufstellung) return SEL.has(k) || SEL.has(KURZ[m.aufstellung.gegner]);
+    if (!k || m.pos === "Spielansetzung") return true;
+    return SEL.has(k);
+  }
   function list(){
     GAME = null;
     const now = Date.now();
     const fest = N.filter(angeheftet).sort((a, b) => dt(a.pin_bis) - dt(b.pin_bis));
-    const rest = N.filter(m => !fest.includes(m)).sort((a, b) => (dt(b.zeit) || 0) - (dt(a.zeit) || 0));
+    const alle = N.filter(m => !fest.includes(m)).sort((a, b) => (dt(b.zeit) || 0) - (dt(a.zeit) || 0));
+    const filter = SEL.size && !NEWSALLE;
+    const rest = filter ? alle.filter(meineMeldung) : alle;
     let A = IN && IN.analyse && IN.analyse.news_zeit && dt(IN.analyse.news_zeit) <= now ? IN.analyse : null;
-    if (!fest.length && !rest.length){ $("#main").innerHTML = '<p class="leer">Noch keine Meldungen.</p>'; return; }
+    if (!fest.length && !alle.length){ $("#main").innerHTML = vereinsZeile() + '<p class="leer">Noch keine Meldungen.</p>'; return; }
     let h = fest.map(punktKarte).join("");
+    if (SEL.size) h += NEWSALLE
+      ? `<div class="hinw"><span>Alle Meldungen</span><button data-newsalle="0">Nur meine Vereine</button></div>`
+      : !rest.length ? `<div class="leer" style="padding:28px 4px;display:grid;gap:10px;justify-items:center"><span>Keine Meldungen deiner Vereine in den letzten 14 Tagen.</span><button class="lk" data-newsalle="1">Alle zeigen</button></div>`
+      : "";
     rest.forEach(m => { if (A && dt(A.news_zeit) >= (dt(m.zeit) || 0)) { h += anaTeaser(A); A = null; } h += m.typ === "punkt" ? punktKarte(m) : newsKarte(m); });
     if (A) h += anaTeaser(A);
-    $("#main").innerHTML = `<div class="liste">${h}</div>`;
+    if (filter && rest.length) h += `<div class="hinw"><span>${alle.length - rest.length} weitere Meldungen anderer Vereine</span><button data-newsalle="1">Alle zeigen</button></div>`;
+    $("#main").innerHTML = vereinsZeile() + `<div class="liste">${h}</div>`;
   }
 
   // ---------------- Artikel
@@ -700,11 +734,12 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     return `<span class="mid"><span class="k">${uhr(dt(p.anstoss))}</span><small>Uhr</small></span>`;
   }
   const belSeiten = p => p.status !== "beendet" && p.belastung ? [["heim", p.heim], ["gast", p.gast]].filter(([k]) => p.belastung[k]).map(([k, n]) => [n, p.belastung[k]]) : [];
-  function partieZeile(p){
-    const bs = belSeiten(p);
-    return `<button class="pr" data-game="${esc(p.id)}"><div class="pr-z">
+  const meinK = p => SEL.has(p.heim_k) ? p.heim_k : SEL.has(p.gast_k) ? p.gast_k : null;
+  function partieZeile(p, mitTag){
+    const bs = belSeiten(p), mk = meinK(p), klein = SEL.size && !mk;
+    return `<button class="pr${mk ? " mein" : ""}" ${mk ? `style="--vc:${ring(mk)}" ` : ""}data-game="${esc(p.id)}">${mitTag ? `<div class="dat" style="font-size:11px">${esc(terminiert(p) ? wtLang(p.anstoss) : "Termin offen")}</div>` : ""}<div class="pr-z">
       <span class="pr-t h"><span>${esc(p.heim)}</span>${logo(p.heim_k, 30)}</span>${mitte(p)}<span class="pr-t">${logo(p.gast_k, 30)}<span>${esc(p.gast)}</span></span></div>
-      ${bs.length ? `<div class="belh"><span class="kap">ENGLISCHE WOCHE</span>${bs.map(([n, b]) => `<span><b>${esc(n)}</b> ${esc(b.text)}</span>`).join("")}</div>` : ""}</button>`;
+      ${bs.length ? (klein ? `<div class="belh klein"><span class="kap">ENGLISCHE WOCHE</span></div>` : `<div class="belh"><span class="kap">ENGLISCHE WOCHE</span>${bs.map(([n, b]) => `<span><b>${esc(n)}</b> ${esc(b.text)}</span>`).join("")}</div>`) : ""}</button>`;
   }
   const alleSpiele = () => { const g = new Set(); return (SP.spieltage || []).flatMap(t => t.partien.concat(t.nachholspiele || [])).filter(p => !g.has(p.id) && g.add(p.id)); };
   function zeitraum(t){
@@ -719,17 +754,20 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     if (!tage.length){ $("#main").innerHTML = '<p class="leer">Kein Spielplan vorhanden.</p>'; return; }
     if (!tage.some(t => t.nr === MD)) MD = SP.aktuell;
     const i = tage.findIndex(x => x.nr === MD), t = tage[i];
-    const gruppen = [];
-    t.partien.slice().sort((a, b) => (dt(a.anstoss) || Infinity) - (dt(b.anstoss) || Infinity)).forEach(p => {
+    const gruppen = [], sortiertP = t.partien.slice().sort((a, b) => (dt(a.anstoss) || Infinity) - (dt(b.anstoss) || Infinity));
+    const meine = SEL.size ? sortiertP.filter(meinK) : [], andere = SEL.size ? sortiertP.filter(p => !meinK(p)) : sortiertP;
+    andere.forEach(p => {
       const ti = terminiert(p) ? wtLang(p.anstoss) : "Termin offen"; const g = gruppen.find(x => x.t === ti); g ? g.ps.push(p) : gruppen.push({t: ti, ps: [p]}); });
     const offen = t.partien.some(p => !terminiert(p) && p.status !== "beendet");
-    const nach = t.nachholspiele || [];
-    $("#main").innerHTML = `<div class="liste" id="sp" style="gap:8px">
+    const nachAlle = t.nachholspiele || [], nach = SEL.size && !WEITERE ? nachAlle.filter(meinK) : nachAlle;
+    $("#main").innerHTML = vereinsZeile() + `<div class="liste" id="sp" style="gap:8px">
       <div class="mdnav"><button class="arr" data-step="-1" aria-label="Vorheriger Spieltag" ${i <= 0 ? "disabled" : ""}>${svg(P.links)}</button>
         <div class="mdlbl"><h1 class="disp">${t.nr}. Spieltag</h1><span>${esc(zeitraum(t))}</span>${t.nr !== SP.aktuell && tage.some(x => x.nr === SP.aktuell) ? `<button data-md="${SP.aktuell}">zum aktuellen Spieltag</button>` : ""}</div>
         <button class="arr" data-step="1" aria-label="Nächster Spieltag" ${i >= tage.length - 1 ? "disabled" : ""}>${svg(P.rechts)}</button></div>
       ${offen ? `<div class="offen">${svg(P.uhr)}<span>Dieser Spieltag ist noch nicht genau terminiert. Tage und Anstoßzeiten tragen wir automatisch nach, sobald der DFB sie veröffentlicht.</span></div>` : ""}
-      ${gruppen.map(g => `<div class="kap gruppe">${esc(g.t)}</div>${g.ps.map(partieZeile).join("")}`).join("")}
+      ${SEL.size ? `<div class="kap gruppe">Deine Spiele</div>${meine.length ? meine.map(p => partieZeile(p, true)).join("") : '<p class="dat" style="margin:0 2px">Deine Vereine spielen an diesem Spieltag nicht.</p>'}
+        ${andere.length + nachAlle.length - nachAlle.filter(meinK).length ? `<button class="weitere" data-weitere="1" aria-expanded="${WEITERE}">Weitere Spiele <span>${andere.length + nachAlle.length - nachAlle.filter(meinK).length} Partien ${WEITERE ? "▴" : "▾"}</span></button>` : ""}` : ""}
+      ${!SEL.size || WEITERE ? gruppen.map(g => `<div class="kap gruppe">${esc(g.t)}</div>${g.ps.map(p => partieZeile(p)).join("")}`).join("") : ""}
       ${nach.length ? `<div class="kap gruppe">${nach.length > 1 ? "Nachholspiele" : "Nachholspiel"}</div>${nach.map(p => `<div class="dat" style="font-size:11px;padding-left:2px">${p.md ? p.md + ". Spieltag · " : ""}${esc(wtLang(p.anstoss))}</div>${partieZeile(p)}`).join("")}` : ""}
     </div>`;
   }
@@ -817,9 +855,16 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
   const sektion = (nr, kat, titel, notiz) => `<div class="sk"><span class="nr">${nr} · ${esc(kat)}</span>${titel ? `<h2 class="disp">${esc(titel)}</h2>` : ""}${notiz ? `<p>${esc(notiz)}</p>` : ""}</div>`;
   const FG = [["up", "Aufwind", "Im Aufwind", "#4ADE80"], ["down", "Formtief", "Im Formtief", "#FF8A8A"], ["hold", "Stabil", "Stabil", "#8FB0FF"]];
   const formListe = key => (((IN.form || {})[key]) || []).filter(f => zeigen(f.k));
+  function vereinsZeile(){
+    const gew = ALLE.filter(k => SEL.has(k));
+    const kopf = `<button class="vz-k" data-vzauf="1" aria-expanded="${VZOFFEN}"><span class="l">MEINE VEREINE</span>
+      <span class="w">${gew.length ? gew.map(k => logo(k, 16)).join("") + `<span style="margin-left:4px;overflow:hidden;text-overflow:ellipsis">${esc(gew.map(kname).join(", "))}</span>` : '<span class="mu" style="font-weight:500">Alle Vereine</span>'}</span>
+      <span class="a">${VZOFFEN ? "fertig" : gew.length ? "ändern" : "auswählen"}</span></button>`;
+    return `<div class="vz">${kopf}${VZOFFEN ? `<div class="vz-o">${filterBlock()}</div>` : ""}</div>`;
+  }
   function filterBlock(){
-    return `<div class="filt"><div class="filt-h"><span class="l">MEINE VEREINE · ${SEL.size ? SEL.size + " GEWÄHLT" : "ALLE"}</span>${SEL.size ? '<button data-clear="1">Alle zeigen</button>' : '<span class="r">Wappen antippen zum Filtern</span>'}</div>
-      <div class="wps${SEL.size ? " teil" : ""}">${ALLE.map(k => `<button class="wp${SEL.has(k) ? " an" : ""}" data-club="${k}" aria-pressed="${SEL.has(k)}" aria-label="${esc(KNAME[k])}">${logo(k, 30)}</button>`).join("")}</div></div>`;
+    return `<div class="filt"><div class="filt-h"><span class="l">${SEL.size ? SEL.size + " GEWÄHLT" : "ALLE VEREINE · Wappen antippen für deine Auswahl"}</span>${SEL.size ? '<button data-clear="1">Auswahl löschen</button>' : ""}</div>
+      <div class="wps">${ALLE.map(k => `<button class="wp${SEL.has(k) ? " an" : ""}" style="--vc:${ring(k)}" data-club="${k}" aria-pressed="${SEL.has(k)}" aria-label="${esc(KNAME[k])}">${logo(k, 30)}</button>`).join("")}</div></div>`;
   }
   function hero(a){
     const f = x => x === "risk" ? "#FF8A8A" : x === "chance" ? "#4ADE80" : "#F5B041";
@@ -884,7 +929,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       return s >= 3 ? `<span class="s3"><i class="gp"></i>${n}</span>` : s === 2 ? `<span class="s2">${n}</span>` : `<span class="s1">${n}</span>`; }).join("")}</div>`;
   }
   function standardSektion(){
-    const w = (IN.swaps || []).filter(s => zeigen(s.k)), r = (IN.standards || []).filter(s => zeigen(s.k));
+    const w = (IN.swaps || []).filter(s => zeigen(s.k)), r = (IN.standards || []).filter(s => STDALLE || zeigen(s.k));
     return `<section class="sek">${sektion("03", "Standards", "Standard-Wechsel", "Wer übernimmt, wenn die Schützin fehlt.")}
       ${!w.length ? '<p class="dat">Bei deinen Vereinen hat sich diese Woche nichts geändert.</p>' : ""}
       ${w.map(s => `<div class="sw"><div class="k">${logo(s.k, 22)}<b>${esc(kname(s.k))}</b><span class="art${s.el ? " el" : ""}">${esc(s.art)}</span></div>
@@ -892,6 +937,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
         ${s.check ? `<div class="chk">${svg(P.haken)}<span>${esc(s.check)}</span></div>` : ""}${kbBox(s.kb)}</div>`).join("")}
       <div style="display:grid;gap:6px;padding-top:8px"><h3 class="disp" style="font-size:21px">Alle Schützinnen</h3>
         <div class="std-l"><span class="g1"><i class="gp"></i>gesetzt: viele Belege oder Tor daraus</span><span class="g2">normal: 2 bis 3 Belege</span><span class="g3">kursiv: erster Hinweis</span></div></div>
+      ${SEL.size ? `<button class="lk" style="font-size:12px;justify-self:start;text-decoration:none" data-stdalle="1">${STDALLE ? "Nur meine Vereine" : "Alle 14 Vereine"}</button>` : ""}
       <div class="stab"><div class="r h"><span></span><span>ECKEN</span><span>FREISTÖSSE</span><span>ELFMETER</span></div>
         ${r.map(s => `<div class="r"><div class="wk">${logo(s.k, 24)}<span>${esc(s.k)}</span></div>${zelle(s.ecken)}${zelle(s.fs)}${zelle(s.elfer)}
           ${s.hinweis ? `<div class="hw">${svg(P.warn, "").replace("<svg", '<svg style="width:13px;height:13px;flex:none;stroke:currentColor;fill:none;stroke-width:2"')}<span>${esc(s.hinweis)}</span></div>` : ""}</div>`).join("")}</div></section>`;
@@ -952,10 +998,10 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
   function inside(){
     if (!IN){ $("#main").innerHTML = '<p class="leer">Inside wird geladen …</p>'; return; }
     const ph = IN.punkt_hinweis, pm = ph && N.find(m => m.id === ph.id), A = IN.analyse;
-    $("#main").innerHTML = `<div class="iv">${filterBlock()}
+    $("#main").innerHTML = vereinsZeile() + `<div class="iv">
       ${pm ? `<button class="phl" data-punkt="${esc(ph.id)}"><b>Keine Zeit?</b> ${esc(ph.text)} ›</button>` : ""}
       ${IN.ausgabe ? hero(IN.ausgabe) : ""}${formSektion()}${standardSektion()}${spieleSektion()}${IN.kalender ? kalenderSektion(IN.kalender) : ""}
-      ${A && zeigen(A.verein) ? `<section class="sek" id="analyse">${sektion("06", "Analyse")}${analyseKopf(A, String(A.tag || "Analyse der Woche").toUpperCase())}${analyseInhalt(A)}</section>` : ""}
+      ${A ? `<section class="sek" id="analyse">${sektion("06", "Analyse")}${analyseKopf(A, String(A.tag || "Analyse der Woche").toUpperCase())}${analyseInhalt(A)}</section>` : ""}
       <p class="dbasis">Datenbasis: Statistik, Aufstellungen und Liveticker der Sportschau, Termine von DFB und UEFA, Sperren aus der DFB-Sperrenliste. Inside enthält Einschätzungen der Redaktion von WOSOINSIDER und wird mit KI erstellt.</p></div>`;
     railAnbinden();
   }
@@ -1111,6 +1157,11 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     window.scrollTo(0, 0);
   }
 
+  function neuZeichnen(){
+    const y = window.scrollY;
+    if (VIEW === "inside") inside(); else if (VIEW === "spielplan") spielplan(); else list();
+    window.scrollTo(0, y);
+  }
   document.addEventListener("click", e => {
     const q = s => e.target.closest(s);
     let x;
@@ -1119,8 +1170,12 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     if ((x = q("[data-tab]"))) { show(x.dataset.tab); return; }
     if ((x = q("[data-tabgo]"))) { show(x.dataset.tabgo); return; }
     if (q("[data-zu]")) { setHash(""); VIEW === "inside" ? inside() : list(); window.scrollTo(0, SCROLL || 0); return; }
-    if ((x = q("[data-club]"))) { const k = x.dataset.club; SEL.has(k) ? SEL.delete(k) : SEL.add(k); saveSel(); FIDX = 0; const y = window.scrollY; inside(); window.scrollTo(0, y); return; }
-    if (q("[data-clear]")) { SEL.clear(); saveSel(); FIDX = 0; const y = window.scrollY; inside(); window.scrollTo(0, y); return; }
+    if ((x = q("[data-club]"))) { const k = x.dataset.club; SEL.has(k) ? SEL.delete(k) : SEL.add(k); saveSel(); FIDX = 0; NEWSALLE = false; neuZeichnen(); return; }
+    if (q("[data-clear]")) { SEL.clear(); saveSel(); FIDX = 0; NEWSALLE = false; neuZeichnen(); return; }
+    if (q("[data-vzauf]")) { VZOFFEN = !VZOFFEN; neuZeichnen(); return; }
+    if ((x = q("[data-newsalle]"))) { NEWSALLE = x.dataset.newsalle === "1"; neuZeichnen(); return; }
+    if (q("[data-weitere]")) { WEITERE = !WEITERE; neuZeichnen(); return; }
+    if (q("[data-stdalle]")) { STDALLE = !STDALLE; neuZeichnen(); return; }
     if ((x = q("[data-dir]"))) { FDIR = x.dataset.dir; FIDX = 0; const y = window.scrollY; inside(); window.scrollTo(0, y); return; }
     if ((x = q("[data-fstep]"))) { const l = formListe(FDIR), j = Math.min(Math.max(FIDX + Number(x.dataset.fstep), 0), l.length - 1), r = $("#rail");
       FIDX = j; formIndexAnzeigen(); if (r) r.scrollTo({left: j * (r.clientWidth + 12), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); return; }
