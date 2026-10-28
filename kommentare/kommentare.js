@@ -116,7 +116,7 @@
     var wert = ENTWURF.name != null ? ENTWURF.name : (S.ich ? S.ich.name : "");
     return '<div class="wk-name"><label for="' + id + '">Dein Name</label>' +
       '<input id="' + id + '" data-kname maxlength="24" autocomplete="nickname" placeholder="z. B. Lena aus Köln" value="' + esc(wert) + '">' +
-      '<span class="wk-mu">Leer lassen = zufälliger Name wie „WoSo-Fan 1704“. Später einmal änderbar.</span></div>';
+      '<span class="wk-mu wk-1z">Leer = zufälliger Name, später einmal änderbar</span></div>';
   }
   function namensZeile() {
     if (!S.ich || nameFehlt()) return "";
@@ -138,7 +138,7 @@
       (nameFehlt() ? nameFeld(eltern) : "") +
       '<label class="wk-sr" for="wk-t-' + esc(eltern || "h") + '">' + (eltern ? "Antwort schreiben" : "Kommentar schreiben") + "</label>" +
       '<textarea id="wk-t-' + esc(eltern || "h") + '" maxlength="' + MAX + '" rows="' + (eltern ? 2 : 3) + '" placeholder="' +
-        (eltern ? "Antworten …" : "Was meinst du? Fair bleiben, Spielerinnen respektieren.") + '">' + esc(wert) + "</textarea>" +
+        (eltern ? "Antworten …" : "Was meinst du?") + '">' + esc(wert) + "</textarea>" +
       '<div class="wk-fz"><span class="wk-mu">' + wer + '<span data-kzahl>' + wert.length + "</span>/" + MAX + "</span>" +
       (eltern ? '<button type="button" class="wk-link" data-kaktion="abbrechen">Abbrechen</button>' : "") +
       '<button type="submit" class="wk-senden"' + (S.sendet ? " disabled" : "") + ">" + (S.sendet ? "Sendet …" : "Senden") + "</button></div>" +
@@ -207,7 +207,6 @@
     h += '<details class="wk-regeln"' + (S.offenRegeln ? " open" : "") + '><summary>Kommentarregeln</summary>' + REGELN + "</details>";
     if (S.fehler && S.fehlerAn === null) h += '<p class="wk-fehler" role="alert">' + esc(S.fehler) + "</p>";
     if (!S.geladen) h += '<p class="wk-mu">Kommentare werden geladen …</p>';
-    else if (!haupt.length) h += '<p class="wk-mu">Noch keine Kommentare. Schreib den ersten.</p>';
     haupt.slice(0, S.zeige).forEach(function (k) {
       var subs = (kinder[k.id] || []).slice().sort(function (a, b) { return new Date(a.erstellt) - new Date(b.erstellt); });
       if (k.status !== "sichtbar" && k.status !== "geloescht" && !(S.ich && k.autor === S.ich.id) && !istMod()) return;
@@ -394,7 +393,9 @@
     ".wk-text{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}" +
     ".wk-hinweis{margin:0;font-size:12.5px;color:var(--frag)}" +
     ".wk-akt{display:flex;gap:14px;flex-wrap:wrap}" +
-    ".wk-akt button{font-size:12.5px;color:var(--muted);padding:6px 0;min-height:32px}" +
+    ".wk-akt{gap:6px}.wk-akt button{font-size:12.5px;color:var(--muted);padding:8px 8px;min-height:40px;margin:-4px 0}" +
+    ".wk-akt button:first-child{margin-left:-8px}.wk-akt button[data-kaktion=like]{min-width:52px;font-size:14px;text-align:left}" +
+    ".wk-1z{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
     ".wk-akt button[aria-pressed=true]{color:var(--rot)}.wk-akt button[disabled]{opacity:.5}" +
     ".wk-akt .wk-mod{color:var(--frag)}" +
     ".wk-melden{display:grid;gap:6px;background:var(--soft);border-radius:10px;padding:10px}" +
