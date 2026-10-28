@@ -424,6 +424,7 @@
       if (alt) alt.innerHTML = html;
       else ziel.insertAdjacentHTML("beforeend", '<span class="wk-zahl" aria-label="' + n + (n === 1 ? " Kommentar" : " Kommentare") + '">' + html + "</span>");
     });
+    if (typeof window.wiMetaPassen === "function") window.wiMetaPassen();
   }
   function feed() {
     if (!AKTIV) return;

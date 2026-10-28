@@ -639,10 +639,11 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     return POS.concat(sonst).map(p => elf.filter(x => (x.p || "") === p)
       .map(x => esc(x.n) + (x.f === "neu" ? '<span class="neu">NEU</span>' : "")).join(", ")).filter(Boolean).join('<span class="mu"> - </span>');
   }
-  function metaZeile(m, auf){
+  // stufe 0 = Verein ausgeschrieben, 1 = Vereinskürzel, 2 = ohne Verein (wenn die Zeile auf der Karte nicht passt)
+  function metaZeile(m, auf, stufe = 0){
     const zeit = relativ(m.zeit);
     if (auf) return zeit;
-    const verein = m.verein ? (KNAME[KURZ[m.verein]] || m.verein) : null;
+    const verein = !m.verein || (stufe === 2 && m.spielerin) ? null : stufe === 1 ? (KURZ[m.verein] || m.verein) : (KNAME[KURZ[m.verein]] || m.verein);
     if (!istSpielerin(m) && String(m.pos || "").startsWith("Trainer") && m.spielerin)
       return `${zeit} · ${[verein, `${m.pos} ${m.spielerin}`].filter(Boolean).join(", ")}`;
     const wer = [m.spielerin, verein].filter(x => x && x !== "Spielansetzung").join(", ");
@@ -654,7 +655,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     return `<button class="nk" data-id="${esc(m.id)}">${bild(m, 72)}<div class="nk-b">
       <div class="nk-top"><div class="tags">${(m.tags || []).map(tag).join("")}${auf ? tag("AUFSTELLUNG") : ""}</div>${rechts}</div>
       ${auf ? `<p class="elf">${startelfZeile(a.startelf)}</p>` : `<h2>${esc(m.headline)}</h2>`}
-      <div class="meta">${esc(metaZeile(m, auf))}</div></div></button>`;
+      <div class="meta" data-lang="${esc(metaZeile(m, auf))}" data-kurz="${esc(metaZeile(m, auf, 1))}" data-nur="${esc(metaZeile(m, auf, 2))}">${esc(metaZeile(m, auf))}</div></div></button>`;
   }
   const angeheftet = m => m.typ === "punkt" && m.pin_bis && dt(m.pin_bis) > Date.now();
   function punktKarte(m){
@@ -769,8 +770,23 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     if (A) h += anaTeaser(A);
     if (filter && rest.length) h += `<div class="hinw"><span>${alle.length - rest.length} weitere Meldungen anderer Vereine</span><button data-newsalle="1">Alle zeigen</button></div>`;
     $("#main").innerHTML = vereinsZeile() + `<div class="liste">${h}</div>`;
+    metaPassen();
     if (window.WIKOM) window.WIKOM.feed();
   }
+  // Meta-Zeile: Spielerin und Verein ausgeschrieben, nur wenn es nicht in eine Zeile passt, mit Vereinskürzel
+  function metaPassen(){
+    document.querySelectorAll("#main .meta[data-kurz]").forEach(z => {
+      const t = z.querySelector(".wk-mt") || z;
+      t.textContent = z.dataset.lang;
+      for (const st of [z.dataset.kurz, z.dataset.nur]) {
+        if (!st || t.scrollWidth <= t.clientWidth) break;
+        t.textContent = st;
+      }
+    });
+  }
+  window.wiMetaPassen = metaPassen;
+  let META_T = null;
+  window.addEventListener("resize", () => { clearTimeout(META_T); META_T = setTimeout(metaPassen, 150); });
 
   // ---------------- Artikel
   const zurueck = (t = "‹ Zurück") => `<button class="back" data-zu="1">${t}</button>`;

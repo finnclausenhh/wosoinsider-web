@@ -133,8 +133,9 @@ create or replace function public.normalisiere(t text) returns text
 language sql immutable set search_path = '' as $$
   select regexp_replace(
            translate(
-             replace(replace(replace(replace(lower(coalesce(t, '')), 'ä', 'ae'), 'ö', 'oe'), 'ü', 'ue'), 'ß', 'ss'),
-             '013457@$€', 'oieastase'),
+             replace(replace(replace(replace(replace(replace(lower(coalesce(t, '')), 'ä', 'ae'), 'ö', 'oe'), 'ü', 'ue'), 'ß', 'ss'), 'æ', 'ae'), 'þ', 'th'),
+             '013457@$€áàâãåāéèêëēěíìîïīóòôõøōőúùûūůűýçćčñńňšśşžźżđðłğıăţřďťľĺŕ',
+             'oieastaseaaaaaaeeeeeeiiiiiooooooouuuuuuycccnnnssszzzddlgiatrdtllr'),
            '(.)\1{2,}', '\1', 'g')
 $$;
 
@@ -466,6 +467,40 @@ begin
   end if;
 end $$;
 
+-- Zusätzliche Sperrliste nur für Namen (Spielerinnen, NS-Bezüge, Sexuelles).
+-- teil = darf nirgends im Namen stecken, exakt = Name darf nicht genau so lauten.
+-- Spielerinnen-Namen kommen aus supabase/namenssperre.sql (neu erzeugen, wenn sich Kader ändern).
+create table if not exists public.namenssperre (
+  wort     text primary key,
+  schluessel text generated always as (regexp_replace(public.normalisiere(wort), '[^a-z0-9]', '', 'g')) stored,
+  art      text not null default 'teil' check (art in ('teil', 'exakt')),
+  info     text
+);
+alter table public.namenssperre enable row level security;
+revoke all on public.namenssperre from anon, authenticated;
+
+insert into public.namenssperre (wort, art, info) values
+  ('hitler','teil','NS'), ('adolf','teil','NS'), ('fuehrer','teil','NS'), ('fuhrer','teil','NS'), ('nsdap','teil','NS'),
+  ('holocaust','teil','NS'), ('auschwitz','teil','NS'), ('hakenkreuz','teil','NS'), ('swastika','teil','NS'),
+  ('1488','teil','NS'), ('reichsbuerger','teil','NS'), ('terror','teil','Gewalt'), ('amok','teil','Gewalt'),
+  ('sex','teil','Sexuell'), ('porn','teil','Sexuell'), ('nackt','teil','Sexuell'), ('nude','teil','Sexuell'), ('titten','teil','Sexuell'),
+  ('penis','teil','Sexuell'), ('vagina','teil','Sexuell'), ('muschi','teil','Sexuell'), ('schwanz','teil','Sexuell'), ('pussy','teil','Sexuell'),
+  ('milf','teil','Sexuell'), ('horny','teil','Sexuell'), ('geil','teil','Sexuell'), ('fetisch','teil','Sexuell'), ('blowjob','teil','Sexuell'),
+  ('wichs','teil','Sexuell'), ('hure','teil','Beleidigung'), ('arsch','teil','Beleidigung'), ('paedo','teil','Sexuell'), ('pedophil','teil','Sexuell'),
+  ('dfb','exakt','Verwechslung'), ('kickbase','exakt','Verwechslung')
+on conflict (wort) do nothing;
+
+-- true, wenn ein Name gegen Filterwörter oder Namenssperre verstößt (Wörter auch zusammengeschrieben, mit Zahlen oder Akzenten)
+create or replace function public.name_verboten(n text) returns boolean
+language sql stable security definer set search_path = '' as $$
+  with k as (select regexp_replace(public.normalisiere(n), '[^a-z0-9]', '', 'g') as key)
+  select exists (select 1 from public.filterwort f, k
+                 where position(regexp_replace(f.wort_norm, '[^a-z0-9]', '', 'g') in k.key) > 0)
+      or exists (select 1 from public.namenssperre s, k
+                 where (s.art = 'teil' and position(s.schluessel in k.key) > 0)
+                    or (s.art = 'exakt' and s.schluessel = k.key))
+$$;
+
 -- Namen festlegen: beim ersten Kommentar frei (auch Platzhalter behalten), danach genau eine Änderung.
 -- Gilt für anonyme Profile und Konten gleich. Redaktion ohne Grenze.
 create or replace function public.name_aendern(neu text) returns text
@@ -485,8 +520,7 @@ begin
   if not public.ist_mod() and (lower(n) ~ '(wosoinsider|woso.?inside|redaktion|admin|moderat|support|offiziell)' or lower(n) ~ '^woso.?fan') then
     raise exception 'WI_NAME';
   end if;
-  select * into f from public.filter_treffer(n);
-  if f.aktion is not null then raise exception 'WI_NAME'; end if;
+  if public.name_verboten(n) and not public.ist_mod() then raise exception 'WI_NAME'; end if;
   if exists (select 1 from public.profil where lower(name) = lower(n) and id <> p.id) then raise exception 'WI_NAME_VERGEBEN'; end if;
   update public.profil
      set name = n,
@@ -625,7 +659,7 @@ grant execute on function public.mein_profil(), public.kommentar_loeschen(uuid),
 -- Intern (Trigger, Filter, Aufräumen): nicht von außen aufrufbar
 revoke execute on function public.profil_anlegen(), public.kommentar_regeln(), public.like_regeln(), public.like_zaehlen(),
   public.meldung_regeln(), public.meldung_zaehlen(), public.filter_treffer(text), public.protokoll(text, text, text),
-  public.aufraeumen(), public.darf_moderieren() from authenticated;
+  public.aufraeumen(), public.darf_moderieren(), public.name_verboten(text) from authenticated;
 
 commit;
 
