@@ -107,7 +107,8 @@
     '<path d="M7.6 12.3l3 3 5.8-6" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   function badge(k) {
     var p = k.profil || {};
-    return p.verifiziert || p.rolle === "admin" || p.rolle === "moderator" ? HAKEN : "";
+    var team = p.rolle === "admin" || p.rolle === "moderator";
+    return (p.verifiziert || team ? HAKEN : "") + (team ? '<span class="wk-red">Redaktion</span>' : "");
   }
   function nameFehlt() { return !S.ich || !S.ich.name_gewaehlt; }
   function nameFeld(eltern) {
@@ -389,6 +390,7 @@
     ".wk-verborgen{opacity:.75}" +
     ".wk-kopf{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.wk-kopf b{font-size:13.5px}" +
     ".wk-name-z{display:inline-flex;align-items:center;gap:4px}.wk-haken{width:15px;height:15px;flex:none}" +
+    ".wk-red{font:700 9.5px var(--f-mono);letter-spacing:.6px;text-transform:uppercase;background:rgba(47,91,255,.18);color:var(--hell);border-radius:99px;padding:2px 7px;margin-left:2px}" +
     ".wk-text{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}" +
     ".wk-hinweis{margin:0;font-size:12.5px;color:var(--frag)}" +
     ".wk-akt{display:flex;gap:14px;flex-wrap:wrap}" +

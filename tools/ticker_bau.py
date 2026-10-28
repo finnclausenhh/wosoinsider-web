@@ -40,7 +40,7 @@ def legal_ersetzen(s, html):
     return s
 
 # Kommentare (Supabase): Skripte liegen in /kommentare/ auf wosoinsider.de, Version gegen Browser-Cache hochzählen.
-KOMMENTARE_V = "4"
+KOMMENTARE_V = "5"
 def kommentare():
     v = KOMMENTARE_V
     return (f'<script src="https://wosoinsider.de/kommentare/supabase.js?v=2.118.0"></script>\n'
