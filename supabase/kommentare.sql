@@ -213,6 +213,8 @@ create table if not exists public.kommentar (
   meldungen  int not null default 0,
   erstellt   timestamptz not null default now()
 );
+-- Angeheftet (Redaktion): höchstens ein Kommentar je Meldung steht oben
+alter table public.kommentar add column if not exists angeheftet boolean not null default false;
 create index if not exists kommentar_beitrag_idx on public.kommentar (beitrag, erstellt desc);
 create index if not exists kommentar_autor_idx   on public.kommentar (autor, erstellt desc);
 create index if not exists kommentar_eltern_idx  on public.kommentar (eltern);
@@ -226,6 +228,7 @@ begin
   -- Felder, die Nutzer nicht selbst setzen dürfen
   new.autor := auth.uid();
   new.status := 'sichtbar'; new.grund := null; new.likes := 0; new.meldungen := 0; new.erstellt := now();
+  new.angeheftet := false;
 
   if new.autor is null then raise exception 'WI_LOGIN' using hint = 'Keine Sitzung'; end if;
   if public.einst('kommentare_an') is distinct from 'ja' then raise exception 'WI_AUS'; end if;
@@ -493,7 +496,7 @@ begin
   if aktion = 'freigeben' then
     update public.kommentar set status = 'sichtbar', grund = null where id = kid;
   elsif aktion = 'ausblenden' then
-    update public.kommentar set status = 'ausgeblendet',
+    update public.kommentar set status = 'ausgeblendet', angeheftet = false,
       grund = coalesce(nullif(btrim(begruendung), ''), 'Verstoß gegen die Kommentarregeln') where id = kid;
   elsif aktion = 'loeschen' then
     delete from public.kommentar where id = kid;
@@ -502,6 +505,19 @@ begin
   end if;
   update public.kommentar_meldung set erledigt = true where kommentar = kid;
   perform public.protokoll(aktion, kid::text, begruendung);
+end $$;
+
+-- Anheften: nur sichtbare Hauptkommentare, je Meldung höchstens einer
+create or replace function public.anheften(kid uuid, an boolean) returns void
+language plpgsql security definer set search_path = '' as $$
+declare k public.kommentar;
+begin
+  if not public.darf_moderieren() then raise exception 'WI_KEIN_MOD'; end if;
+  select * into k from public.kommentar where id = kid;
+  if not found or k.eltern is not null or k.status <> 'sichtbar' then raise exception 'WI_WEG'; end if;
+  if an then update public.kommentar set angeheftet = false where beitrag = k.beitrag and angeheftet; end if;
+  update public.kommentar set angeheftet = an where id = kid;
+  perform public.protokoll(case when an then 'anheften' else 'loesen' end, kid::text, null);
 end $$;
 
 -- Sperren: tage = null bedeutet dauerhaft, tage = 0 hebt die Sperre auf
@@ -584,7 +600,7 @@ grant execute on function public.ist_mod(), public.ist_schatten(uuid), public.is
 -- Nur mit Sitzung
 grant execute on function public.mein_profil(), public.kommentar_loeschen(uuid), public.name_aendern(text),
   public.moderieren(uuid, text, text), public.nutzer_sperren(uuid, int, text), public.schattensperre(uuid, boolean),
-  public.vertrauen_setzen(uuid, int), public.mod_warteschlange() to authenticated;
+  public.vertrauen_setzen(uuid, int), public.mod_warteschlange(), public.anheften(uuid, boolean) to authenticated;
 -- Intern (Trigger, Filter, Aufräumen): nicht von außen aufrufbar
 revoke execute on function public.profil_anlegen(), public.kommentar_regeln(), public.like_regeln(), public.like_zaehlen(),
   public.meldung_regeln(), public.meldung_zaehlen(), public.filter_treffer(text), public.protokoll(text, text, text),

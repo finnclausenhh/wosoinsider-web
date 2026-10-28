@@ -15,7 +15,10 @@
   var MAX = 1000, SEITE = 20;
   var S = { beitrag: null, liste: [], likes: {}, ich: null, sort: "neu", zeige: SEITE, antwort: null,
             melden: null, fehler: "", fehlerAn: null, sendet: false, offenRegeln: false, laden: false, geladen: false };
-  var ENTWURF = {};   // Entwürfe je Meldung und Antwort, überleben das Neuzeichnen des Artikels
+  var ENTWURF = {};
+  var STUMM = {};     // stummgeschaltete Personen {id: Name}, nur auf diesem Gerät
+  try { STUMM = JSON.parse(localStorage.getItem("woso-stumm") || "{}") || {}; } catch (e) {}
+  function stummSpeichern() { try { localStorage.setItem("woso-stumm", JSON.stringify(STUMM)); } catch (e) {} }   // Entwürfe je Meldung und Antwort, überleben das Neuzeichnen des Artikels
   var TIMER = null;
 
   var FEHLER = {
@@ -74,7 +77,7 @@
     if (!S.beitrag) return Promise.resolve();
     var b = S.beitrag; S.laden = true;
     return sb.from("kommentar")
-      .select("id,beitrag,eltern,autor,text,status,grund,likes,erstellt,profil(name,rolle)")
+      .select("id,beitrag,eltern,autor,text,status,grund,likes,angeheftet,erstellt,profil(name,rolle)")
       .eq("beitrag", b).order("erstellt", { ascending: false }).limit(500)
       .then(function (r) {
         if (b !== S.beitrag) return;
@@ -118,6 +121,7 @@
     var geloescht = k.status === "geloescht";
     var nichtOeffentlich = k.status === "pruefung" || k.status === "ausgeblendet";
     var h = '<div class="wk-k' + (istAntwort ? " wk-sub" : "") + (nichtOeffentlich ? " wk-verborgen" : "") + '">' +
+      (k.angeheftet && !istAntwort ? '<div class="wk-pin">Angeheftet</div>' : "") +
       '<div class="wk-kopf"><b>' + esc(k.profil ? k.profil.name : "Fan") + "</b>" + badge(k) +
       '<span class="wk-mu">' + vor(k.erstellt) + "</span></div>";
     if (nichtOeffentlich) {
@@ -131,9 +135,15 @@
              (eigen ? " disabled" : "") + ">" + (S.likes[k.id] ? "♥" : "♡") + " " + (k.likes || 0) + "</button>";
         if (!istAntwort) h += '<button data-kaktion="antworten" data-kid="' + k.id + '">Antworten</button>';
         if (!eigen) h += '<button data-kaktion="melden" data-kid="' + k.id + '">Melden</button>';
+        if (!eigen && !(k.profil && (k.profil.rolle === "admin" || k.profil.rolle === "moderator")))
+          h += '<button data-kaktion="stumm" data-kid="' + k.id + '" title="Kommentare dieser Person nicht mehr anzeigen">Stumm</button>';
       }
       if (eigen) h += '<button data-kaktion="loeschen" data-kid="' + k.id + '">Löschen</button>';
+      if (eigen && istMod() && !istAntwort && k.status === "sichtbar")
+        h += '<button class="wk-mod" data-kaktion="anheften" data-kid="' + k.id + '" data-an="' + (k.angeheftet ? "0" : "1") + '">' + (k.angeheftet ? "Lösen" : "Anheften") + "</button>";
       if (istMod() && !eigen) {
+        if (!istAntwort && k.status === "sichtbar")
+          h += '<button class="wk-mod" data-kaktion="anheften" data-kid="' + k.id + '" data-an="' + (k.angeheftet ? "0" : "1") + '">' + (k.angeheftet ? "Lösen" : "Anheften") + "</button>";
         h += k.status === "sichtbar"
           ? '<button class="wk-mod" data-kaktion="ausblenden" data-kid="' + k.id + '">Ausblenden</button>'
           : '<button class="wk-mod" data-kaktion="freigeben" data-kid="' + k.id + '">Freigeben</button>';
@@ -151,11 +161,12 @@
   function zeichnen() {
     var box = el();
     if (!box || !AKTIV) return;
-    var alle = S.liste;
+    var alle = S.liste.filter(function (k) { return !STUMM[k.autor]; });
     var haupt = alle.filter(function (k) { return !k.eltern; });
     var kinder = {};
     alle.forEach(function (k) { if (k.eltern) (kinder[k.eltern] = kinder[k.eltern] || []).push(k); });
     if (S.sort === "top") haupt.sort(function (a, b) { return (b.likes - a.likes) || (new Date(b.erstellt) - new Date(a.erstellt)); });
+    haupt.sort(function (a, b) { return (b.angeheftet ? 1 : 0) - (a.angeheftet ? 1 : 0); });   // stabil: Angeheftetes nach oben
     var sichtbar = alle.filter(function (k) { return k.status === "sichtbar"; }).length;
     var h = '<section class="wk" aria-labelledby="wk-h"><div class="wk-top"><h2 id="wk-h" class="kap">Kommentare' +
       (sichtbar ? " · " + sichtbar : "") + "</h2>" +
@@ -174,6 +185,8 @@
       h += '<div class="wk-faden">' + kommentar(k, false) + subs.map(function (s) { return kommentar(s, true); }).join("") +
         (S.antwort === k.id ? formular(k.id) : "") + "</div>";
     });
+    var stumm = Object.keys(STUMM).length;
+    if (stumm) h += '<p class="wk-mu wk-stumm">' + (stumm === 1 ? "1 Person" : stumm + " Personen") + ' stummgeschaltet · <button class="wk-link" data-kaktion="stumm-aus">Wieder anzeigen</button></p>';
     if (haupt.length > S.zeige) h += '<button class="wk-mehr" data-kaktion="mehr">Weitere ' + Math.min(SEITE, haupt.length - S.zeige) + " Kommentare</button>";
     h += "</section>";
     var fokus = document.activeElement && box.contains(document.activeElement) && document.activeElement.id;
@@ -237,6 +250,16 @@
         return an ? sb.from("kommentar_like").insert({ kommentar: id })
                   : sb.from("kommentar_like").delete().eq("kommentar", id).eq("nutzer", S.ich && S.ich.id);
       });
+      return;
+    }
+    if (a === "stumm") {
+      var ks = S.liste.find(function (x) { return x.id === id; }); if (!ks) return;
+      if (!window.confirm((ks.profil ? ks.profil.name : "Diese Person") + " stummschalten? Du siehst ihre Kommentare dann auf diesem Gerät nicht mehr.")) return;
+      STUMM[ks.autor] = ks.profil ? ks.profil.name : ""; stummSpeichern(); zeichnen(); return;
+    }
+    if (a === "stumm-aus") { STUMM = {}; stummSpeichern(); zeichnen(); return; }
+    if (a === "anheften") {
+      aktion(function () { return sb.rpc("anheften", { kid: id, an: b.dataset.an === "1" }); });
       return;
     }
     if (a === "loeschen") {
@@ -320,11 +343,49 @@
     ".wk-akt .wk-mod{color:var(--frag)}" +
     ".wk-melden{display:grid;gap:6px;background:var(--soft);border-radius:10px;padding:10px}" +
     ".wk-gr{display:flex;flex-wrap:wrap;gap:6px}.wk-gr button{font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 10px}" +
+    ".wk-pin{font:700 10px var(--f-mono);letter-spacing:.8px;text-transform:uppercase;color:var(--hell)}" +
+    ".wk-stumm{margin:0;text-align:center}.wk-stumm .wk-link{font-size:12.5px}" +
+    ".wk-zahl{display:inline-flex;align-items:center;gap:3px;flex:none;color:var(--muted);font-size:12px}.wk-zahl svg{width:13px;height:13px}" +
+    ".wk-mt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
+    ".nk .meta.wk-hatz,.pk .z.wk-hatz{display:flex;gap:8px;justify-content:space-between;align-items:center}" +
     ".wk-mehr{justify-self:center;color:var(--accent);font-size:13px;font-weight:600;padding:8px 12px}" +
     ".wk-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}";
   document.head.appendChild(css);
 
-  window.WIKOM = { mount: mount, aktiv: AKTIV };
+  // ---------- Kommentarzahl auf den Feed-Karten ----------
+  var ZAHLEN = {}, ZEIT = 0, LAEUFT = null;
+  var BLASE = '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v6a1.5 1.5 0 0 1-1.5 1.5H7l-3.2 2.6c-.33.27-.8.03-.8-.39V11h0A1.5 1.5 0 0 1 2 9.5z"/></svg>';
+  function feedZeichnen() {
+    document.querySelectorAll("#main .nk[data-id], #main .pk[data-id]").forEach(function (karte) {
+      var n = ZAHLEN[karte.dataset.id] || 0;
+      var ziel = karte.querySelector(".meta") || karte.querySelector(".pk-b .z");
+      if (!ziel) return;
+      var alt = ziel.querySelector(".wk-zahl");
+      if (!n) { if (alt) alt.remove(); return; }
+      if (!ziel.classList.contains("wk-hatz")) {
+        ziel.innerHTML = '<span class="wk-mt">' + ziel.innerHTML + "</span>"; ziel.classList.add("wk-hatz");
+      }
+      var html = BLASE + n;
+      if (alt) alt.innerHTML = html;
+      else ziel.insertAdjacentHTML("beforeend", '<span class="wk-zahl" aria-label="' + n + (n === 1 ? " Kommentar" : " Kommentare") + '">' + html + "</span>");
+    });
+  }
+  function feed() {
+    if (!AKTIV) return;
+    feedZeichnen();
+    if (Date.now() - ZEIT < 60000 || LAEUFT) return;
+    var ids = Array.prototype.map.call(document.querySelectorAll("#main [data-id]"), function (x) { return x.dataset.id; });
+    if (!ids.length) return;
+    LAEUFT = sb.rpc("kommentar_zahlen", { ids: ids.filter(function (x, i) { return ids.indexOf(x) === i; }) }).then(function (r) {
+      LAEUFT = null; if (r.error) return;
+      ZEIT = Date.now(); ZAHLEN = {};
+      (r.data || []).forEach(function (z) { ZAHLEN[z.beitrag] = Number(z.anzahl) || 0; });
+      feedZeichnen();
+    }, function () { LAEUFT = null; });
+  }
+
+  window.WIKOM = { mount: mount, feed: feed, aktiv: AKTIV };
+  if (document.querySelector("#main .nk[data-id], #main .pk[data-id]")) feed();
   // Falls der Artikel schon vor diesem Skript gezeichnet wurde (Direktlink)
   var vorhanden = el(); if (vorhanden && vorhanden.dataset.beitrag) mount(vorhanden.dataset.beitrag);
 })();
