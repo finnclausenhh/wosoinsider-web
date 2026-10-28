@@ -319,9 +319,9 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .um-leg i{display:inline-block;width:12px;height:5px;border-radius:2px;margin-right:4px;vertical-align:1px}
 .um-o{display:grid;gap:8px;padding:8px 12px}
 .uo{position:relative;display:flex;align-items:center;gap:10px;min-height:58px;padding:8px 10px;border-radius:12px;background:var(--soft);border:1.5px solid transparent;overflow:hidden;width:100%}
-.uo .bar{position:absolute;inset:0 auto 0 0;background:rgba(47,91,255,.22);transition:width .6s cubic-bezier(.2,.8,.2,1)}
-.uo.mein{border-color:var(--accent)}.uo.mein .bar{background:rgba(47,91,255,.38)}
-.uo.richtig{border-color:#22C55E}.uo.richtig .bar{background:rgba(34,197,94,.28)}
+.uo .ubar{position:absolute;inset:0 auto 0 0;background:rgba(47,91,255,.22);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.uo.mein{border-color:var(--accent)}.uo.mein .ubar{background:rgba(47,91,255,.38)}
+.uo.richtig{border-color:#22C55E}.uo.richtig .ubar{background:rgba(34,197,94,.28)}
 .uo .bi{position:relative;width:42px;height:42px;border-radius:50%;overflow:hidden;flex:none;display:grid;place-items:center}
 .uo .bi img{width:100%;height:100%;object-fit:cover;object-position:50% 0}
 .uo .bi.lg{background:#fff}.uo .bi.lg img{width:30px;height:30px;object-fit:contain}
@@ -690,7 +690,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       return o.logo ? `<span class="bi lg">${logo(o.logo, 30)}</span>` : src ? `<span class="bi" style="background:${KFARBE[u.verein] || "var(--soft)"}"><img src="${esc(src)}" alt="" loading="lazy"></span>` : `<span class="bi" style="background:var(--line)">?</span>`; };
     const opts = (u.optionen || []).map(o => { const mein = meine && meine.o === o.id, richtig = auf && auf.richtig === o.id;
       return `<button class="uo${mein ? " mein" : ""}${richtig ? " richtig" : ""}" data-uvote="${esc(u.id)}|${esc(o.id)}" ${zeigt ? "disabled" : ""}>
-        <span class="bar" style="width:${zeigt ? pz(o) : 0}%"></span>${bild(o)}
+        <span class="ubar" style="width:${zeigt ? pz(o) : 0}%"></span>${bild(o)}
         <span class="tx"><b>${esc(o.n)}</b>${o.info ? `<small>${esc(o.info)}</small>` : ""}${o.kader ? `<span class="ks" aria-label="Kader der letzten 5 Spieltage">${[...String(o.kader)].map(c => `<i class="${c === "b" ? "b" : ""}"></i>`).join("")}<span>Sp. ${esc(u.kader_von)} bis ${Number(u.kader_von) + String(o.kader).length - 1}</span></span>` : ""}
           ${mein ? '<span class="ck">Deine Stimme</span>' : ""}${richtig ? '<span class="ck" style="color:#22C55E">Stand in der Startelf</span>' : ""}</span>
         ${zeigt ? `<span class="pz">${pz(o)} %</span>` : ""}</button>`; }).join("");
