@@ -66,13 +66,15 @@ create table if not exists public.profil (
 
 alter table public.profil add column if not exists name_gewaehlt boolean not null default false;
 alter table public.profil add column if not exists name_aenderungen smallint not null default 0;
+-- Verifiziert-Haken (blauer Haken wie bei Instagram): Redaktion automatisch, später z. B. Vereine oder Spielerinnen
+alter table public.profil add column if not exists verifiziert boolean not null default false;
 
 alter table public.profil enable row level security;
 drop policy if exists profil_lesen on public.profil;
 create policy profil_lesen on public.profil for select to anon, authenticated using (true);
 revoke all on public.profil from anon, authenticated;
 -- Öffentlich nur Name und Rolle (für das Abzeichen "Redaktion")
-grant select (id, name, rolle) on public.profil to anon, authenticated;
+grant select (id, name, rolle, verifiziert) on public.profil to anon, authenticated;
 
 -- Neuer Nutzer (auch anonym) bekommt einen Platzhalternamen wie "WoSo-Fan 1704".
 -- Beim ersten Kommentar wählt er seinen Namen (oder behält diesen), danach ist genau eine Änderung möglich.
@@ -450,7 +452,7 @@ language sql stable security definer set search_path = '' as $$
   select json_build_object('id', p.id, 'name', p.name, 'rolle', p.rolle, 'vertrauen', p.vertrauen,
                            'gesperrt_bis', p.gesperrt_bis, 'sperrgrund', p.sperrgrund,
                            'anonym', public.ist_anonym(),
-                           'name_gewaehlt', p.name_gewaehlt, 'name_aenderung_frei', p.name_aenderungen < 1)
+                           'name_gewaehlt', p.name_gewaehlt, 'name_aenderung_frei', p.name_aenderungen < 1, 'verifiziert', p.verifiziert)
   from public.profil p where p.id = auth.uid()
 $$;
 
@@ -587,6 +589,33 @@ begin
   perform public.protokoll(case when tage = 0 then 'entsperren' else 'sperren ' || coalesce(tage::text, 'dauerhaft') end, uid::text, begruendung);
 end $$;
 
+-- Rollen vergeben (nur Admins): nutzer | moderator | admin. Redaktion bekommt automatisch den Haken.
+create or replace function public.rolle_setzen(uid uuid, neu text) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not (exists (select 1 from public.profil where id = auth.uid() and rolle = 'admin')
+          or (auth.uid() is null and session_user in ('postgres', 'supabase_admin'))) then
+    raise exception 'WI_KEIN_MOD';
+  end if;
+  if neu not in ('nutzer', 'moderator', 'admin') then raise exception 'WI_AKTION'; end if;
+  if uid = auth.uid() and neu <> 'admin' then raise exception 'WI_AKTION'; end if;  -- sich selbst nicht versehentlich entmachten
+  update public.profil set rolle = neu, verifiziert = (neu <> 'nutzer') or verifiziert, vertrauen = greatest(vertrauen, case when neu = 'nutzer' then 0 else 2 end)
+   where id = uid;
+  perform public.protokoll('rolle ' || neu, uid::text, null);
+end $$;
+
+-- Verifiziert-Haken setzen oder entfernen (nur Admins)
+create or replace function public.verifizieren(uid uuid, an boolean) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not (exists (select 1 from public.profil where id = auth.uid() and rolle = 'admin')
+          or (auth.uid() is null and session_user in ('postgres', 'supabase_admin'))) then
+    raise exception 'WI_KEIN_MOD';
+  end if;
+  update public.profil set verifiziert = an where id = uid;
+  perform public.protokoll(case when an then 'verifiziert' else 'nicht verifiziert' end, uid::text, null);
+end $$;
+
 -- Schattensperre: Person sieht ihre Kommentare, sonst niemand
 create or replace function public.schattensperre(uid uuid, an boolean) returns void
 language plpgsql security definer set search_path = '' as $$
@@ -655,7 +684,7 @@ grant execute on function public.ist_mod(), public.ist_schatten(uuid), public.is
 -- Nur mit Sitzung
 grant execute on function public.mein_profil(), public.kommentar_loeschen(uuid), public.name_aendern(text),
   public.moderieren(uuid, text, text), public.nutzer_sperren(uuid, int, text), public.schattensperre(uuid, boolean),
-  public.vertrauen_setzen(uuid, int), public.mod_warteschlange(), public.anheften(uuid, boolean) to authenticated;
+  public.vertrauen_setzen(uuid, int), public.mod_warteschlange(), public.anheften(uuid, boolean), public.rolle_setzen(uuid, text), public.verifizieren(uuid, boolean) to authenticated;
 -- Intern (Trigger, Filter, Aufräumen): nicht von außen aufrufbar
 revoke execute on function public.profil_anlegen(), public.kommentar_regeln(), public.like_regeln(), public.like_zaehlen(),
   public.meldung_regeln(), public.meldung_zaehlen(), public.filter_treffer(text), public.protokoll(text, text, text),
@@ -668,6 +697,10 @@ commit;
 -- =====================================================================
 -- Aufräumen täglich um 03:17 (Database > Extensions > pg_cron vorher aktivieren):
 --   select cron.schedule('wi-aufraeumen', '17 3 * * *', 'select public.aufraeumen()');
+--
+-- Weitere Admins/Moderatoren bestimmen (Name aus den Kommentaren):
+--   select public.rolle_setzen((select id from public.profil where name = 'Lena aus Köln'), 'moderator');
+--   select public.verifizieren((select id from public.profil where name = 'FC Bayern Frauen'), true);
 --
 -- Eigenes Gerät zum Redaktions-Profil machen (ID steht in der Tabelle profil,
 -- schreib einen Kommentar und nutze den Namen, den du dabei gewählt hast):
