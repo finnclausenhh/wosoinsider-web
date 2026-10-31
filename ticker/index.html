@@ -529,10 +529,98 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 @media (max-width:380px){.pr-t{font-size:14px}.pr-z{grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr)}.fkomp .pic{width:112px;height:140px}.fkomp .tx .fbadge{align-self:flex-start}
 .fkomp .tx{min-height:140px}}
 @media (prefers-reduced-motion:reduce){.rail{scroll-behavior:auto}}
+
+/* Suche und Spielerinnenprofil */
+.bar-in{position:relative}
+.such-btn{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:8px;width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center}
+.such-btn svg{width:17px;height:17px;stroke:var(--ink);fill:none;stroke-width:2}
+.pf-feld{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:12px 14px}
+.pf-feld svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;flex:none}
+.pf-feld input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--ink);font:inherit;font-size:16px}
+.pf-liste{display:grid;gap:8px}
+.pf-tr,.pf-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border-radius:12px;padding:8px 12px 8px 8px;width:100%}
+.pf-tx{display:grid;min-width:0}.pf-tx b{font-weight:700}.pf-tx small{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-dot{width:10px;height:10px;border-radius:50%}
+.pf-lg{width:52px;height:52px;border-radius:9px;background:var(--soft);display:grid;place-items:center}
+.pf-tipp{font-size:13px;color:var(--muted)}
+.pf-vk{display:flex;align-items:center;gap:10px}.pf-vk h1{margin:0;font-size:28px}
+.pf-card{background:var(--soft)}.pf-card .p{color:var(--accent);font-weight:600;font-size:13px}
+.pf{position:relative}.pf-teilen{position:absolute;right:0;top:4px;width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center}
+.pf-teilen svg{width:17px;height:17px;stroke:var(--ink);fill:none;stroke-width:2}
+.pf-kopf{display:grid;grid-template-columns:132px minmax(0,1fr);gap:16px;align-items:end}
+.pf-kopf .bild{width:132px;height:165px}
+.pf-kt{position:relative;min-width:0}
+.pf-kt h1{font-family:var(--f-display);font-weight:800;font-size:34px;line-height:.95;margin:0 0 8px;text-transform:uppercase;padding-right:54px}
+.pf-ver{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:14px;margin-bottom:8px}
+.pf-tags{display:flex;flex-wrap:wrap;gap:6px}
+.pf-tag{font:700 11px var(--f-mono);letter-spacing:.04em;padding:4px 7px;border-radius:6px;background:var(--soft)}
+.pf-tag.raus{background:rgba(226,74,74,.2);color:#FF9A9A}.pf-tag.frag{background:rgba(224,150,43,.2);color:#F7C27A}.pf-tag.sperre{background:rgba(155,107,232,.22);color:#C9AEF7}
+.pf-mk{position:absolute;right:0;top:2px;width:46px;height:69px;border-radius:5px;background:#1E5A3E;overflow:hidden}
+.pf-mk i{position:absolute;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:#fff}
+.pf-rasen{position:absolute;inset:0;width:100%;height:100%}
+.pf-blick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pf-blick > div{background:var(--card);border-radius:12px;padding:10px 8px 9px;display:grid;grid-template-rows:14px 26px 16px;gap:3px;min-width:0;text-align:center;justify-items:center;align-items:center}
+.pf-blick .k{font:600 10px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pf-blick b{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:26px;text-transform:uppercase;white-space:nowrap}
+.pf-blick small{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.oe{font-family:var(--f-body);font-weight:400;font-size:.62em;margin-right:2px;opacity:.85;vertical-align:.12em}
+.pf-box{background:var(--card);border-radius:14px;padding:14px;display:grid;gap:8px}
+.pf-box > .kap{margin-top:6px}.pf-box > .kap:first-child{margin-top:0}
+.pf-kb{border:1px solid rgba(110,155,255,.35);background:linear-gradient(180deg,rgba(47,91,255,.12),var(--card) 70%)}
+.pf-w{font-size:14px;color:var(--muted);margin:0}
+.pf-stds{display:flex;flex-wrap:wrap;gap:6px}.pf-std{background:rgba(110,155,255,.18);color:#C7D7FF;font-weight:600;font-size:13px;padding:5px 9px;border-radius:8px}.pf-std i{font-style:normal;color:var(--muted);font-weight:500}
+.pf-warn{font:700 10.5px var(--f-mono);color:#E0962B;margin-left:6px;text-transform:none;letter-spacing:0}
+.pf-km{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:14px;padding:6px 0;border-top:1px solid var(--line)}
+.pf-km .gg{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pf-km .gg small{color:var(--muted);font-size:11.5px}.pf-km .r{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.pf-km.pause{color:var(--muted);font-style:italic}
+.pf-wb{font:700 10.5px var(--f-mono);padding:3px 0;border-radius:5px;text-align:center}.pf-wb.l{background:var(--soft);color:var(--muted)}.pf-wb.p{background:rgba(224,150,43,.2);color:#F7C27A}.pf-wb.c{background:rgba(155,107,232,.22);color:#C9AEF7}
+.pf-prow{display:grid;grid-template-columns:84px minmax(0,1fr);gap:16px;align-items:center}
+.pf-pfeld{position:relative;width:84px;height:126px;border-radius:7px;background:#1E5A3E;overflow:hidden}
+.pf-pb{position:absolute;width:var(--g);height:var(--g);margin:calc(var(--g) / -2);border-radius:50%;background:#fff;color:#0E1726;font:800 9px var(--f-mono);display:grid;place-items:center}
+.pf-pinfo{display:grid;gap:6px;justify-items:start}
+.pf-pn{font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1;text-transform:uppercase}
+.pf-rolle{font:700 11px var(--f-mono);letter-spacing:.05em;border:1px solid;border-radius:6px;padding:3px 7px}
+.pf-pz{font-size:13px}.pf-pz b{font-family:var(--f-display);font-size:16px;font-weight:700}
+.pf-er{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.pf-er span{color:var(--muted);text-align:right}
+.pf-zahlen{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;text-align:center}
+.pf-zahlen div{background:var(--soft);border-radius:10px;padding:10px 2px 8px}
+.pf-zahlen b{display:block;font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1}
+.pf-zahlen span{font-size:10.5px;color:var(--muted)}
+.pf-saeulen{display:flex;gap:4px;align-items:flex-end;margin-top:8px}
+.pf-sae{flex:1;display:grid;justify-items:center;gap:4px;padding:2px 0 4px;border-radius:8px;min-width:0}
+.pf-sae.cup{flex:.75}
+.pf-sae .fl{height:64px;width:72%;display:flex;align-items:flex-end;background:rgba(255,255,255,.04);border-radius:5px;overflow:hidden}
+.pf-sae .s{display:block;width:100%;border-radius:4px 4px 0 0;position:relative}
+.pf-sae .s em{position:absolute;left:0;right:0;top:3px;font:700 9.5px var(--f-mono);font-style:normal;color:#fff;text-align:center}
+.pf-sae .s.S{background:#6E9BFF}.pf-sae .s.E{background:#4ADE80}.pf-sae .s.B{background:#5B6780}.pf-sae .s.X{background:#E24A4A}
+.pf-sae.po .s.S,.pf-sae.po .s.E{background:#E0962B}.pf-sae.cl .s.S,.pf-sae.cl .s.E{background:#9B6BE8}
+.pf-sae .md{font:600 10px var(--f-mono);color:var(--muted)}.pf-sae.po .md{color:#F7C27A}.pf-sae.cl .md{color:#C9AEF7}
+.pf-sae .pf-ohne{width:18px;height:18px}
+.pf-sae .tz{height:14px;font-size:10px;line-height:14px;white-space:nowrap}.pf-sae .tz i{font:700 9.5px var(--f-mono);font-style:normal;background:var(--ink);color:var(--bg);border-radius:4px;padding:0 3px;margin-left:1px}
+.pf-sae[aria-pressed="true"]{background:var(--soft);outline:2px solid #6E9BFF}
+.pf-det{font-size:13.5px;background:var(--soft);border-radius:10px;padding:10px 12px;display:none}.pf-det.an{display:block}
+.pf-leg{display:flex;gap:8px;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden}.pf-leg span{display:flex;gap:3px;align-items:center}
+.pf-leg i{display:inline-block;width:10px;height:10px;border-radius:3px}.pf-leg .S{background:#6E9BFF}.pf-leg .E{background:#4ADE80}.pf-leg .B{background:#5B6780}.pf-leg .X{background:#E24A4A}.pf-leg .po{background:#E0962B}.pf-leg .cl{background:#9B6BE8}
+.pf-einsch{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:13.5px}.pf-einsch .k{display:block;font:600 10.5px var(--f-mono);letter-spacing:.05em;color:#6E9BFF;margin-bottom:4px}
+.pf-ph{display:grid;margin-top:8px}.pf-ph div{display:grid;grid-template-columns:62px 1fr;font-size:13px;padding:3px 0}.pf-ph span:first-child{color:var(--muted);font-size:12px}.pf-ph .prog span:last-child{color:#B5CBFF}
+.pf-vgl{font-size:12px;color:var(--muted);margin:6px 0 0}
+.pf-tl .ev{display:grid;grid-template-columns:14px 1fr;gap:12px;padding-bottom:12px;position:relative}
+.pf-tl .ev::before{content:"";position:absolute;left:6px;top:14px;bottom:0;width:2px;background:var(--line)}.pf-tl .ev:last-child::before{display:none}
+.pf-tl .ev > i{width:14px;height:14px;border-radius:50%;margin-top:3px}
+.pf-tl .dt{font-size:12px;color:var(--muted)}.pf-tl .g{font-size:14px}.pf-tl .q{font-size:12px;color:var(--muted)}
+.pf-nw{display:grid;padding:9px 0;border-top:1px solid var(--line);width:100%;min-width:0}.pf-box > .kap + .pf-nw{border-top:0}
+.pf-nw span{font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pf-nw small{color:var(--muted);font-size:12px}
+.pf-alle{color:var(--accent);font-weight:600;font-size:14px;text-align:center;padding-top:6px}
+.pf-fuss{font-size:12px;color:var(--muted);text-align:center}
+.wer-btn{font:inherit;color:inherit;text-align:left;border-bottom:1px dashed rgba(169,180,198,.5)}
+button.chip.pfc{cursor:pointer}
 </style>
+
 
 <header class="bar"><div class="bar-in">
   <div class="logo" aria-label="WOSOINSIDER"><b>WOSO</b><i>INSIDER</i></div>
+  <button class="such-btn" data-suche="1" aria-label="Spielerin suchen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
   <div class="seg" role="tablist"><button id="tab-meldungen" role="tab" aria-selected="true" data-tab="meldungen">News</button><button id="tab-spielplan" role="tab" aria-selected="false" data-tab="spielplan">Spielplan</button><button id="tab-inside" role="tab" aria-selected="false" data-tab="inside">Inside</button></div>
 </div></header>
 
@@ -814,6 +902,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     if (o.info) h += `<span class="gr">(${esc(o.info)})</span>`;
     if (o.mark === "neu") h += '<span class="neu">NEU</span>'; else if (o.mark === "raus") h += '<span class="raus">RAUS</span>';
     const cls = `chip${o.stufe ? " st" : ""}${o.dim ? " dim" : ""}${o.sel ? " sel" : ""}`;
+    if (o.prof && !o.btn) return `<button class="${cls} pfc" data-profilname="${esc(o.prof)}">${h}</button>`;
     return o.btn ? `<button class="${cls}" data-chip="${esc(o.btn)}" title="${esc(o.title || "")}">${h}</button>` : `<span class="${cls}">${h}</span>`;
   }
   function posZeilen(l, f){
@@ -832,7 +921,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     if (!Array.isArray(L) || !L.length) return "";
     L = L.slice().sort((a, b) => (b.verein === verein) - (a.verein === verein));  // eigener Verein zuerst
     const team = (t, i) => {
-      const c = s => ({n: s.n, tore: s.tore || 0, gelb: s.gelb, rot: s.rot, gelbMin: s.gelb_min, rotMin: s.rot_min, mark: s.f, aus: s.aus});
+      const c = s => ({n: s.n, tore: s.tore || 0, gelb: s.gelb, rot: s.rot, gelbMin: s.gelb_min, rotMin: s.rot_min, mark: s.f, aus: s.aus, prof: (t.k || KURZ[t.verein]) + "|" + s.n});
       const tl = (t.tore || []).map(g => `<span${g.eigen ? "" : ' class="g"'}>${esc(g.min)}' ${esc(g.n)}${g.art ? " (" + esc(g.art) + ")" : ""}${g.vorlage ? " (Vorlage " + esc(g.vorlage) + ")" : ""}</span>`).join(", ");
       let h = (tl ? `<div class="zeile tl"><b>TORE</b>${tl}</div>` : "") + posZeilen(t.startelf || [], s => chip(c(s)));
       if ((t.eingewechselt || []).length) h += kap("Eingewechselt") + `<div class="chips">${t.eingewechselt.map(s => chip({...c(s), ein: true, einMin: s.ein_min})).join("")}</div>`;
@@ -860,7 +949,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
           <div style="display:flex;gap:8px;align-items:center">${logo(KURZ[m.verein], 30)}<h1 class="disp" style="font-size:26px">${esc(m.headline)}</h1></div>
           <div class="dat">${esc(lang(m.zeit))}</div></div>${aufBlock(a)}`
       : `<div style="display:grid;gap:12px"><div class="mk">${bild(m, 96)}<div class="mk-m"><div class="tags">${(m.tags || []).map(tag).join("")}</div>
-          <div class="wer">${esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc([m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
+          <div class="wer">${istSpielerin(m) && m.spielerin ? `<button class="wer-btn" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}">${esc(m.spielerin)}</button>` : esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc([m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
           ${st ? `<div class="mk-st">${plakette(meldungsStatus(m), 28)}<span>${st[2]}</span></div>` : ""}</div>
           <h1 class="disp" style="font-size:30px">${esc(m.headline)}</h1><div class="dat">${esc(lang(m.zeit))}</div></div>
           <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>${spielAufstellung(m.spiel_aufstellung, m.verein)}`;
@@ -870,7 +959,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       ? (!freigabe(fi) && quelleURL(fi) ? `<a href="${esc(quelleURL(fi))}" target="_blank" rel="noopener">${nachweis(fi)}, Wikimedia Commons</a>` : nachweis(fi))
       : fc && fc.autor ? (fc.url ? `<a href="${esc(fc.url)}" target="_blank" rel="noopener">Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}, Wikimedia Commons</a>` : `Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}`) : "";
     ARTIKEL = id; const um = umfrageZu(m.id);
-    $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${um ? umfrageBlock(um) : ""}${kbBox(m.kickbase)}
+    $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${um ? umfrageBlock(um) : ""}${kbBox(m.kickbase)}<div id="pf-karte">${auf ? "" : profilKarte(m)}</div>
       <div id="kom" data-beitrag="${esc(m.id)}"></div>
       <div class="nachw">
       ${m.instagram ? `<a href="${esc(m.instagram)}" target="_blank" rel="noopener" style="font-size:14px">Instagram-Profil von ${esc(m.spielerin)}</a>` : ""}
@@ -879,6 +968,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       ${credit ? `<div class="credit">${credit}</div>` : ""}
       </div>
     </article>`;
+    if (!auf && !SPN && istSpielerin(m)) ladeSPN().then(() => { const el = $("#pf-karte"); if (el && ARTIKEL === id) el.innerHTML = profilKarte(m); }).catch(() => {});
     // Kommentare: nur in der öffentlichen Webversion (Skripte setzt ticker_bau.py ein)
     if (window.WIKOM) window.WIKOM.mount(m.id);
     window.scrollTo(0, 0);
@@ -996,13 +1086,13 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
   }
   function teamBlock(name, k, a, seite){
     let inh;
-    if (a && (a.startelf || []).length) inh = a.typ === "offiziell" ? offiziell(a) : prognose(a, seite);
+    if (a && (a.startelf || []).length) inh = a.typ === "offiziell" ? offiziell(a, k) : prognose(a, seite);
     else inh = '<p class="dat">Noch keine Aufstellung.</p>';
     const badge = a ? (a.typ === "offiziell" ? '<span class="badge off">OFFIZIELL</span>' : '<span class="badge ein">EINSCHÄTZUNG</span>') : "";
     return `<div class="kartebox"><div class="tb-k">${logo(k, 22)}<span class="n">${esc(name)}</span>${a && a.formation ? `<span class="f">${esc(a.formation)}</span>` : ""}${badge}</div>${inh}</div>`;
   }
-  function offiziell(a){
-    const c = s => ({n: s.n, tore: s.tore || 0, rot: s.rot, gelb: s.gelb, gelbMin: s.gelb_min, rotMin: s.rot_min});
+  function offiziell(a, k){
+    const c = s => ({n: s.n, tore: s.tore || 0, rot: s.rot, gelb: s.gelb, gelbMin: s.gelb_min, rotMin: s.rot_min, prof: k ? k + "|" + (s.voll || s.n) : null});
     let h = posZeilen(a.startelf, s => chip({...c(s), aus: s.aus}));
     const bank = a.bank || [], rein = bank.filter(s => s.ein === true), draussen = bank.filter(s => s.ein !== true), bekannt = bank.some(s => s.ein != null);
     if (bekannt) {
@@ -1352,10 +1442,218 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     if (VIEW === "inside") inside(); else if (VIEW === "spielplan") spielplan(); else list();
     window.scrollTo(0, y);
   }
+  // ---------------- Suche und Spielerinnenprofil (spielerinnen.json, Finn 31.10.2026)
+  let SPN = null, SPN_LADEN = null, PR_STAPEL = [], PR_HER = null, PR_NEWSALLE = false;
+  const KBNAME = {TW:"TORWART", ABW:"ABWEHR", MF:"MITTELFELD", ST:"STURM"};
+  const STFARBE = {raus:"#E24A4A", gesperrt:"#9B6BE8", fraglich:"#E0962B", fit:"#2EB872", zurueck:"#2EB872"};
+  const PSTUFE = {sicher:["Sicher","#6E9BFF"], erwartet:["Erwartet","#22C55E"], unsicher:["Unsicher","#F59E0B"], unwahrscheinlich:["Unwahrscheinlich","#F87171"], ausgeschlossen:["Fällt aus","#8A95A8"]};
+  const normS = s => String(s || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/ð/g, "d").replace(/ß/g, "ss").replace(/ø/g, "o").replace(/ł/g, "l").toLowerCase();
+  const nachN = n => String(n || "").trim().split(/\s+/).slice(-1)[0];
+  const ladeSPN = () => SPN ? Promise.resolve(SPN) : (SPN_LADEN = SPN_LADEN || json("spielerinnen.json").then(d => { SPN = d; return d; }).catch(e => { SPN_LADEN = null; throw e; }));
+  const findeSP = (k, nach) => { const l = ((SPN && SPN.spielerinnen) || []).filter(x => x.k === k && (normS(nachN(x.n)) === normS(nach) || normS(x.n) === normS(nach))); return l.length === 1 ? l[0] : null; };
+  const spById = id => ((SPN && SPN.spielerinnen) || []).find(x => x.id === id);
+  const zuletzt = () => { try { return JSON.parse(localStorage.getItem("woso-zuletzt") || "[]"); } catch(e) { return []; } };
+  const merkeZuletzt = id => { try { localStorage.setItem("woso-zuletzt", JSON.stringify([id, ...zuletzt().filter(x => x !== id)].slice(0, 4))); } catch(e) {} };
+  function pfFoto(s, w, h, r, gross){
+    const f = FOTOS[s.n] || {}, src = f.portrait || f.datei;
+    if (!src) return `<div class="bild" style="width:${w}px;height:${h}px;border-radius:${r}px;background:linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.18)),${KFARBE[s.k] || "var(--soft)"}" aria-hidden="true">${SIL}</div>`;
+    const g = WMG[s.k], wmi = g ? `<img class="wm" src="logos/wm/${esc(s.k)}.png" alt="" style="width:${Math.min(100, g[0] * (gross ? 1.3 : 1))}%;height:${Math.min(100, g[1] * (gross ? 1.3 : 1))}%${s.k === "FCU" ? ";top:30%" : ""}" onerror="this.remove()">` : "";
+    return `<div class="bild fg" style="width:${w}px;height:${h}px;border-radius:${r}px;background:radial-gradient(circle at 50% 45%,#3A4F78 0%,#2A3B5E 70%)" aria-hidden="true">${wmi}<img class="f" src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()"></div>`;
+  }
+  function rasen(dick){
+    const L = `stroke="rgba(255,255,255,${dick ? .55 : .4})" stroke-width="${dick ? 1.1 : .6}" fill="none"`;
+    return `<svg class="pf-rasen" viewBox="-2 -2 72 109" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="0" width="68" height="105" ${L}/><line x1="0" y1="52.5" x2="68" y2="52.5" ${L}/>
+      <circle cx="34" cy="52.5" r="9.15" ${L}/><circle cx="34" cy="52.5" r=".7" fill="rgba(255,255,255,.5)"/><rect x="13.85" y="0" width="40.3" height="16.5" ${L}/><rect x="24.85" y="0" width="18.3" height="5.5" ${L}/>
+      <rect x="13.85" y="88.5" width="40.3" height="16.5" ${L}/><rect x="24.85" y="99.5" width="18.3" height="5.5" ${L}/><path d="M26.7 16.5 A9.15 9.15 0 0 0 41.3 16.5" ${L}/><path d="M26.7 88.5 A9.15 9.15 0 0 1 41.3 88.5" ${L}/>
+      <circle cx="34" cy="11" r=".6" fill="rgba(255,255,255,.5)"/><circle cx="34" cy="94" r=".6" fill="rgba(255,255,255,.5)"/></svg>`;
+  }
+  const fx = x => 2 / 72 * 100 + x * 68 / 72 * 100, fy = y => 2 / 109 * 100 + (1 - y) * 105 / 109 * 100;
+  const seiteW = x => x < .4 ? "links" : x > .6 ? "rechts" : "zentral";
+  const zoneW = y => y < .2 ? "Tor" : y < .4 ? "Abwehr" : y < .6 ? "Mittelfeld" : y < .8 ? "Offensive" : "Sturm";
+  const platzW = (x, y) => zoneW(y) === "Tor" ? "Tor" : zoneW(y) + " " + seiteW(x);
+  function kurzZurueck(s){
+    if (!s) return "";
+    const M = {januar:"Januar",februar:"Februar",märz:"März",april:"April",mai:"Mai",juni:"Juni",juli:"Juli",august:"August",september:"September",oktober:"Oktober",november:"November",dezember:"Dezember"};
+    const t = String(s.rueckkehr || "").toLowerCase(), m = Object.keys(M).find(k => t.includes(k));
+    if (m) return "zurück " + M[m];
+    const d = t.match(/(\d{1,2})\.(\d{1,2})\./); if (d) return "zurück " + d[1] + "." + d[2] + ".";
+    if (s.stand) { const tage = Math.max(0, Math.round((Date.now() - dt(s.stand)) / 864e5)); return tage ? "seit " + tage + " Tagen" : "seit heute"; }
+    return "";
+  }
+  function oeffneProfil(id, her){
+    if (!PR_STAPEL.length) PR_HER = her || PR_HER || {typ: VIEW};
+    BACK = "profil";
+    ladeSPN().then(() => { const s = spById(id); if (!s) { $("#main").innerHTML = `<div class="det">${pfZurueck()}<p class="leer">Profil nicht gefunden.</p></div>`; return; }
+      if (PR_STAPEL[PR_STAPEL.length - 1] !== id) PR_STAPEL.push(id); merkeZuletzt(id); setHash("spielerin/" + id); profilSeite(s); window.scrollTo(0, 0); })
+      .catch(() => { $("#main").innerHTML = `<div class="det">${pfZurueck()}<p class="leer">Die Profile konnten nicht geladen werden. Seite neu laden.</p></div>`; });
+  }
+  const pfZurueck = () => `<button class="back" data-prback="1">‹ Zurück</button>`;
+  function profilZurueck(){
+    PR_STAPEL.pop();
+    if (PR_STAPEL.length) { const s = spById(PR_STAPEL[PR_STAPEL.length - 1]); if (s) { setHash("spielerin/" + s.id); profilSeite(s); window.scrollTo(0, 0); return; } }
+    const h = PR_HER || {typ: "meldungen"}; PR_HER = null; BACK = null; PR_STAPEL = [];
+    if (h.typ === "suche") { suche(); return; }
+    if (h.typ === "artikel" && h.id) { VIEW = "meldungen"; setHash(h.id); article(h.id); return; }
+    if (h.typ === "spiel" && h.id) { VIEW = "spielplan"; spiel(h.id); return; }
+    show(h.typ === "spielplan" || h.typ === "inside" ? h.typ : "meldungen"); if (h.scroll) window.scrollTo(0, h.scroll);
+  }
+  function suche(q){
+    if (!PR_HER || PR_HER.typ !== "suche") PR_HER = null;
+    BACK = "suche"; PR_STAPEL = []; setHash("suche");
+    $("#main").innerHTML = `<div class="det pf-such">${`<button class="back" data-suchezu="1">‹ Zurück</button>`}
+      <label class="pf-feld">${svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>', "pf-lupe")}<input type="search" placeholder="Spielerin oder Verein suchen" autocomplete="off" enterkeyhint="search" aria-label="Spielerin oder Verein suchen"></label>
+      <div id="pf-erg"><p class="leer">Profile werden geladen …</p></div></div>`;
+    const inp = $(".pf-feld input"); if (q) inp.value = q;
+    const zeig = () => {
+      if (!SPN) return;
+      const t = normS(inp.value.trim()), L = SPN.spielerinnen;
+      const zeile = s => { const st = s.status ? s.status.s : "fit";
+        return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 52, 52, 9)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc((KBNAME[s.pos] || s.pos || "").toLowerCase().replace(/^./, c => c.toUpperCase()))}${s.nr ? " · Nr. " + esc(s.nr) : ""}</small></span><i class="pf-dot" style="background:${STFARBE[st] || STFARBE.fit}" title="${esc(st)}"></i></button>`; };
+      let h = "";
+      if (!t) {
+        const zl = zuletzt().map(spById).filter(Boolean);
+        if (zl.length) h += kap("Zuletzt angesehen") + `<div class="pf-liste">${zl.map(zeile).join("")}</div>`;
+        const grenze = Date.now() - 7 * 864e5, z = {};
+        N.forEach(m => { if (m.spielerin && dt(m.zeit) > grenze) z[m.spielerin] = (z[m.spielerin] || 0) + 1; });
+        const im = Object.entries(z).sort((a, b) => b[1] - a[1]).map(([n]) => L.find(s => s.n === n)).filter(Boolean).slice(0, 6);
+        if (im.length) h += kap("Gerade im Gespräch") + `<div class="pf-liste">${im.map(zeile).join("")}</div>`;
+        h += `<p class="pf-tipp">Tipp: Namen in Meldungen und Aufstellungen lassen sich antippen und öffnen das Profil.</p>`;
+      } else {
+        const sp = L.filter(s => normS(s.n).includes(t) || normS(nachN(s.n)).startsWith(t)).sort((a, b) => (normS(nachN(b.n)).startsWith(t)) - (normS(nachN(a.n)).startsWith(t)) || a.n.localeCompare(b.n, "de"));
+        const ve = ALLE.filter(k => normS(kname(k)).includes(t) || normS(Object.keys(KURZ).find(v => KURZ[v] === k) || "").includes(t));
+        if (sp.length) h += kap("Spielerinnen") + `<div class="pf-liste">${sp.slice(0, 30).map(zeile).join("")}</div>`;
+        if (ve.length) h += kap("Vereine") + `<div class="pf-liste">${ve.map(k => `<button class="pf-tr" data-suchverein="${k}"><span class="pf-lg">${logo(k, 32)}</span><span class="pf-tx"><b>${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</b><small>Kader</small></span></button>`).join("")}</div>`;
+        if (!h) h = '<p class="leer">Keine Spielerin gefunden. Der Nachname reicht.</p>';
+      }
+      $("#pf-erg").innerHTML = h;
+    };
+    inp.addEventListener("input", zeig);
+    ladeSPN().then(zeig).catch(() => { $("#pf-erg").innerHTML = '<p class="leer">Die Profile konnten nicht geladen werden.</p>'; });
+    setTimeout(() => inp.focus(), 50);
+  }
+  function vereinsKader(k){
+    BACK = "suche";
+    const L = SPN.spielerinnen.filter(s => s.k === k), ord = {TW:0, ABW:1, MF:2, ST:3};
+    L.sort((a, b) => (ord[a.pos] ?? 9) - (ord[b.pos] ?? 9) || (parseInt(a.nr, 10) || 99) - (parseInt(b.nr, 10) || 99));
+    const zeile = s => { const st = s.status ? s.status.s : "fit"; return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small></span><i class="pf-dot" style="background:${STFARBE[st] || STFARBE.fit}"></i></button>`; };
+    $("#main").innerHTML = `<div class="det pf-such"><button class="back" data-suchezu="2">‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>
+      ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}</div>`;
+    window.scrollTo(0, 0);
+  }
+  function warumSatz(s, pr){
+    const m = String(pr.warum || "").match(/(\d+)\/(\d+) Startelf/);
+    if (pr.st === "ausgeschlossen") return `Fällt aus (${pr.grund || "verletzt"}).${m ? ` Vorher ${m[1]} der letzten ${m[2]} Spiele in der Startelf.` : ""}`;
+    const letzte = s.spiele.slice(-(m ? Number(m[2]) : 5)), aus = letzte.filter(e => e.art === "S" && e.aus).length;
+    return m ? `${m[1]} der letzten ${m[2]} Spiele in der Startelf${Number(m[1]) ? (aus ? `, davon ${aus}x vorzeitig ausgewechselt.` : ", jeweils über 90 Minuten.") : "."}` : String(pr.warum || "");
+  }
+  function profilSeite(s){
+    const nach = nachN(s.n), vorn = s.n.slice(0, s.n.length - nach.length).trim(), sp = s.spiele || [], st = s.status ? s.status.s : "fit";
+    const pr = s.prognose, sf = pr ? PSTUFE[pr.st] || [pr.st, "var(--muted)"] : null, wert = pr && pr.st !== "ausgeschlossen" ? pr.wert : null;
+    const V = (SPN.vereine || {})[s.k] || {};
+    const haupt = (s.orte || [])[0];
+    // Kopf
+    const stTag = st === "raus" ? '<span class="pf-tag raus">VERLETZT</span>' : st === "gesperrt" ? '<span class="pf-tag sperre">GESPERRT</span>' : st === "fraglich" ? '<span class="pf-tag frag">FRAGLICH</span>' : "";
+    let h = `<div class="pf-kopf">${pfFoto(s, 132, 165, 12, true)}<div class="pf-kt">${haupt ? `<span class="pf-mk" title="Position im Spiel">${rasen(true)}<i style="left:${Math.min(86, Math.max(14, fx(haupt[0])))}%;top:${fy(haupt[1])}%"></i></span>` : ""}
+      <h1>${vorn ? esc(vorn) + "<br>" : ""}${esc(nach)}</h1><div class="pf-ver">${logo(s.k, 20)}${esc(s.verein)}${s.nr ? " · Nr. " + esc(s.nr) : ""}</div>
+      <div class="pf-tags">${stTag}<span class="pf-tag">${esc(KBNAME[s.pos] || s.pos || "")}</span></div></div></div>`;
+    // Auf einen Blick
+    const eins = sp.filter(e => e.art === "S" || e.art === "E").slice(-3), avg = eins.length ? Math.round(eins.reduce((a, e) => a + e.min, 0) / eins.length) : 0;
+    const fT = eins.reduce((a, e) => a + (e.tore || []).length, 0), fV = eins.reduce((a, e) => a + (e.vorl || 0), 0);
+    const stB = st === "fit" ? ["Fit", "nichts gemeldet", STFARBE.fit] : [st === "raus" ? "Verletzt" : st === "gesperrt" ? "Gesperrt" : "Fraglich", kurzZurueck(s.status), STFARBE[st]];
+    h += `<div class="pf-blick"><div><span class="k">Status</span><b style="color:${stB[2]}">${esc(stB[0])}</b><small>${esc(stB[1])}</small></div>
+      <div><span class="k">Nächster Spieltag</span><b style="color:${sf ? sf[1] : "var(--muted)"}">${esc(sf ? sf[0] : "offen")}</b><small>${wert != null ? "Einsatzwert " + wert + " %" : pr && pr.grund ? esc(pr.grund) : ""}</small></div>
+      <div><span class="k">Letzte 3 Einsätze</span><b>${eins.length ? `<span class="oe">Ø</span>${avg}'` : "0"}</b><small>${fT} ${fT === 1 ? "Tor" : "Tore"} · ${fV} ${fV === 1 ? "Vorlage" : "Vorlagen"}</small></div></div>`;
+    // Für Kickbase
+    const ART = {elfmeter: "Elfmeter", freistoesse: "Freistöße", ecken: "Ecken"};
+    const std = Object.entries(s.standards || {}).map(([a, r]) => `<span class="pf-std">${ART[a] || a}${r > 1 ? ` <i>${r}. Wahl</i>` : ""}</span>`).join("");
+    const zeilen = [], kom = V.kommend || [];
+    kom.forEach((z, i) => { if (i && (dt(z.datum) - dt(kom[i - 1].datum)) / 864e5 >= 14) zeilen.push({pause: Math.round((dt(z.datum) - dt(kom[i - 1].datum)) / 864e5)}); zeilen.push(z); });
+    const dicht = (() => { let mx = 0; kom.forEach((z, i) => { let c = 1; for (let j = i + 1; j < kom.length; j++) if ((dt(kom[j].datum) - dt(z.datum)) / 864e5 <= 8) c++; mx = Math.max(mx, c); }); return mx; })();
+    const WB = {Liga: ["LIGA", "l"], Pokal: ["POKAL", "p"], CL: ["UWCL", "c"], Europapokal: ["EUROPA", "c"]};
+    const komH = zeilen.slice(0, 3).map(z => z.pause ? `<div class="pf-km pause"><span class="pf-wb l">PAUSE</span><span>Länderspielpause</span><span class="r">${z.pause} Tage ohne Spiel</span></div>`
+      : `<div class="pf-km"><span class="pf-wb ${(WB[z.wb] || WB.Liga)[1]}">${(WB[z.wb] || WB.Liga)[0]}</span><span class="gg">${z.ha === "H" ? "gegen" : "in"} ${esc(kname(z.gk) !== z.gk && z.gk ? kname(z.gk) : z.gegner)}${z.rang ? ` <small>${z.rang}.</small>` : ""}</span><span class="r">${esc(tagDatum(z.datum))}, ${esc(uhr(dt(z.datum)))}</span></div>`).join("");
+    h += `<section class="pf-box pf-kb">${kap("Für Kickbase")}${pr ? `<p class="pf-w">${esc(warumSatz(s, pr))}</p>` : `<p class="pf-w">Für den nächsten Spieltag gibt es noch keine Prognose.</p>`}
+      ${std ? kap("Standards") + `<div class="pf-stds">${std}</div>` : ""}
+      ${komH ? `<div class="kap">Nächste Spiele${dicht >= 3 ? ` <span class="pf-warn">${dicht} Spiele in 8 Tagen</span>` : ""}</div>${komH}` : ""}</section>`;
+    // Ihre Position
+    if (haupt) {
+      const ol = s.orte.map(([x, y, c]) => ({x, y, c})), starts = ol.reduce((a, o) => a + o.c, 0), kader = sp.filter(e => e.art !== "X").length;
+      ol.forEach((o, i) => { o.px = Math.min(84, Math.max(16, fx(o.x))); o.py = fy(o.y);
+        for (let j = 0; j < i; j++) if (Math.abs(ol[j].px - o.px) < 20 && Math.abs(ol[j].py - o.py) < 12) { const d = o.px >= ol[j].px ? 1 : -1; o.px = Math.min(84, Math.max(16, ol[j].px + d * 22)); if (Math.abs(ol[j].px - o.px) < 20) ol[j].px -= d * 22; } });
+      const q = kader ? starts / kader : 0, rolle = q >= .75 ? ["STAMMPLATZ", "#2EB872"] : q >= .4 ? ["ROTATION", "#E0962B"] : ["HERAUSFORDERIN", "#A9B4C6"];
+      const stS = sp.filter(e => e.art === "S"), avgS = stS.length ? Math.round(stS.reduce((a, e) => a + e.min, 0) / stS.length) : 0;
+      const ers = (s.ersatz || []).map(r => `<div class="pf-er"><b>${esc(r.n)}</b><span>${[r.s ? r.s + "x für sie in der Startelf" : "", r.w ? r.w + "x für sie eingewechselt" : ""].filter(Boolean).join(" · ")}</span></div>`).join("");
+      h += `<section class="pf-box">${kap("Ihre Position")}<div class="pf-prow"><div class="pf-pfeld">${rasen(false)}${ol.map(o => `<span class="pf-pb" style="left:${o.px}%;top:${o.py}%;--g:${ol.length > 1 ? 10 + o.c / starts * 8 : 14}px;opacity:${ol.length > 1 ? .55 + .45 * o.c / starts : 1}">${ol.length > 1 ? o.c : ""}</span>`).join("")}</div>
+        <div class="pf-pinfo"><b class="pf-pn">${esc(platzW(haupt[0], haupt[1]))}</b><span class="pf-rolle" style="color:${rolle[1]};border-color:${rolle[1]}">${rolle[0]}</span>
+        <div class="pf-pz"><b>${starts}</b> von ${kader} Spielen in der Startelf${kader < sp.length ? ` <span class="mu">(${sp.length - kader}x nicht im Kader)</span>` : ""}</div>
+        <div class="pf-pz"><b><span class="oe">Ø</span>${avgS}'</b> wenn sie beginnt</div>
+        ${ol.length > 1 ? `<div class="pf-pz mu">auch: ${ol.slice(1).map(o => esc(platzW(o.x, o.y)) + " " + o.c + "x").join(", ")}</div>` : ""}</div></div>
+        ${kap("Wer sie ersetzt")}${ers || '<div class="pf-er"><span>Bisher keine, sie hat immer selbst gespielt.</span></div>'}</section>`;
+    }
+    // Saison mit Pokal
+    const alle = sp.map(e => ({...e, typ: "Liga"})).concat((s.pokal || []).filter(e => e.art !== "B" || true).map(e => {
+      const min = e.art === "S" ? Number(e.aus || 90) : e.art === "E" ? Math.max(1, 90 - Number(e.ein || 90)) : 0;
+      return {...e, typ: /pokal/i.test(e.wb || "") ? "Pokal" : "CL", min, tore: e.tore ? Array(e.tore).fill("") : [], gk: KURZ[e.gegner]}; }))
+      .sort((a, b) => String(a.datum || "").localeCompare(String(b.datum || "")));
+    const tore = sp.reduce((a, e) => a + (e.tore || []).length, 0), vorl = sp.reduce((a, e) => a + (e.vorl || 0), 0), min = sp.reduce((a, e) => a + (e.min || 0), 0), karten = sp.filter(e => e.gelb || e.rot).length;
+    h += `<section class="pf-box">${kap("Saison Bundesliga")}<div class="pf-zahlen"><div><b>${sp.filter(e => e.art === "S").length}/${sp.length}</b><span>Startelf</span></div><div><b>${zahlDE(min)}</b><span>Minuten</span></div><div><b>${tore}</b><span>Tore</span></div><div><b>${vorl}</b><span>Vorlagen</span></div><div><b>${karten}</b><span>Karten</span></div></div>
+      ${alle.length ? `<div class="pf-saeulen">${alle.map((e, i) => { const hoch = e.art === "S" || e.art === "E" ? Math.max(8, Math.min(120, e.min) / 120 * 100) : 8;
+        const lab = e.typ === "Liga" ? e.md + "." : e.typ === "Pokal" ? "P" : "CL";
+        return `<button class="pf-sae${e.typ !== "Liga" ? " cup " + (e.typ === "Pokal" ? "po" : "cl") : ""}" data-sae="${i}" aria-pressed="false" aria-label="${esc(lab + " " + e.gegner)}"><span class="tz">${(e.tore || []).length ? "⚽".repeat(Math.min(3, e.tore.length)) : ""}${e.vorl ? "<i>V</i>" : ""}</span>
+          <span class="fl"><span class="s ${e.art}" style="height:${hoch}%">${e.art === "S" || e.art === "E" ? `<em>${e.min}'</em>` : ""}</span></span>${e.gk ? logo(e.gk, 18) : '<span class="pf-ohne"></span>'}<span class="md">${lab}</span></button>`; }).join("")}</div>
+      <div class="pf-det" id="pf-det"></div>
+      <div class="pf-leg"><span><i class="S"></i>Startelf</span><span><i class="E"></i>Joker</span><span><i class="B"></i>Bank</span><span><i class="X"></i>fehlte</span><span><i class="po"></i>Pokal</span><span><i class="cl"></i>UWCL</span></div>` : '<p class="pf-w">Noch keine Ligaspiele.</p>'}</section>`;
+    // Status-Verlauf
+    if ((s.verlauf || []).length) {
+      const e = s.einschaetzung;
+      h += `<section class="pf-box">${kap("Status-Verlauf")}${e ? `<div class="pf-einsch"><b class="k">UNSERE EINSCHÄTZUNG</b>${esc(e.satz)}<div class="pf-ph">${(e.phasen || []).map(x => `<div${x.prog ? ' class="prog"' : ""}><span>${esc(x.d)}</span><span>${esc(x.t)}${x.prog ? " (Einschätzung)" : ""}</span></div>`).join("")}</div>${e.vergleich ? `<p class="pf-vgl">${esc(e.vergleich)}</p>` : ""}</div>` : ""}
+        <div class="pf-tl">${s.verlauf.slice().reverse().map(v => `<div class="ev"><i style="background:${STFARBE[v.status] || "#8A95A8"}"></i><div><div class="dt">${esc(kurz(dt(v.stand)))} · ${esc({raus: "Ausfall", gesperrt: "Sperre", fraglich: "fraglich", zurueck: "zurück", fit: "fit"}[v.status] || v.status)}</div><div class="g">${esc(v.grund)}</div>${v.rueckkehr ? `<div class="q">${esc(v.rueckkehr)}</div>` : ""}${v.quelle ? `<div class="q">Quelle: ${esc(v.quelle)}</div>` : ""}</div></div>`).join("")}</div></section>`;
+    }
+    // News
+    const nw = N.filter(m => m.spielerin === s.n && m.typ !== "punkt");
+    if (nw.length) h += `<section class="pf-box">${kap("News zu " + nach)}${(PR_NEWSALLE ? nw : nw.slice(0, 3)).map(m => `<button class="pf-nw" data-pfnews="${esc(m.id)}"><span>${esc(m.headline)}</span><small>${esc(kurz(dt(m.zeit)))}${(m.tags || []).length ? " · " + esc(m.tags.join(", ")) : ""}</small></button>`).join("")}${nw.length > 3 && !PR_NEWSALLE ? `<button class="pf-alle" data-pfnewsalle="1">Alle ${nw.length} Meldungen zu ${esc(nach)}</button>` : ""}</section>`;
+    const f = FOTOS[s.n];
+    h += `<div class="pf-fuss">${f && f.autor ? esc(nachweis(f).replace(/<[^>]+>/g, "")) + " · " : ""}Daten: Sportschau, Vereine, eigene Auswertung</div>`;
+    $("#main").innerHTML = `<div class="det pf">${pfZurueck()}<button class="pf-teilen" data-teilen="${esc(s.id)}" aria-label="Profil teilen">${svg('<path d="M12 15V4M8 8l4-4 4 4"/><path d="M6 12v7h12v-7"/>')}</button>${h}</div>`;
+    document.querySelectorAll(".pf-sae").forEach(z => z.addEventListener("click", () => {
+      const e = alle[+z.dataset.sae], det = $("#pf-det"), an = z.getAttribute("aria-pressed") === "true";
+      document.querySelectorAll(".pf-sae").forEach(x => x.setAttribute("aria-pressed", "false"));
+      if (an) { det.classList.remove("an"); return; }
+      z.setAttribute("aria-pressed", "true");
+      const was = e.art === "S" ? `Startelf, ${e.aus ? "ausgewechselt in der " + e.aus + "." : e.min + " Minuten"}` : e.art === "E" ? `eingewechselt${e.ein ? " in der " + e.ein + "." : ""}, ${e.min} Minuten` : e.art === "B" ? "auf der Bank, ohne Einsatz" : "nicht im Kader";
+      const tz = (e.tore || []).filter(Boolean), nt = (e.tore || []).length;
+      const extra = [nt ? (nt > 1 ? nt + " Tore" : "Tor") + (tz.length ? " " + tz.map(m => m + "'").join(", ") : "") : "", e.vorl ? e.vorl + (e.vorl > 1 ? " Vorlagen" : " Vorlage") : "", e.gelb ? "Gelb" + (e.gelb !== true ? " " + e.gelb + "'" : "") : "", e.rot ? "Rot" + (e.rot !== true ? " " + e.rot + "'" : "") : ""].filter(Boolean).join(" · ");
+      const titel = e.typ === "Liga" ? e.md + ". Spieltag" : e.wb || (e.typ === "Pokal" ? "DFB-Pokal" : "Champions League");
+      det.innerHTML = `<b>${esc(titel)}</b> ${e.ha === "A" ? "in" : "gegen"} ${esc(e.gk ? kname(e.gk) : e.gegner)}${e.erg ? " · " + esc(e.erg) : ""}${e.typ !== "Liga" ? ' <span class="mu">(zählt nicht für Kickbase)</span>' : ""}<br>${esc(was)}${extra ? "<br>" + esc(extra) : ""}`;
+      det.classList.add("an");
+    }));
+  }
+  function profilKarte(m){
+    if (!m.spielerin || !istSpielerin(m) || !SPN) return "";
+    const s = findeSP(KURZ[m.verein], m.spielerin) || SPN.spielerinnen.find(x => x.n === m.spielerin); if (!s) return "";
+    const pr = s.prognose, sf = pr ? PSTUFE[pr.st] : null;
+    return `<button class="pf-card" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc((KBNAME[s.pos] || "").toLowerCase().replace(/^./, c => c.toUpperCase()))}${sf ? ` · ${esc(sf[0])} für den ${pr.md}. Spieltag` : ""}</small></span><span class="p">Profil ›</span></button>`;
+  }
+
   document.addEventListener("click", e => {
     const q = s => e.target.closest(s);
     let x;
     if ((x = q("[data-legal]"))) { legal(x.dataset.legal); return; }
+    if (q("[data-suche]")) { PR_HER = {typ: document.querySelector("article.det") && ARTIKEL ? "artikel" : VIEW === "spielplan" && GAME ? "spiel" : VIEW, id: ARTIKEL || GAME, scroll: window.scrollY}; suche(); return; }
+    if ((x = q("[data-suchezu]"))) { if (x.dataset.suchezu === "2") { suche(); return; } const h = PR_HER || {typ: "meldungen"}; PR_HER = null; BACK = null;
+      if (h.typ === "artikel" && h.id) { setHash(h.id); article(h.id); } else if (h.typ === "spiel" && h.id) { VIEW = "spielplan"; spiel(h.id); } else { show(h.typ === "spielplan" || h.typ === "inside" ? h.typ : "meldungen"); if (h.scroll) window.scrollTo(0, h.scroll); } return; }
+    if ((x = q("[data-suchverein]"))) { vereinsKader(x.dataset.suchverein); return; }
+    if ((x = q("[data-profil]"))) { const her = BACK === "suche" ? {typ: "suche"} : document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
+      oeffneProfil(x.dataset.profil, her); return; }
+    if ((x = q("[data-profilname]"))) { const [k, n] = x.dataset.profilname.split("|"), her = document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
+      ladeSPN().then(() => { const sp = findeSP(k, n); if (sp) oeffneProfil(sp.id, her); }).catch(() => {}); return; }
+    if (q("[data-prback]")) { PR_NEWSALLE = false; profilZurueck(); return; }
+    if ((x = q("[data-pfnews]"))) { PR_STAPEL = []; PR_HER = null; BACK = null; VIEW = "meldungen"; setHash(x.dataset.pfnews); article(x.dataset.pfnews); return; }
+    if (q("[data-pfnewsalle]")) { PR_NEWSALLE = true; const s = spById(PR_STAPEL[PR_STAPEL.length - 1]); if (s) { const y = window.scrollY; profilSeite(s); window.scrollTo(0, y); } return; }
+    if ((x = q("[data-teilen]"))) { const u = location.origin + location.pathname + "#spielerin/" + x.dataset.teilen, s = spById(x.dataset.teilen);
+      if (navigator.share) navigator.share({title: s ? s.n + " bei WOSOINSIDER" : "WOSOINSIDER", url: u}).catch(() => {});
+      else if (navigator.clipboard) navigator.clipboard.writeText(u).then(() => { x.setAttribute("aria-label", "Link kopiert"); x.classList.add("ok"); setTimeout(() => x.classList.remove("ok"), 1500); }).catch(() => {});
+      return; }
     if (q("[data-legalback]")) { legalBack(); return; }
     if ((x = q("[data-tab]"))) { show(x.dataset.tab); return; }
     if ((x = q("[data-tabgo]"))) { show(x.dataset.tabgo); return; }
@@ -1393,7 +1691,9 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
   json("news.json").then(d => {
     N = d.meldungen || [];
     const h = decodeURIComponent(location.hash.slice(1));
-    if (h === "spielplan") show("spielplan");
+    if (h.startsWith("spielerin/")) { list(); oeffneProfil(h.slice(10), {typ: "meldungen"}); }
+    else if (h === "suche") { list(); suche(); }
+    else if (h === "spielplan") show("spielplan");
     else if (h === "inside") show("inside");
     else if (h === "analyse") { list(); loadIN().then(() => { if (IN && IN.analyse) anaArticle(); }); }
     else if (INFO[h]) { list(); legal(h); }
