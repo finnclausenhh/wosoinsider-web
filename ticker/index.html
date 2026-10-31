@@ -149,7 +149,8 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .sa{display:grid;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
 .sa-k{display:flex;align-items:center;gap:8px;font-weight:700;flex-wrap:wrap}.sa-k .w{margin-left:auto;font-size:12px;color:var(--muted);font-weight:600}
 .sa .vgl{font-size:12.5px;color:var(--muted)}.sa .tabs{display:flex;gap:6px}.sa .tabs button{flex:1;padding:8px;border-radius:9px;background:var(--soft);color:var(--muted);font-weight:600;font-size:13px}.sa .tabs button[aria-pressed=true]{background:var(--accent);color:#fff}
-.bild .wm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);object-fit:contain;opacity:.26;pointer-events:none}
+.bild .wm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);object-fit:contain;opacity:.30;pointer-events:none}
+.bild.fg,.fkomp .pic.fg{box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
 .bild .sil{position:absolute;left:14%;right:14%;bottom:0;height:80%;fill:rgba(255,255,255,.42)}
 .bild .nr{position:absolute;left:8%;top:4%;font-family:var(--f-display);font-weight:800;color:rgba(255,255,255,.9);line-height:1}
 .bild .wap{position:absolute;right:5%;bottom:5%;background:#fff;border-radius:50%;display:grid;place-items:center}
@@ -217,6 +218,8 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .chip .gr{font-size:11px;color:var(--muted);white-space:nowrap}
 .chip .tz{font-size:10.5px;font-weight:700}
 .chip .aus{font-size:10.5px;font-weight:600;color:#FF9A9A;white-space:nowrap}
+.chip .km{font-size:10.5px;font-weight:600;color:var(--muted);white-space:nowrap;margin-left:-2px}
+.sa .tl span.g{opacity:.6}
 .chip .ein{font-size:11px;font-weight:700;color:var(--gruen)}
 .chip .neu{margin-left:0}
 .leg{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--muted);align-items:center}
@@ -409,7 +412,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .fkomp{display:flex;gap:12px;padding:12px 12px 0}
 .fkomp .pic{width:132px;height:165px;flex:none;border-radius:10px;overflow:hidden;background:var(--vc);display:grid;place-items:center}
 .fkomp .pic{position:relative}.fkomp .pic img.f{position:relative;width:100%;height:100%;object-fit:cover;object-position:50% 0}
-.fkomp .pic .wm{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);object-fit:contain;opacity:.26;pointer-events:none}
+.fkomp .pic .wm{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);object-fit:contain;opacity:.30;pointer-events:none}
 .fkomp .tx .fbadge{align-self:flex-start}
 .fkomp .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;min-height:165px}
 .fkomp .nm{font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1;text-transform:uppercase;padding-top:4px;overflow-wrap:anywhere}
@@ -632,7 +635,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     const r = g > 70 ? 11 : 8, k = KURZ[m.verein], f = bildPfad(m);
     const box = (inner, bg) => `<div class="bild" style="width:${g}px;height:${g}px;border-radius:${r}px;${bg ? `background:${bg}` : ""}" aria-hidden="true">${inner}</div>`;
     // Neutraler Grund mit Vereinswappen als Wasserzeichen (alle Portraits sind freigestellt)
-    if (f) return box(wm(k) + `<img class="f" src="${esc(f)}" alt="" loading="lazy" onerror="this.remove()">`, "#24334F");
+    if (f) return box(wm(k) + `<img class="f" src="${esc(f)}" alt="" loading="lazy" onerror="this.remove()">`, "radial-gradient(circle at 50% 45%,#3A4F78 0%,#2A3B5E 70%)").replace('class="bild"', 'class="bild fg"');
     if (istSpielerin(m)) {
       const w = Math.round(g * .25);
       return box(SIL + (m.nr ? `<span class="nr" style="font-size:${Math.round(g * .21)}px">${esc(m.nr)}</span>` : "")
@@ -803,8 +806,8 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
   function chip(o){
     let h = (o.stufe ? stufeSym(o.stufe) : "") + (o.ein && !o.einMin ? '<span class="ein" aria-label="eingewechselt">↑</span>' : "") + `<span class="cn">${esc(o.n)}</span>`;
     if (o.tore > 0) h += BALL + (o.tore > 1 ? `<b class="tz">${o.tore}</b>` : "");
-    if (o.gelb && !o.rot) h += karte(false);
-    if (o.rot) h += karte(true);
+    if (o.gelb && !o.rot) h += karte(false) + (o.gelbMin ? `<span class="km" aria-label="Minute ${esc(o.gelbMin)}">${esc(o.gelbMin)}'</span>` : "");
+    if (o.rot) h += karte(true) + (o.rotMin ? `<span class="km" aria-label="Minute ${esc(o.rotMin)}">${esc(o.rotMin)}'</span>` : "");
     if (o.aus) h += `<span class="aus" aria-label="ausgewechselt in Minute ${esc(o.aus)}">↓${esc(o.aus)}'</span>`;
     if (o.einMin) h += `<span class="ein" aria-label="eingewechselt in Minute ${esc(o.einMin)}">↑${esc(o.einMin)}'</span>`;
     if (o.grund) h += `<span class="gr">${esc(o.grund)}</span>`;
@@ -829,9 +832,10 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     if (!Array.isArray(L) || !L.length) return "";
     L = L.slice().sort((a, b) => (b.verein === verein) - (a.verein === verein));  // eigener Verein zuerst
     const team = (t, i) => {
-      const c = s => ({n: s.n, tore: s.tore || 0, gelb: s.gelb, rot: s.rot, mark: s.f, aus: s.aus});
-      let h = posZeilen(t.startelf || [], s => chip(c(s)));
-      if ((t.eingewechselt || []).length) h += kap("Eingewechselt") + `<div class="chips">${t.eingewechselt.map(s => chip({n: s.n, ein: true, einMin: s.ein_min})).join("")}</div>`;
+      const c = s => ({n: s.n, tore: s.tore || 0, gelb: s.gelb, rot: s.rot, gelbMin: s.gelb_min, rotMin: s.rot_min, mark: s.f, aus: s.aus});
+      const tl = (t.tore || []).map(g => `<span${g.eigen ? "" : ' class="g"'}>${esc(g.min)}' ${esc(g.n)}${g.art ? " (" + esc(g.art) + ")" : ""}${g.vorlage ? " (Vorlage " + esc(g.vorlage) + ")" : ""}</span>`).join(", ");
+      let h = (tl ? `<div class="zeile tl"><b>TORE</b>${tl}</div>` : "") + posZeilen(t.startelf || [], s => chip(c(s)));
+      if ((t.eingewechselt || []).length) h += kap("Eingewechselt") + `<div class="chips">${t.eingewechselt.map(s => chip({...c(s), ein: true, einMin: s.ein_min})).join("")}</div>`;
       if ((t.raus || []).length) h += `<div class="zeile"><b>NICHT IN DER STARTELF</b>${t.raus.map(r => esc(r.n) + (r.wo ? " (" + esc(r.wo) + ")" : "")).join(", ")}</div>`;
       if ((t.ohne_einsatz || []).length) h += `<div class="zeile"><b>OHNE EINSATZ</b>${t.ohne_einsatz.map(esc).join(", ")}</div>`;
       return `<div class="sa-t"${i ? " hidden" : ""}><div class="sa-k">${logo(t.k || KURZ[t.verein], 22)}<span>${esc(t.verein)}</span><span class="w">${esc(t.wettbewerb || "")}${t.ergebnis ? " · " + esc(t.ergebnis) : ""}</span></div>
@@ -998,7 +1002,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     return `<div class="kartebox"><div class="tb-k">${logo(k, 22)}<span class="n">${esc(name)}</span>${a && a.formation ? `<span class="f">${esc(a.formation)}</span>` : ""}${badge}</div>${inh}</div>`;
   }
   function offiziell(a){
-    const c = s => ({n: s.n, tore: s.tore || 0, rot: s.rot, gelb: s.gelb});
+    const c = s => ({n: s.n, tore: s.tore || 0, rot: s.rot, gelb: s.gelb, gelbMin: s.gelb_min, rotMin: s.rot_min});
     let h = posZeilen(a.startelf, s => chip({...c(s), aus: s.aus}));
     const bank = a.bank || [], rein = bank.filter(s => s.ein === true), draussen = bank.filter(s => s.ein !== true), bekannt = bank.some(s => s.ein != null);
     if (bekannt) {
@@ -1069,7 +1073,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     const kopf = gross
       ? `<div class="fgross" style="--vc:${vc}"><img src="${esc(fo.datei)}" alt="${esc(f.n)}" loading="lazy">${badge}
           <div class="ov"><div><span class="nm">${esc(f.n)}</span><span class="vn">${esc(kname(f.k))}</span><span class="bg"><b>${esc(f.big)}</b><span>${esc(f.big_txt)}</span></span></div>${logo(f.k, 38)}</div></div>`
-      : `<div class="fkomp"><div class="pic" style="--vc:${fo && (fo.portrait || fo.datei) ? "#24334F" : vc}">${fo && (fo.portrait || fo.datei) ? wm(f.k) + `<img class="f" src="${esc(fo.portrait || fo.datei)}" alt="${esc(f.n)}" loading="lazy">` : logo(f.k, 70)}</div>
+      : `<div class="fkomp"><div class="pic${fo && (fo.portrait || fo.datei) ? " fg" : ""}" style="--vc:${fo && (fo.portrait || fo.datei) ? "radial-gradient(circle at 50% 36%,#3A4F78 0%,#2A3B5E 70%)" : vc}">${fo && (fo.portrait || fo.datei) ? wm(f.k) + `<img class="f" src="${esc(fo.portrait || fo.datei)}" alt="${esc(f.n)}" loading="lazy">` : logo(f.k, 70)}</div>
           <div class="tx">${badge}<span class="nm">${esc(f.n)}</span><span class="vn">${logo(f.k, 18)}${esc(kname(f.k))}</span><span class="big">${esc(f.big)}</span><span class="bt">${esc(f.big_txt)}</span></div></div>`;
     const geg = naechste(f.k).map(x => { const w = IN.ga ? IN.ga[x.k] : null;
       const s = w == null ? null : w >= 2 ? ["leicht", "#4ADE80"] : w >= 1.3 ? ["mittel", "#F5B041"] : ["schwer", "#FF8A8A"];
