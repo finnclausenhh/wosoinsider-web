@@ -146,6 +146,9 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 /* Bild der Spielerin: Foto, Silhouette in Vereinsfarbe oder Wappen */
 .bild{position:relative;flex:none;overflow:hidden;background:var(--soft);display:grid;place-items:center}
 .bild > img.f{position:relative;width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.sa{display:grid;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.sa-k{display:flex;align-items:center;gap:8px;font-weight:700;flex-wrap:wrap}.sa-k .w{margin-left:auto;font-size:12px;color:var(--muted);font-weight:600}
+.sa .vgl{font-size:12.5px;color:var(--muted)}.sa .tabs{display:flex;gap:6px}.sa .tabs button{flex:1;padding:8px;border-radius:9px;background:var(--soft);color:var(--muted);font-weight:600;font-size:13px}.sa .tabs button[aria-pressed=true]{background:var(--accent);color:#fff}
 .bild .wm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);object-fit:contain;opacity:.26;pointer-events:none}
 .bild .sil{position:absolute;left:14%;right:14%;bottom:0;height:80%;fill:rgba(255,255,255,.42)}
 .bild .nr{position:absolute;left:8%;top:4%;font-family:var(--f-display);font-weight:800;color:rgba(255,255,255,.9);line-height:1}
@@ -821,6 +824,28 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
       ${(a.fehlt || []).length ? kap("Nicht im Kader") + `<div class="chips">${sortiert(a.fehlt).map(s => chip({n: s.n, info: s.i, mark: s.f, dim: true})).join("")}</div>` : ""}
       <div class="leg"><span><b class="neu" style="margin:0;border:0;padding:0">NEU</b> und <b class="raus" style="border:0;padding:0">RAUS</b> im Vergleich zum letzten Spiel</span></div></div>`;
   }
+  // Aufstellung aus Pokal und Europapokal unter dem Spielbericht (Feld spiel_aufstellung), NEU/RAUS gegenüber dem letzten Ligaspiel
+  function spielAufstellung(L, verein){
+    if (!Array.isArray(L) || !L.length) return "";
+    L = L.slice().sort((a, b) => (b.verein === verein) - (a.verein === verein));  // eigener Verein zuerst
+    const team = (t, i) => {
+      const c = s => ({n: s.n, tore: s.tore || 0, gelb: s.gelb, rot: s.rot, mark: s.f, aus: s.aus});
+      let h = posZeilen(t.startelf || [], s => chip(c(s)));
+      if ((t.eingewechselt || []).length) h += kap("Eingewechselt") + `<div class="chips">${t.eingewechselt.map(s => chip({n: s.n, ein: true, einMin: s.ein_min})).join("")}</div>`;
+      if ((t.raus || []).length) h += `<div class="zeile"><b>NICHT IN DER STARTELF</b>${t.raus.map(r => esc(r.n) + (r.wo ? " (" + esc(r.wo) + ")" : "")).join(", ")}</div>`;
+      if ((t.ohne_einsatz || []).length) h += `<div class="zeile"><b>OHNE EINSATZ</b>${t.ohne_einsatz.map(esc).join(", ")}</div>`;
+      return `<div class="sa-t"${i ? " hidden" : ""}><div class="sa-k">${logo(t.k || KURZ[t.verein], 22)}<span>${esc(t.verein)}</span><span class="w">${esc(t.wettbewerb || "")}${t.ergebnis ? " · " + esc(t.ergebnis) : ""}</span></div>
+        ${t.vergleich ? `<div class="vgl">NEU und RAUS im Vergleich zur Startelf am ${esc(t.vergleich)}</div>` : ""}${h}</div>`;
+    };
+    const tabs = L.length > 1 ? `<div class="tabs">${L.map((t, i) => `<button type="button" data-sa="${i}" aria-pressed="${!i}">${esc(t.verein)}</button>`).join("")}</div>` : "";
+    return `<section class="sa">${kap("Aufstellung im Spiel")}${tabs}${L.map(team).join("")}</section>`;
+  }
+  document.addEventListener("click", e => {
+    const b = e.target.closest && e.target.closest(".sa .tabs button"); if (!b) return;
+    const sa = b.closest(".sa"), i = +b.dataset.sa;
+    sa.querySelectorAll(".tabs button").forEach((x, j) => x.setAttribute("aria-pressed", String(j === i)));
+    sa.querySelectorAll(".sa-t").forEach((d, j) => { d.hidden = j !== i; });
+  });
   function article(id){
     const m = N.find(x => x.id === id); if (!m) return list();
     if (m.typ === "punkt") { $("#main").innerHTML = `<div class="det">${zurueck()}${punktArtikel(m)}</div>`; if (window.WIKOM) window.WIKOM.mount(m.id); window.scrollTo(0, 0); return; }
@@ -834,7 +859,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
           <div class="wer">${esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc([m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
           ${st ? `<div class="mk-st">${plakette(meldungsStatus(m), 28)}<span>${st[2]}</span></div>` : ""}</div>
           <h1 class="disp" style="font-size:30px">${esc(m.headline)}</h1><div class="dat">${esc(lang(m.zeit))}</div></div>
-          <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>`;
+          <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>${spielAufstellung(m.spiel_aufstellung, m.verein)}`;
     // Nachweis zum gezeigten Foto: Eintrag aus fotos.json hat Vorrang, sonst der Nachweis aus der Meldung
     const fi = FOTOS[m.spielerin], fc = m.foto_credit;
     const credit = fi && fi.datei && nachweis(fi)
