@@ -145,7 +145,8 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 
 /* Bild der Spielerin: Foto, Silhouette in Vereinsfarbe oder Wappen */
 .bild{position:relative;flex:none;overflow:hidden;background:var(--soft);display:grid;place-items:center}
-.bild > img.f{width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.bild > img.f{position:relative;width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.bild .wm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);object-fit:contain;opacity:.26;pointer-events:none}
 .bild .sil{position:absolute;left:14%;right:14%;bottom:0;height:80%;fill:rgba(255,255,255,.42)}
 .bild .nr{position:absolute;left:8%;top:4%;font-family:var(--f-display);font-weight:800;color:rgba(255,255,255,.9);line-height:1}
 .bild .wap{position:absolute;right:5%;bottom:5%;background:#fff;border-radius:50%;display:grid;place-items:center}
@@ -404,7 +405,8 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .fgross .ov .bg span{font-size:13px;color:rgba(255,255,255,.85)}
 .fkomp{display:flex;gap:12px;padding:12px 12px 0}
 .fkomp .pic{width:132px;height:165px;flex:none;border-radius:10px;overflow:hidden;background:var(--vc);display:grid;place-items:center}
-.fkomp .pic img.f{width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.fkomp .pic{position:relative}.fkomp .pic img.f{position:relative;width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.fkomp .pic .wm{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);object-fit:contain;opacity:.26;pointer-events:none}
 .fkomp .tx .fbadge{align-self:flex-start}
 .fkomp .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;min-height:165px}
 .fkomp .nm{font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1;text-transform:uppercase;padding-top:4px;overflow-wrap:anywhere}
@@ -620,11 +622,14 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
   const freigabe = f => !f.lizenz_url && !String(f.lizenz || "").startsWith("CC");
   const nachweis = f => !f || !f.autor ? "" : freigabe(f) ? `Foto: ${esc(f.autor)}` : `Foto: ${esc(f.autor)}${f.lizenz ? `, ${esc(f.lizenz)}` : ""}`;
   const quelleURL = f => f && /^https?:/.test(f.quelle || "") ? f.quelle : null;
+  // Wappen als Wasserzeichen hinter Portraits: gleiche sichtbare Fläche je Verein, mittig (Union höher, weil breiter Schriftzug)
+  const WMG = {"FCB": [76.4, 76.4], "WOB": [76.4, 76.4], "SGE": [76.4, 76.4], "B04": [84.0, 66.2], "KOE": [70.4, 80.0], "RBL": [84.0, 54.0], "SVW": [59.8, 90.0], "SCF": [62.8, 90.0], "FCU": [94.0, 34.1], "VFB": [71.8, 80.0], "TSG": [66.8, 80.0], "HSV": [80.0, 80.0], "FCN": [76.4, 76.4], "M05": [79.3, 73.6]};
+  const wm = k => k && WMG[k] ? `<img class="wm" src="logos/wm/${esc(k)}.png" alt="" style="width:${WMG[k][0]}%;height:${WMG[k][1]}%${k === "FCU" ? ";top:30%" : ""}" onerror="this.remove()">` : "";
   function bild(m, g){
     const r = g > 70 ? 11 : 8, k = KURZ[m.verein], f = bildPfad(m);
     const box = (inner, bg) => `<div class="bild" style="width:${g}px;height:${g}px;border-radius:${r}px;${bg ? `background:${bg}` : ""}" aria-hidden="true">${inner}</div>`;
-    // Vereinsfarbe als Grund, damit bei transparenten Portraits nicht die Karte durchschimmert
-    if (f) return box(`<img class="f" src="${esc(f)}" alt="" loading="lazy" onerror="this.remove()">`, KFARBE[k] || "var(--soft)");
+    // Neutraler Grund mit Vereinswappen als Wasserzeichen (alle Portraits sind freigestellt)
+    if (f) return box(wm(k) + `<img class="f" src="${esc(f)}" alt="" loading="lazy" onerror="this.remove()">`, "#24334F");
     if (istSpielerin(m)) {
       const w = Math.round(g * .25);
       return box(SIL + (m.nr ? `<span class="nr" style="font-size:${Math.round(g * .21)}px">${esc(m.nr)}</span>` : "")
@@ -793,11 +798,12 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
   const zurueck = (t = "‹ Zurück") => `<button class="back" data-zu="1">${t}</button>`;
   function sortiert(l){ const r = {TW:0,ABW:1,DM:2,MF:3,OM:4,ST:5}; return l.map((x, i) => [x, i]).sort((a, b) => ((r[a[0].p] ?? 9) - (r[b[0].p] ?? 9)) || a[1] - b[1]).map(x => x[0]); }
   function chip(o){
-    let h = (o.stufe ? stufeSym(o.stufe) : "") + (o.ein ? '<span class="ein" aria-label="eingewechselt">↑</span>' : "") + `<span class="cn">${esc(o.n)}</span>`;
+    let h = (o.stufe ? stufeSym(o.stufe) : "") + (o.ein && !o.einMin ? '<span class="ein" aria-label="eingewechselt">↑</span>' : "") + `<span class="cn">${esc(o.n)}</span>`;
     if (o.tore > 0) h += BALL + (o.tore > 1 ? `<b class="tz">${o.tore}</b>` : "");
     if (o.gelb && !o.rot) h += karte(false);
     if (o.rot) h += karte(true);
     if (o.aus) h += `<span class="aus" aria-label="ausgewechselt in Minute ${esc(o.aus)}">↓${esc(o.aus)}'</span>`;
+    if (o.einMin) h += `<span class="ein" aria-label="eingewechselt in Minute ${esc(o.einMin)}">↑${esc(o.einMin)}'</span>`;
     if (o.grund) h += `<span class="gr">${esc(o.grund)}</span>`;
     if (o.info) h += `<span class="gr">(${esc(o.info)})</span>`;
     if (o.mark === "neu") h += '<span class="neu">NEU</span>'; else if (o.mark === "raus") h += '<span class="raus">RAUS</span>';
@@ -971,7 +977,8 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     let h = posZeilen(a.startelf, s => chip({...c(s), aus: s.aus}));
     const bank = a.bank || [], rein = bank.filter(s => s.ein === true), draussen = bank.filter(s => s.ein !== true), bekannt = bank.some(s => s.ein != null);
     if (bekannt) {
-      if (rein.length) h += kap("Eingewechselt") + `<div class="chips">${rein.map(s => chip({...c(s), ein: true})).join("")}</div>`;
+      rein.sort((x, y) => (parseInt(x.ein_min, 10) || 99) - (parseInt(y.ein_min, 10) || 99));
+      if (rein.length) h += kap("Eingewechselt") + `<div class="chips">${rein.map(s => chip({...c(s), ein: true, einMin: s.ein_min})).join("")}</div>`;
       if (draussen.length) h += `<div class="zeile"><b>OHNE EINSATZ</b>${draussen.map(s => esc(s.n)).join(", ")}</div>`;
     } else if (bank.length) h += kap("Bank") + `<div class="chips">${bank.map(s => chip(c(s))).join("")}</div>`;
     return h;
@@ -1037,7 +1044,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
     const kopf = gross
       ? `<div class="fgross" style="--vc:${vc}"><img src="${esc(fo.datei)}" alt="${esc(f.n)}" loading="lazy">${badge}
           <div class="ov"><div><span class="nm">${esc(f.n)}</span><span class="vn">${esc(kname(f.k))}</span><span class="bg"><b>${esc(f.big)}</b><span>${esc(f.big_txt)}</span></span></div>${logo(f.k, 38)}</div></div>`
-      : `<div class="fkomp"><div class="pic" style="--vc:${vc}">${fo && (fo.portrait || fo.datei) ? `<img class="f" src="${esc(fo.portrait || fo.datei)}" alt="${esc(f.n)}" loading="lazy">` : logo(f.k, 70)}</div>
+      : `<div class="fkomp"><div class="pic" style="--vc:${fo && (fo.portrait || fo.datei) ? "#24334F" : vc}">${fo && (fo.portrait || fo.datei) ? wm(f.k) + `<img class="f" src="${esc(fo.portrait || fo.datei)}" alt="${esc(f.n)}" loading="lazy">` : logo(f.k, 70)}</div>
           <div class="tx">${badge}<span class="nm">${esc(f.n)}</span><span class="vn">${logo(f.k, 18)}${esc(kname(f.k))}</span><span class="big">${esc(f.big)}</span><span class="bt">${esc(f.big_txt)}</span></div></div>`;
     const geg = naechste(f.k).map(x => { const w = IN.ga ? IN.ga[x.k] : null;
       const s = w == null ? null : w >= 2 ? ["leicht", "#4ADE80"] : w >= 1.3 ? ["mittel", "#F5B041"] : ["schwer", "#FF8A8A"];
