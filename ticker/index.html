@@ -452,6 +452,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .std-l .g1{display:inline-flex;align-items:center;gap:5px;font-weight:700}
 .std-l .g2{color:rgba(244,245,247,.85)}
 .std-l .g3{font-style:italic;color:#7F8BA0}
+.std-l{flex-wrap:nowrap;white-space:nowrap}.std-i{width:18px;height:18px;border-radius:50%;border:1px solid var(--line);font:700 10px var(--f-mono);color:var(--muted);display:grid;place-items:center;margin-left:auto}.std-e{margin:0;font-size:12px;color:var(--muted)}
 .gp{width:6px;height:6px;border-radius:50%;background:var(--gruen);display:inline-block;flex:none}
 .stab{background:var(--card);border-radius:12px;padding:0 10px}
 .stab .r{display:grid;grid-template-columns:40px repeat(3,minmax(0,1fr));gap:6px;padding:10px 0;border-top:1px solid var(--line);font-size:13px}
@@ -659,6 +660,15 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .pf-fuss{font-size:12px;color:var(--muted);text-align:center}
 .wer-btn{font:inherit;color:inherit;text-align:left;border-bottom:1px dashed rgba(169,180,198,.5)}
 button.chip.pfc{cursor:pointer}
+
+/* Struktur Taktiktafel (Finn 31.10.): Kopf Mittelkreis, Inside Strafraum, Analyse Laufweg, Profil Eckfahne */
+.bar{background:var(--bg) url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27300%27%20height%3D%27150%27%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.07%29%27%20stroke-width%3D%271.5%27%3E%3Ccircle%20cx%3D%27150%27%20cy%3D%2738%27%20r%3D%2766%27/%3E%3Ccircle%20cx%3D%27150%27%20cy%3D%2738%27%20r%3D%272.5%27%20fill%3D%27rgba%28255%2C255%2C255%2C.07%29%27/%3E%3C/svg%3E") no-repeat center top/300px 150px}
+.bar-in .seg{background:#272E3C}
+.hero{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27240%27%20height%3D%27200%27%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.056%29%27%20stroke-width%3D%271.5%27%3E%3Crect%20x%3D%2750%27%20y%3D%27-2%27%20width%3D%27200%27%20height%3D%2788%27/%3E%3Crect%20x%3D%27130%27%20y%3D%27-2%27%20width%3D%27120%27%20height%3D%2734%27/%3E%3Cpath%20d%3D%27M120%2086%20A50%2050%200%200%200%20214%2086%27/%3E%3Ccircle%20cx%3D%27172%27%20cy%3D%2760%27%20r%3D%272.2%27%20fill%3D%27rgba%28255%2C255%2C255%2C.056%29%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right top}
+.akopf{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27300%27%20height%3D%27150%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.056%29%27%20stroke-width%3D%271.5%27%3E%3Crect%20x%3D%27120%27%20y%3D%27-2%27%20width%3D%27182%27%20height%3D%2780%27/%3E%3Cpath%20d%3D%27M168%2078%20A42%2042%200%200%200%20244%2078%27/%3E%3C/g%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28110%2C155%2C255%2C.17%29%27%20stroke-width%3D%271.6%27%20stroke-dasharray%3D%275%205%27%3E%3Cpath%20d%3D%27M120%2092%20C150%2072%20172%2056%20196%2040%27/%3E%3C/g%3E%3Ccircle%20cx%3D%27114%27%20cy%3D%2796%27%20r%3D%276%27%20fill%3D%27none%27%20stroke%3D%27rgba%28110%2C155%2C255%2C.17%29%27%20stroke-width%3D%271.6%27/%3E%3Cpath%20d%3D%27M186%2032%20l9%209%20m0%20-9%20l-9%209%27%20stroke%3D%27rgba%28110%2C155%2C255%2C.17%29%27%20stroke-width%3D%271.6%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right top}
+.pf-kopf{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27220%27%20height%3D%27170%27%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.084%29%27%20stroke-width%3D%271.5%27%3E%3Cpath%20d%3D%27M0%2014%20H206%20V170%27/%3E%3Cpath%20d%3D%27M190%2014%20A16%2016%200%200%200%20206%2030%27/%3E%3Cpath%20d%3D%27M120%2014%20V58%20H206%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right top}
+/* Alle Schützinnen: Legende einzeilig, Trennlinien erst ab den Namen */
+.stab .r{border-top:0;position:relative}.stab .r+.r::before{content:"";position:absolute;left:46px;right:0;top:0;border-top:1px solid var(--line)}
 </style>
 
 
@@ -1261,7 +1271,7 @@ button.chip.pfc{cursor:pointer}
         <div class="fl"><s>${esc(s.alt)}</s>${svg(P.pfeil)}<b>${esc(s.neu || "offen")}</b></div><p>${esc(s.text)}</p>
         ${s.check ? `<div class="chk">${svg(P.haken)}<span>${esc(s.check)}</span></div>` : ""}${kbBox(s.kb)}</div>`).join("")}
       <div style="display:grid;gap:6px;padding-top:8px"><h3 class="disp" style="font-size:21px">Alle Schützinnen</h3>
-        <div class="std-l"><span class="g1"><i class="gp"></i>gesetzt: viele Belege oder Tor daraus</span><span class="g2">normal: 2 bis 3 Belege</span><span class="g3">kursiv: erster Hinweis</span></div></div>
+        <div class="std-l"><span class="g1"><i class="gp"></i>gesetzt</span><span class="g2">2 bis 3 Belege</span><span class="g3">erster Hinweis</span><button class="std-i" data-stdinfo="1" aria-label="Erklärung">i</button></div><p class="std-e" hidden>Gesetzt heißt: viele Belege aus Spielberichten oder ein Tor nach ihrem Standard. Normal: 2 bis 3 Belege. Kursiv: bisher nur ein Hinweis.</p></div>
       ${SEL.size ? `<button class="lk" style="font-size:12px;justify-self:start;text-decoration:none" data-stdalle="1">${STDALLE ? "Nur meine Vereine" : "Alle 14 Vereine"}</button>` : ""}
       <div class="stab"><div class="r h"><span></span><span>ECKEN</span><span>FREISTÖSSE</span><span>ELFMETER</span></div>
         ${r.map(s => `<div class="r"><div class="wk">${logo(s.k, 24)}<span>${esc(s.k)}</span></div>${zelle(s.ecken)}${zelle(s.fs)}${zelle(s.elfer)}
@@ -1805,6 +1815,7 @@ button.chip.pfc{cursor:pointer}
   document.addEventListener("click", e => {
     const q = s => e.target.closest(s);
     let x;
+    if (q("[data-stdinfo]")) { const e = document.querySelector(".std-e"); if (e) e.hidden = !e.hidden; return; }
     if ((x = q("[data-kiauf]"))) { const z = x.closest(".nachw").querySelector(".nq-mehr"); z.hidden = !z.hidden; x.setAttribute("aria-expanded", !z.hidden); return; }
     if ((x = q("[data-legal]"))) { legal(x.dataset.legal); return; }
     if ((x = q("[data-statview]"))) { if (!STAT_HER && BACK !== "stat" && BACK !== "statkader") STAT_HER = {typ: document.querySelector("article.det") && ARTIKEL ? "artikel" : VIEW === "spielplan" && GAME ? "spiel" : VIEW, id: ARTIKEL || GAME, scroll: window.scrollY};
