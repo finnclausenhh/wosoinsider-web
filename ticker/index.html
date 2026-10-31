@@ -1222,7 +1222,9 @@ button.chip.pfc{cursor:pointer}
           ${s.hinweis ? `<div class="hw">${svg(P.warn, "").replace("<svg", '<svg style="width:13px;height:13px;flex:none;stroke:currentColor;fill:none;stroke-width:2"')}<span>${esc(s.hinweis)}</span></div>` : ""}</div>`).join("")}</div></section>`;
   }
   function spieleSektion(){
-    const tage = (IN.spiele || {}).spieltage || []; if (!tage.length) return "";
+    // Abgelaufene Partien ausblenden (Abgleich mit dem Spielplan), leere Spieltage weglassen
+    const vorbei = g => SP && alleSpiele().some(q => q.heim_k === g.heim && q.gast_k === g.gast && q.status === "beendet");
+    const tage = ((IN.spiele || {}).spieltage || []).map(t => ({...t, partien: (t.partien || []).filter(g => !vorbei(g))})).filter(t => t.partien.length); if (!tage.length) return "";
     if (!tage.some(t => t.md === IMD)) IMD = tage[0].md;
     const ps = (tage.find(t => t.md === IMD).partien || []).filter(g => zeigen(g.heim, g.gast));
     return `<section class="sek">${sektion("04", "Spieltag", "Spiele mit Ansage", "Die Fakten, die für deine Aufstellung zählen.")}
