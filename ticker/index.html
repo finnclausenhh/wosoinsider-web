@@ -203,7 +203,11 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .dat{font-size:12px;color:var(--muted)}
 .src{display:grid;gap:6px;font-size:14px}
 .credit{font-size:11px;color:var(--muted)}
-.nachw{display:grid;gap:12px;border-top:1px solid var(--line);padding-top:14px}
+.nachw{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:14px}
+.nq-z{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline;font-size:13.5px}.nq-z b{font:600 10.5px var(--f-mono);letter-spacing:.8px;color:var(--muted)}
+.nq-z a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}.nq-p{color:var(--muted)}
+.nq-ki{margin:0;font-size:12.5px;color:var(--muted)}.nq-ki button{color:inherit;font:inherit;border-bottom:1px dotted rgba(169,180,198,.6)}.nq-ki .credit{font-size:inherit}
+.nq-mehr{margin:0}.nq-mehr button{color:var(--accent);font-weight:600;font-size:13px}
 .credit a{color:var(--muted)}
 .kartebox{background:var(--card);border-radius:14px;padding:12px;display:grid;gap:10px}
 .rasen{background:var(--rasen);border-radius:9px;padding:8px;display:grid;gap:7px}
@@ -756,7 +760,7 @@ button.chip.pfc{cursor:pointer}
     const rechts = auf ? `<span class="nk-r" role="img" aria-label="${esc(m.verein)} gegen ${esc(a.gegner)}">${logo(KURZ[m.verein], 20)}${logo(KURZ[a.gegner], 20)}</span>` : plakette(meldungsStatus(m));
     return `<button class="nk" data-id="${esc(m.id)}">${bild(m, 76, 100)}<div class="nk-b">
       <div class="nk-top"><div class="tags">${(m.tags || []).map(tag).join("")}${auf ? tag("AUFSTELLUNG") : ""}</div>${rechts}</div>
-      ${auf ? `<p class="elf">${startelfZeile(a.startelf)}</p>` : `<h2>${esc(m.headline)}</h2>`}
+      ${auf ? `<p class="elf">${startelfZeile(a.startelf)}</p>` : `<h2>${esc(m.kurz || m.headline)}</h2>`}
       <div class="meta" data-lang="${esc(metaZeile(m, auf))}" data-kurz="${esc(metaZeile(m, auf, 1))}" data-nur="${esc(metaZeile(m, auf, 2))}">${esc(metaZeile(m, auf))}</div></div></button>`;
   }
   const angeheftet = m => m.typ === "punkt" && m.pin_bis && dt(m.pin_bis) > Date.now();
@@ -954,9 +958,9 @@ button.chip.pfc{cursor:pointer}
     const kopf = auf
       ? `<div style="display:grid;gap:8px"><div class="tags">${(m.tags || []).map(tag).join("")}${tag("AUFSTELLUNG")}</div>
           <div style="display:flex;gap:8px;align-items:center">${logo(KURZ[m.verein], 30)}<h1 class="disp" style="font-size:26px">${esc(m.headline)}</h1></div>
-          <div class="dat">${esc(lang(m.zeit))}</div></div>${aufBlock(a)}`
+          <div class="dat">${esc(lang(m.zeit))}</div></div>${aufBlock(a)}${(m.text || []).length ? `<div class="body">${m.text.map(p => `<p>${esc(p)}</p>`).join("")}</div>` : ""}`
       : `<div style="display:grid;gap:12px"><div class="mk">${istSpielerin(m) && m.spielerin ? `<button class="mk-foto" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}" aria-label="Profil von ${esc(m.spielerin)}">${bild(m, 96)}</button>` : bild(m, 96)}<div class="mk-m"><div class="tags">${(m.tags || []).map(tag).join("")}</div>
-          <div class="wer">${istSpielerin(m) && m.spielerin ? `<button class="wer-btn" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}">${esc(m.spielerin)}</button>` : esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc([m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
+          <div class="wer">${m.pos === "Spielansetzung" ? esc(m.spielerin && m.spielerin !== "Spielansetzung" ? m.spielerin : [m.verein, m.aufstellung && m.aufstellung.gegner].filter(Boolean).join(" gegen ")) : istSpielerin(m) && m.spielerin ? `<button class="wer-btn" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}">${esc(m.spielerin)}</button>` : esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc(m.pos === "Spielansetzung" ? "Vorbericht" : [m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
           ${st ? `<div class="mk-st">${plakette(meldungsStatus(m), 28)}<span>${st[2]}</span></div>` : ""}</div>
           <h1 class="disp" style="font-size:30px">${esc(m.headline)}</h1><div class="dat">${esc(lang(m.zeit))}</div></div>
           <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>${spielAufstellung(m.spiel_aufstellung, m.verein)}`;
@@ -970,9 +974,9 @@ button.chip.pfc{cursor:pointer}
       <div id="kom" data-beitrag="${esc(m.id)}"></div>
       <div class="nachw">
       ${m.instagram ? `<a href="${esc(m.instagram)}" target="_blank" rel="noopener" style="font-size:14px">Instagram-Profil von ${esc(m.spielerin)}</a>` : ""}
-      ${(m.quellen || []).length ? `<div class="src">${kap("Quellen")}${m.quellen.map(q => q.url ? `<a href="${esc(q.url)}" target="_blank" rel="noopener">${esc(q.name || q.url)}</a>` : `<span>${esc(q.name)}</span>`).join("")}</div>` : ""}
-      ${kiHinweis()}
-      ${credit ? `<div class="credit">${credit}</div>` : ""}
+      ${(m.quellen || []).length ? `<div class="nq-z"><b>QUELLEN</b>${m.quellen.map(q => q.url ? `<a href="${esc(q.url)}" target="_blank" rel="noopener">${esc(q.name || q.url)}</a>` : `<span>${esc(q.name)}</span>`).join('<span class="nq-p">·</span>')}</div>` : ""}
+      <p class="nq-ki"><button data-kiauf="1" aria-expanded="false">Aus den Quellen mit KI erstellt</button>${credit ? ` · <span class="credit">${credit}</span>` : ""}</p>
+      <p class="nq-mehr" hidden><button data-legal="so-entsteht">So entsteht WOSOINSIDER ›</button></p>
       </div>
     </article>`;
     if (!auf && !SPN && istSpielerin(m)) ladeSPN().then(() => { const el = $("#pf-karte"); if (el && ARTIKEL === id) el.innerHTML = profilKarte(m); }).catch(() => {});
@@ -1647,6 +1651,7 @@ button.chip.pfc{cursor:pointer}
   document.addEventListener("click", e => {
     const q = s => e.target.closest(s);
     let x;
+    if ((x = q("[data-kiauf]"))) { const z = x.closest(".nachw").querySelector(".nq-mehr"); z.hidden = !z.hidden; x.setAttribute("aria-expanded", !z.hidden); return; }
     if ((x = q("[data-legal]"))) { legal(x.dataset.legal); return; }
     if (q("[data-suche]")) { PR_HER = {typ: document.querySelector("article.det") && ARTIKEL ? "artikel" : VIEW === "spielplan" && GAME ? "spiel" : VIEW, id: ARTIKEL || GAME, scroll: window.scrollY}; suche(); return; }
     if ((x = q("[data-suchezu]"))) { if (x.dataset.suchezu === "2") { suche(); return; } const h = PR_HER || {typ: "meldungen"}; PR_HER = null; BACK = null;
