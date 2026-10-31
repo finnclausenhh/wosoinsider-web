@@ -485,7 +485,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .akopf{background:var(--card);border-radius:14px;padding:16px;display:grid;gap:12px}
 .akopf .disp{font-size:30px}
 .akopf > .tag{justify-self:start}
-.akopf .st{display:grid;grid-template-columns:100px minmax(0,1fr);gap:10px;align-items:baseline;border-top:1px solid var(--line);padding:10px 0}
+.akopf .st{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:baseline;border-top:1px solid var(--line);padding:10px 0}
 .akopf .st:last-child{padding-bottom:0}
 .akopf .st b{font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--hell);line-height:1;white-space:nowrap}
 .akopf .st span{font-size:13.5px}
@@ -504,6 +504,16 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .mx .c .t{position:absolute;right:2px;top:2px;width:7px;height:7px;border-radius:50%;background:var(--pokal)}
 .mx .c .r{position:absolute;right:2px;top:2px;width:5px;height:7px;background:var(--inj)}
 .mx .c[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
+.ak-kurz{display:grid;gap:6px}.ak-kurz ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:14px}
+.ak-aus{display:grid;gap:8px}.ak-z{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:start;background:var(--card);border-radius:12px;padding:10px 12px}
+.ak-md{display:grid;justify-items:center;line-height:1}.ak-md b{font-family:var(--f-display);font-weight:800;font-size:24px}.ak-md span{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap}
+.ak-g{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--muted)}.ak-g b{color:var(--ink)}.ak-t p{margin:3px 0 0;font-size:13.5px;line-height:1.35}
+.ak-n{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.ak-n span{background:var(--soft);border-radius:6px;padding:2px 7px;font-size:12px}
+.ak-f span{background:rgba(226,74,74,.16);color:#F28B8B}
+.ak-kb{font:700 10.5px var(--f-mono);letter-spacing:.03em;text-transform:uppercase;padding:4px 7px;border-radius:6px;background:rgba(47,91,255,.15);color:#8FB0FF;white-space:nowrap;margin-left:auto}
+.ak-kb.warn{background:rgba(224,150,43,.16);color:#F0B25A}.ak-kb.gut{background:rgba(34,197,94,.14);color:#5FD08A}
+.ak-hin{margin:0;font-size:11px;color:var(--muted)}
+.ak-mehr summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:13.5px;list-style:none}.ak-mehr summary::-webkit-details-marker{display:none}.ak-mehr summary::after{content:" ›"}.ak-mehr[open] summary::after{content:" ‹"}.ak-mehr[open]{display:grid;gap:12px}
 .einsch{background:rgba(20,184,166,.12);border-radius:10px;padding:12px;display:grid;gap:6px;font-size:14px}
 .einsch .kap{color:var(--opin)}
 .einsch p{margin:0}
@@ -515,6 +525,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .doc h2{font-size:17px;font-weight:600;margin:8px 0 0}
 .doc p,.doc ul{margin:0}
 .doc ul{padding-left:18px;display:grid;gap:4px}
+.doc .ue-sub{font-size:16px;color:var(--muted)}.doc .ue-l{margin:0;padding-left:20px;display:grid;gap:4px}.doc .lk{color:var(--accent);font-weight:600}
 .doc address{font-style:normal}
 .doc .back{font-size:15px}
 .bn{display:grid;gap:2px;font-size:14px}
@@ -536,7 +547,29 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 
 /* Suche und Spielerinnenprofil */
 .bar-in{position:relative}
-.such-btn{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:8px;width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center}
+.kopf-btns{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:8px;display:flex;gap:6px}
+.such-btn{width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center}.such-btn[aria-pressed=true]{background:var(--accent)}
+/* Tabelle und Statistik */
+.sv{display:grid;gap:14px}.sv h1{margin:0}.sv .dat{font-size:13px;color:var(--muted)}
+.tb{background:var(--card);border-radius:14px;padding:6px 10px}
+.tb-r{display:grid;grid-template-columns:20px 20px minmax(0,1fr) 20px 50px 42px 28px 26px;gap:5px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px;text-align:center;width:100%;color:var(--ink)}
+.tb-r:first-child{border-top:0}.tb-r.tb-h{font:600 10px var(--f-mono);color:var(--muted);padding:6px 0}
+.tb-r .tb-vn{text-align:left;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-r .tb-pk{font-weight:800;font-family:var(--f-display);font-size:17px}.tb-r .tb-pl{font:600 12px var(--f-mono);color:var(--muted)}.tb-r .tb-mu{color:var(--muted)}
+.st-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}.st-chips button{flex:none;padding:7px 11px;border-radius:999px;background:var(--soft);color:var(--muted);font-weight:600;font-size:13px}
+.stk{background:var(--card);border-radius:14px;padding:14px;display:grid;gap:10px;scroll-margin-top:110px}
+.stk-k{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.stk-k h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:21px;text-transform:uppercase;white-space:nowrap}.stk-k small{color:var(--muted);font-size:12px}
+.sr{display:grid;grid-template-columns:22px 44px 18px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;color:var(--ink)}
+.sr .sr-rk{font:700 13px var(--f-mono);color:var(--muted);text-align:center}
+.sr .sr-rk.g1,.sr .sr-rk.g2,.sr .sr-rk.g3{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#14181F;font-size:12px}.sr .sr-rk.g1{background:#F5C518}.sr .sr-rk.g2{background:#C7CFDA}.sr .sr-rk.g3{background:#C8865A}
+.sr .sr-nm{min-width:0;display:grid;gap:4px}.sr .sr-nm b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr .sr-bal{height:5px;border-radius:3px;background:var(--soft);overflow:hidden}.sr .sr-bal i{display:block;height:100%;background:#6E9BFF;border-radius:3px}.sr.r1 .sr-bal i{background:var(--accent)}
+.sr .sr-w{font-family:var(--f-display);font-weight:800;font-size:22px;min-width:38px;text-align:right}
+.stk.stk-klein .sr{grid-template-columns:22px 30px 18px minmax(0,1fr) auto}.stk.stk-klein .sr-w{font-size:17px}
+.stk .st-erkl{font-size:12px;color:var(--muted)}.stk .st-mehr{color:var(--accent);font-weight:600;font-size:13.5px;justify-self:start}
+.st-chipl{display:flex;flex-wrap:wrap;gap:6px}.st-chipl button{display:flex;align-items:center;gap:5px;background:var(--soft);border-radius:8px;padding:4px 8px;font-size:13px;color:var(--ink)}
+.sv .st-notiz{font-size:12px;color:var(--muted)}
+@media (max-width:370px){.tb-r{gap:3px;grid-template-columns:18px 18px minmax(0,1fr) 16px 44px 40px 26px 24px;font-size:12.5px}.sr{gap:7px}}
 .such-btn svg{width:17px;height:17px;stroke:var(--ink);fill:none;stroke-width:2}
 .pf-feld{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:12px 14px}
 .pf-feld svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;flex:none}
@@ -624,12 +657,12 @@ button.chip.pfc{cursor:pointer}
 
 <header class="bar"><div class="bar-in">
   <div class="logo" aria-label="WOSOINSIDER"><b>WOSO</b><i>INSIDER</i></div>
-  <button class="such-btn" data-suche="1" aria-label="Spielerin suchen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+  <div class="kopf-btns"><button class="such-btn" data-statview="tabelle" aria-label="Tabelle"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M3.5 14.5h17M9 9v11"/></svg></button><button class="such-btn" data-statview="statistik" aria-label="Statistik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-3M11 16V9M16 16V5"/></svg></button><button class="such-btn" data-suche="1" aria-label="Spielerin suchen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></div>
   <div class="seg" role="tablist"><button id="tab-meldungen" role="tab" aria-selected="true" data-tab="meldungen">News</button><button id="tab-spielplan" role="tab" aria-selected="false" data-tab="spielplan">Spielplan</button><button id="tab-inside" role="tab" aria-selected="false" data-tab="inside">Inside</button></div>
 </div></header>
 
 <main id="main"><p class="leer">Meldungen werden geladen …</p></main>
-<footer class="legal"><nav aria-label="Rechtliches"><button data-legal="impressum">Impressum</button><button data-legal="datenschutz">Datenschutz</button><button data-legal="kontakt">Kontakt</button><button data-legal="so-entsteht">KI-Hinweis &amp; Methodik</button><button data-legal="bildnachweise">Bildnachweise</button><button data-legal="patches">Patches</button></nav>
+<footer class="legal"><nav aria-label="Rechtliches"><button data-legal="ueber">Über WOSOINSIDER</button><button data-legal="impressum">Impressum</button><button data-legal="datenschutz">Datenschutz</button><button data-legal="kontakt">Kontakt</button><button data-legal="so-entsteht">KI-Hinweis &amp; Methodik</button><button data-legal="bildnachweise">Bildnachweise</button><button data-legal="patches">Patches</button></nav>
 <small>WOSOINSIDER ist ein unabhängiges Angebot und nicht mit Kickbase, dem DFB oder den Vereinen verbunden. Meldungen werden mit KI erstellt.</small></footer>
 
 <script>
@@ -1278,9 +1311,15 @@ button.chip.pfc{cursor:pointer}
     return `<div class="mxw"><div class="mx" style="grid-template-columns:${cols}">${mx}</div></div>
       <div class="leg"><span><i style="background:var(--accent)"></i>Startelf (Minuten)</span><span><i style="box-shadow:inset 0 0 0 1.5px var(--accent)"></i>eingewechselt</span><span><i style="background:rgba(226,74,74,.3)"></i>verletzt / Reha</span><span><i style="background:var(--pokal);border-radius:50%"></i>Tor</span>${A.cl_ab ? '<span><i style="background:var(--euro);width:3px"></i>Champions League läuft</span>' : ""}</div>
       <div class="info${MXINFO ? " an" : ""}" id="mxinfo">${esc(MXINFO || "Feld antippen für Details.")}</div>
+      ${A.kurz ? `<div class="ak-kurz">${kap("Kurz erklärt")}<ul>${A.kurz.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>` : ""}
+      ${A.ausblick ? `<div class="ak-aus">${kap("Unsere Einschätzung")}${A.ausblick.map(x => { const d = new Date(x.datum + "T12:00");
+        return `<div class="ak-z"><div class="ak-md"><b>${x.md}.</b><span>${WT[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.</span></div>
+        <div class="ak-t"><div class="ak-g">${x.ha === "A" ? "in" : "gegen"} ${logo(x.gk, 16)}<b>${esc(kname(x.gk))}</b><span class="ak-kb ${x.kbart || ""}">Kickbase: ${esc(x.kb)}</span></div><p>${esc(x.satz)}</p>
+        ${(x.namen || []).length ? `<div class="ak-n">${x.namen.map(n => `<span>${esc(n)}</span>`).join("")}</div>` : ""}${(x.fehlt || []).length ? `<div class="ak-n ak-f">${x.fehlt.map(n => `<span>${esc(n)}</span>`).join("")}</div>` : ""}</div></div>`; }).join("")}</div>` : ""}
+      ${A.kurz || A.ausblick ? `<details class="ak-mehr"><summary>Ganze Analyse lesen</summary>` : ""}
       <div class="body" style="display:grid;gap:12px">${(A.text || []).map((p, i) => `<p>${i === 0 && !p.startsWith("Erklärung") ? "<b>Erklärung:</b> " : ""}${esc(p)}</p>`).join("")}</div>
       ${(A.einschaetzung || []).length ? `<div class="einsch">${kap("Unsere Einschätzung für die nächsten Ligaspiele")}${A.einschaetzung.map(p => `<p>${fett(p)}</p>`).join("")}</div>` : ""}
-      ${kbBox(A.kb)}${A.quelle ? `<p class="dbasis">${esc(A.quelle)}</p>` : ""}`;
+      ${A.ausblick ? "" : kbBox(A.kb)}${A.kurz || A.ausblick ? `</details>` : ""}${A.quelle ? `<p class="dbasis">${esc(A.quelle)}</p>` : ""}`;
   }
   function inside(){
     if (!IN){ $("#main").innerHTML = '<p class="leer">Inside wird geladen …</p>'; return; }
@@ -1303,6 +1342,23 @@ button.chip.pfc{cursor:pointer}
   // ---------------- Rechtliches und Infos (Texte gleich wie legal.json der App)
   const mail = k => `${k}@wosoinsider.de`;
   const LEGAL = {
+    ueber: () => `<h1>Über WOSOINSIDER</h1>
+      <p class="ue-sub">Die Frauen-Bundesliga. Jeden Tag auf dem Punkt.</p>
+      <h2>Warum es WOSOINSIDER gibt</h2>
+      <p>Seit Kickbase auch die Google Pixel Frauen-Bundesliga anbietet, stellen viele jede Woche ein Team aus Spielerinnen der Liga auf. Dafür braucht es verlässliche Antworten: Wer ist fit, wer fehlt, wer steht in der Startelf, wer ist in Form?</p>
+      <p>Diese Informationen gibt es, sie sind nur verstreut: auf Vereinsseiten, in Spielberichten, Pressekonferenzen und regionalen Medien. WOSOINSIDER sammelt sie mehrmals täglich, fasst sie in eigenen Worten zusammen und verlinkt immer die Quelle.</p>
+      <h2>Für wen</h2>
+      <ol class="ue-l"><li>Kickbase-Spielerinnen und -Spieler, die vor jedem Spieltag Aufstellung und Transfers planen</li><li>Fans der Frauen-Bundesliga, die alle Vereine im Blick behalten wollen</li><li>Alle, die über Fantasy-Spiele neu zur Frauen-Bundesliga finden</li></ol>
+      <h2>Was du hier findest</h2>
+      <ul><li><b>News:</b> Verletzungen, Sperren, Rückkehr und Spielberichte, jede Meldung mit Quelle</li><li><b>Spielplan:</b> alle Partien, mögliche Aufstellungen mit begründeter Einstufung, ca. 60 Minuten vor Anpfiff die offizielle</li><li><b>Inside:</b> die Wochenausgabe mit Formkurven, Standards, Belastung und Analyse</li></ul>
+      <h2>Kurz, mit Quelle, fair</h2>
+      <p>Gerüchte bleiben Gerüchte. Verletzungen nennen wir nur so weit, wie der Verein sie nennt. Alle 14 Vereine bekommen die gleiche Aufmerksamkeit. WOSOINSIDER ist unabhängig, braucht kein Konto und zeigt keine Werbung.</p>
+      <h2>Wer dahintersteht</h2>
+      <p>WOSOINSIDER ist ein Projekt von Finn Clausen. Er hat Journalistik studiert und ist seit über zehn Jahren im Frauenfußball unterwegs: lange bei den Frauen des FC Bayern, bei Eintracht Frankfurt in der Zeit der Fusion und im Social-Media-Support für Spielerinnen. Kickbase spielt er selbst, und WOSOINSIDER ist die Tageszeitung, die ihm dafür gefehlt hat.</p>
+      <h2>Wie die Meldungen entstehen</h2>
+      <p>Meldungen und Einschätzungen erstellt eine KI aus den verlinkten Quellen, nach festen Regeln und ohne etwas zu erfinden. <button class="lk" data-legal="so-entsteht">So entsteht WOSOINSIDER</button></p>
+      <h2>Kontakt</h2>
+      <p>Hinweise, Korrekturen, Vereine und Presse: <a href="mailto:redaktion@wosoinsider.de">redaktion@wosoinsider.de</a></p>`,
     impressum: () => `<h1>Impressum</h1>
       <h2>Angaben gemäß § 5 DDG</h2>
       <address>Finn Clausen<br>WOSOINSIDER<br>Wiesenweg 14<br>83083 Riedering<br>Deutschland</address>
@@ -1440,7 +1496,8 @@ button.chip.pfc{cursor:pointer}
       .catch(() => { if (VIEW === "inside" && !IN) $("#main").innerHTML = '<p class="leer">Inside konnte nicht geladen werden. Seite neu laden.</p>'; });
   }
   function show(v){
-    VIEW = v; BACK = null;
+    VIEW = v; BACK = null; STAT_HER = null; VIEW_STAT = null;
+    document.querySelectorAll("[data-statview]").forEach(b => b.setAttribute("aria-pressed", false));
     document.querySelectorAll(".seg[role=tablist] button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === v));
     setHash(v === "spielplan" ? "spielplan" : v === "inside" ? "inside" : "");
     clearInterval(TIMER);
@@ -1506,12 +1563,86 @@ button.chip.pfc{cursor:pointer}
     if (PR_STAPEL.length) { const s = spById(PR_STAPEL[PR_STAPEL.length - 1]); if (s) { setHash("spielerin/" + s.id); profilSeite(s); window.scrollTo(0, 0); return; } }
     const h = PR_HER || {typ: "meldungen"}; PR_HER = null; BACK = null; PR_STAPEL = [];
     if (h.typ === "suche") { suche(); return; }
+    if (h.typ === "stat") { statView(h.art || "statistik", true); window.scrollTo(0, h.scroll || 0); return; }
+    if (h.typ === "statkader") { vereinsKader(h.k, "tabelle"); window.scrollTo(0, 0); return; }
     if (h.typ === "artikel" && h.id) { VIEW = "meldungen"; setHash(h.id); article(h.id); return; }
     if (h.typ === "spiel" && h.id) { VIEW = "spielplan"; spiel(h.id); return; }
     show(h.typ === "spielplan" || h.typ === "inside" ? h.typ : "meldungen"); if (h.scroll) window.scrollTo(0, h.scroll);
   }
+
+  // ---------------- Tabelle und Statistik (nur Liga, berechnet aus spielplan.json und spielerinnen.json)
+  let STAUF = {};
+  const STKAT = [["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["gelb","Gelbe Karten","ohne Gelb-Rot"],["rot","Platzverweise","Rot und Gelb-Rot"]];
+  function ligaStand(){
+    const T = {}, fertig = [];
+    ALLE.forEach(k => T[k] = {k, sp: 0, s: 0, u: 0, n: 0, tp: 0, tm: 0, pkt: 0});
+    (SP.spieltage || []).forEach(st => { let alle = st.partien.length > 0;
+      st.partien.forEach(p => { const e = p.ergebnis;
+        if (p.status !== "beendet" || !e || e.length < 2) { alle = false; return; }
+        const h = T[p.heim_k], g = T[p.gast_k], a = +e[0], b = +e[1]; if (!h || !g) return;
+        h.sp++; g.sp++; h.tp += a; h.tm += b; g.tp += b; g.tm += a;
+        if (a > b) { h.s++; g.n++; h.pkt += 3; } else if (a < b) { g.s++; h.n++; g.pkt += 3; } else { h.u++; g.u++; h.pkt++; g.pkt++; } });
+      if (alle) fertig.push(st.nr); });
+    const tab = Object.values(T).sort((x, y) => y.pkt - x.pkt || (y.tp - y.tm) - (x.tp - x.tm) || y.tp - x.tp || kname(x.k).localeCompare(kname(y.k), "de"));
+    return {tab, md: fertig.length ? Math.max(...fertig) : 0, spiele: Object.fromEntries(tab.map(r => [r.k, r.sp]))};
+  }
+  function ligaWerte(sp){
+    return SPN.spielerinnen.map(s => { const g = (s.spiele || []).filter(z => z.art === "S" || z.art === "E");
+      const v = {s, tore: 0, vorl: 0, joker: 0, zunull: 0, gelb: 0, rot: 0, minuten: 0};
+      g.forEach(z => { const t = (z.tore || []).length; v.tore += t; v.vorl += z.vorl || 0; v.minuten += z.min || 0;
+        if (z.art === "E") v.joker += t; if (z.gelb) v.gelb++; if (z.rot) v.rot++;
+        if (s.pos === "TW" && z.art === "S" && z.erg) { const [a, b] = z.erg.split(":").map(Number); if ((z.ha === "H" ? b : a) === 0) v.zunull++; } });
+      v.scorer = v.tore + v.vorl; v.p90 = v.minuten >= 270 && v.tore ? v.tore / v.minuten * 90 : 0;
+      v.voll = sp[s.k] > 0 && g.length === sp[s.k] && g.every(z => z.art === "S" && !z.aus && !z.rot) ? 1 : 0;
+      return v; });
+  }
+  const stFmt = (k, x) => k === "p90" ? x.toFixed(2).replace(".", ",") : String(x);
+  const stNach = s => esc(nachN(s.n));
+  const stNamen = l => { const n = l.map(v => stNach(v.s)); return n.length > 5 ? n.slice(0, 4).join(", ") + ` und ${n.length - 4} weitere` : n.join(", "); };
+  function stListe(k, l, n){
+    const max = l.length ? l[0][k] : 1; let rang = 0, vor = null;
+    return l.slice(0, n).map((v, i) => { if (v[k] !== vor) rang = i + 1; vor = v[k]; const kl = n > 3 ? 30 : 44;
+      return `<button class="sr${rang === 1 ? " r1" : ""}" data-profil="${esc(v.s.id)}"><span class="sr-rk${rang <= 3 ? " g" + rang : ""}">${rang <= 3 ? rang : rang + "."}</span>${pfFoto(v.s, kl, kl, n > 3 ? 7 : 9)}${logo(v.s.k, 18)}<span class="sr-nm"><b>${esc(v.s.n)}</b><span class="sr-bal"><i style="width:${Math.max(4, v[k] / max * 100)}%"></i></span></span><span class="sr-w">${stFmt(k, v[k])}</span></button>`; }).join("");
+  }
+  function statView(art, sanft){
+    BACK = "stat"; PR_STAPEL = []; setHash(art); VIEW_STAT = art;
+    document.querySelectorAll("[data-statview]").forEach(b => b.setAttribute("aria-pressed", b.dataset.statview === art));
+    const zur = `<button class="back" data-statzu="1">‹ Zurück</button>`;
+    if (!SP || !SPN) { $("#main").innerHTML = `<div class="det sv">${zur}<p class="leer">Wird geladen …</p></div>`;
+      Promise.all([SP ? SP : loadSP(), ladeSPN()]).then(() => { if (VIEW_STAT === art && BACK === "stat") statView(art, true); })
+        .catch(() => { $("#main").innerHTML = `<div class="det sv">${zur}<p class="leer">Die Daten konnten nicht geladen werden. Seite neu laden.</p></div>`; });
+      return; }
+    const L = ligaStand();
+    if (art === "tabelle") {
+      $("#main").innerHTML = `<div class="det sv">${zur}<h1 class="disp">Tabelle</h1><div class="dat">Google Pixel Frauen-Bundesliga, nach dem ${L.md}. Spieltag</div>
+        <div class="tb"><div class="tb-r tb-h"><span>#</span><span></span><span class="tb-vn" style="font-weight:600">VEREIN</span><span>SP</span><span>S-U-N</span><span>TORE</span><span>DIFF</span><span>PKT</span></div>
+        ${L.tab.map((r, i) => { const d = r.tp - r.tm, pl = i && r.pkt === L.tab[i - 1].pkt && d === L.tab[i - 1].tp - L.tab[i - 1].tm && r.tp === L.tab[i - 1].tp ? "" : i + 1;
+          return `<button class="tb-r" data-statverein="${r.k}" aria-label="${esc(kname(r.k))}, Kader öffnen"><span class="tb-pl">${pl}</span>${logo(r.k, 20)}<span class="tb-vn">${esc(kname(r.k))}</span><span class="tb-mu">${r.sp}</span><span>${r.s}-${r.u}-${r.n}</span><span class="tb-mu">${r.tp}:${r.tm}</span><span>${d > 0 ? "+" : ""}${d}</span><span class="tb-pk">${r.pkt}</span></button>`; }).join("")}</div>
+        <p class="st-notiz">Bei Punktgleichheit entscheidet die Tordifferenz, dann die Zahl der Tore. Verein antippen öffnet den Kader. Ergebnisse: Sportschau.</p></div>`;
+    } else {
+      const W = ligaWerte(L.spiele);
+      let h = `<div class="det sv">${zur}<h1 class="disp">Statistik</h1><div class="dat">Google Pixel Frauen-Bundesliga, nach dem ${L.md}. Spieltag, nur Ligaspiele</div>
+        <div class="st-chips">${STKAT.map(([k, t]) => `<button data-stsprung="${k}">${t}</button>`).join("")}</div>`;
+      for (const [k, t, e] of STKAT) {
+        const l = W.filter(v => v[k] > 0).sort((a, b) => b[k] - a[k] || a.minuten - b.minuten || a.s.n.localeCompare(b.s.n, "de"));
+        if (k === "voll" || k === "rot") {
+          h += `<section class="stk" id="st-${k}"><div class="stk-k"><h2>${t}</h2><small>${e}</small></div>${l.length ? `<div class="st-chipl">${l.map(v => `<button data-profil="${esc(v.s.id)}">${logo(v.s.k, 14)}${stNach(v.s)}${k === "rot" && v.rot > 1 ? " " + v.rot + "x" : ""}</button>`).join("")}</div>` : '<p class="st-erkl">Noch niemand.</p>'}${k === "voll" && l.length ? `<div class="st-erkl">${l.length} Spielerinnen haben jede Minute ihres Vereins gespielt.</div>` : ""}</section>`; continue; }
+        const auf = STAUF[k], n = auf ? 10 : 3, mehr = l.length > n && l[n][k] === l[n - 1][k] ? l.slice(n).filter(v => v[k] === l[n - 1][k]) : [];
+        h += `<section class="stk${auf ? " stk-klein" : ""}" id="st-${k}"><div class="stk-k"><h2>${t}</h2>${e ? `<small>${e}</small>` : ""}</div>${l.length ? stListe(k, l, n) : '<p class="st-erkl">Noch niemand.</p>'}
+          ${mehr.length ? `<div class="st-erkl">Ebenfalls ${stFmt(k, l[n - 1][k])}: ${stNamen(mehr)}</div>` : ""}${l.length > 3 ? `<button class="st-mehr" data-stauf="${k}">${auf ? "Weniger" : "Top 10 ›"}</button>` : ""}</section>`;
+      }
+      h += `<p class="st-notiz">Tore, Vorlagen, Karten und Minuten aus den offiziellen Aufstellungen und dem Liveticker der Sportschau. Bei Gleichstand teilen sich Spielerinnen den Platz, weiter oben steht, wer weniger Minuten gebraucht hat. Namen antippen öffnet das Profil.</p></div>`;
+      $("#main").innerHTML = h;
+    }
+    if (!sanft) window.scrollTo(0, 0);
+  }
+  function statZu(){
+    document.querySelectorAll("[data-statview]").forEach(b => b.setAttribute("aria-pressed", false));
+    const h = STAT_HER || {typ: "meldungen"}; STAT_HER = null; BACK = null; VIEW_STAT = null;
+    if (h.typ === "artikel" && h.id) { setHash(h.id); article(h.id); } else if (h.typ === "spiel" && h.id) { VIEW = "spielplan"; spiel(h.id); } else { show(h.typ === "spielplan" || h.typ === "inside" ? h.typ : "meldungen"); if (h.scroll) window.scrollTo(0, h.scroll); }
+  }
+  let STAT_HER = null, VIEW_STAT = null, SUCHE_HER = null;
   function suche(q){
-    if (!PR_HER || PR_HER.typ !== "suche") PR_HER = null;
     BACK = "suche"; PR_STAPEL = []; setHash("suche");
     $("#main").innerHTML = `<div class="det pf-such">${`<button class="back" data-suchezu="1">‹ Zurück</button>`}
       <label class="pf-feld">${svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>', "pf-lupe")}<input type="search" placeholder="Spielerin oder Verein suchen" autocomplete="off" enterkeyhint="search" aria-label="Spielerin oder Verein suchen"></label>
@@ -1544,12 +1675,13 @@ button.chip.pfc{cursor:pointer}
     ladeSPN().then(zeig).catch(() => { $("#pf-erg").innerHTML = '<p class="leer">Die Profile konnten nicht geladen werden.</p>'; });
     setTimeout(() => inp.focus(), 50);
   }
-  function vereinsKader(k){
-    BACK = "suche";
+  let KADER_K = null;
+  function vereinsKader(k, von){
+    BACK = von ? "statkader" : "suche"; KADER_K = k;
     const L = SPN.spielerinnen.filter(s => s.k === k), ord = {TW:0, ABW:1, MF:2, ST:3};
     L.sort((a, b) => (ord[a.pos] ?? 9) - (ord[b.pos] ?? 9) || (parseInt(a.nr, 10) || 99) - (parseInt(b.nr, 10) || 99));
     const zeile = s => { const st = s.status ? s.status.s : "fit"; return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small></span><i class="pf-dot" style="background:${STFARBE[st] || STFARBE.fit}"></i></button>`; };
-    $("#main").innerHTML = `<div class="det pf-such"><button class="back" data-suchezu="2">‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>
+    $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>
       ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}</div>`;
     window.scrollTo(0, 0);
   }
@@ -1653,11 +1785,17 @@ button.chip.pfc{cursor:pointer}
     let x;
     if ((x = q("[data-kiauf]"))) { const z = x.closest(".nachw").querySelector(".nq-mehr"); z.hidden = !z.hidden; x.setAttribute("aria-expanded", !z.hidden); return; }
     if ((x = q("[data-legal]"))) { legal(x.dataset.legal); return; }
-    if (q("[data-suche]")) { PR_HER = {typ: document.querySelector("article.det") && ARTIKEL ? "artikel" : VIEW === "spielplan" && GAME ? "spiel" : VIEW, id: ARTIKEL || GAME, scroll: window.scrollY}; suche(); return; }
-    if ((x = q("[data-suchezu]"))) { if (x.dataset.suchezu === "2") { suche(); return; } const h = PR_HER || {typ: "meldungen"}; PR_HER = null; BACK = null;
+    if ((x = q("[data-statview]"))) { if (!STAT_HER && BACK !== "stat" && BACK !== "statkader") STAT_HER = {typ: document.querySelector("article.det") && ARTIKEL ? "artikel" : VIEW === "spielplan" && GAME ? "spiel" : VIEW, id: ARTIKEL || GAME, scroll: window.scrollY};
+      PR_HER = null; statView(x.dataset.statview); return; }
+    if (q("[data-statzu]")) { statZu(); return; }
+    if ((x = q("[data-stsprung]"))) { const z = document.getElementById("st-" + x.dataset.stsprung); if (z) z.scrollIntoView({behavior: "smooth", block: "start"}); return; }
+    if ((x = q("[data-stauf]"))) { STAUF[x.dataset.stauf] = !STAUF[x.dataset.stauf]; const y = window.scrollY; statView("statistik", true); window.scrollTo(0, y); return; }
+    if ((x = q("[data-statverein]"))) { vereinsKader(x.dataset.statverein, "tabelle"); window.scrollTo(0, 0); return; }
+    if (q("[data-suche]")) { STAT_HER = null; VIEW_STAT = null; document.querySelectorAll("[data-statview]").forEach(b => b.setAttribute("aria-pressed", false)); PR_HER = null; SUCHE_HER = {typ: document.querySelector("article.det") && ARTIKEL ? "artikel" : VIEW === "spielplan" && GAME ? "spiel" : VIEW, id: ARTIKEL || GAME, scroll: window.scrollY}; suche(); return; }
+    if ((x = q("[data-suchezu]"))) { if (x.dataset.suchezu === "2") { suche(); return; } const h = SUCHE_HER || {typ: "meldungen"}; SUCHE_HER = null; PR_HER = null; BACK = null;
       if (h.typ === "artikel" && h.id) { setHash(h.id); article(h.id); } else if (h.typ === "spiel" && h.id) { VIEW = "spielplan"; spiel(h.id); } else { show(h.typ === "spielplan" || h.typ === "inside" ? h.typ : "meldungen"); if (h.scroll) window.scrollTo(0, h.scroll); } return; }
     if ((x = q("[data-suchverein]"))) { vereinsKader(x.dataset.suchverein); return; }
-    if ((x = q("[data-profil]"))) { const her = BACK === "suche" ? {typ: "suche"} : document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
+    if ((x = q("[data-profil]"))) { const her = BACK === "suche" ? {typ: "suche"} : BACK === "stat" ? {typ: "stat", art: VIEW_STAT, scroll: window.scrollY} : BACK === "statkader" ? {typ: "statkader", k: KADER_K} : document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
       oeffneProfil(x.dataset.profil, her); return; }
     if ((x = q("[data-profilname]"))) { const [k, n] = x.dataset.profilname.split("|"), her = document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
       ladeSPN().then(() => { const sp = findeSP(k, n); if (sp) oeffneProfil(sp.id, her); }).catch(() => {}); return; }
@@ -1707,6 +1845,7 @@ button.chip.pfc{cursor:pointer}
     const h = decodeURIComponent(location.hash.slice(1));
     if (h.startsWith("spielerin/")) { list(); oeffneProfil(h.slice(10), {typ: "meldungen"}); }
     else if (h === "suche") { list(); suche(); }
+    else if (h === "tabelle" || h === "statistik") { list(); STAT_HER = {typ: "meldungen"}; statView(h); }
     else if (h === "spielplan") show("spielplan");
     else if (h === "inside") show("inside");
     else if (h === "analyse") { list(); loadIN().then(() => { if (IN && IN.analyse) anaArticle(); }); }
