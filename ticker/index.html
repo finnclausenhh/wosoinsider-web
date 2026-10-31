@@ -549,7 +549,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 /* Suche und Spielerinnenprofil */
 .bar-in{position:relative}
 .kopf-btns{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:6px;display:flex;gap:6px}
-.bar-in .seg{margin-top:6px}
+.bar-in .seg{margin-top:4px}
 .such-btn{width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center}.such-btn[aria-pressed=true]{background:var(--accent)}
 /* Tabelle und Statistik */
 .sv{display:grid;gap:14px}.sv h1{margin:0}.sv .dat{font-size:13px;color:var(--muted)}
@@ -668,13 +668,17 @@ button.chip.pfc{cursor:pointer}
 .akopf{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27300%27%20height%3D%27150%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.056%29%27%20stroke-width%3D%271.5%27%3E%3Crect%20x%3D%27120%27%20y%3D%27-2%27%20width%3D%27182%27%20height%3D%2780%27/%3E%3Cpath%20d%3D%27M168%2078%20A42%2042%200%200%200%20244%2078%27/%3E%3C/g%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28110%2C155%2C255%2C.17%29%27%20stroke-width%3D%271.6%27%20stroke-dasharray%3D%275%205%27%3E%3Cpath%20d%3D%27M120%2092%20C150%2072%20172%2056%20196%2040%27/%3E%3C/g%3E%3Ccircle%20cx%3D%27114%27%20cy%3D%2796%27%20r%3D%276%27%20fill%3D%27none%27%20stroke%3D%27rgba%28110%2C155%2C255%2C.17%29%27%20stroke-width%3D%271.6%27/%3E%3Cpath%20d%3D%27M186%2032%20l9%209%20m0%20-9%20l-9%209%27%20stroke%3D%27rgba%28110%2C155%2C255%2C.17%29%27%20stroke-width%3D%271.6%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right top}
 .pf-kopf{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27220%27%20height%3D%27170%27%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.084%29%27%20stroke-width%3D%271.5%27%3E%3Cpath%20d%3D%27M0%2014%20H206%20V170%27/%3E%3Cpath%20d%3D%27M190%2014%20A16%2016%200%200%200%20206%2030%27/%3E%3Cpath%20d%3D%27M120%2014%20V58%20H206%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right top}
 /* Alle Schützinnen: Legende einzeilig, Trennlinien erst ab den Namen */
-.stab .r{border-top:0;position:relative}.stab .r+.r::before{content:"";position:absolute;left:46px;right:0;top:0;border-top:1px solid var(--line)}
+
+
+.vz-btn{position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:6px;width:auto;min-width:34px;padding:0 7px;display:flex;gap:2px;align-items:center;justify-content:center}.vz-btn svg{width:18px;height:18px}.vz-btn.an{background:rgba(47,91,255,.22)}.vz-btn b{font:700 11px var(--f-mono);color:var(--ink);margin-left:2px}.vz-btn[aria-pressed=true]{background:var(--accent)}
+.vz-schmal{display:flex;align-items:center;gap:4px;width:100%;margin:0 0 8px;font-size:12.5px;color:var(--muted)}.vz-schmal span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;margin-left:4px}.vz-schmal i{font-style:normal;color:var(--accent);font-weight:600}
+.vz-fertig{justify-self:end;color:var(--accent);font-weight:600;font-size:13px;padding:4px 2px}
 </style>
 
 
 <header class="bar"><div class="bar-in">
   <div class="logo" aria-label="WOSOINSIDER"><b>WOSO</b><i>INSIDER</i></div>
-  <div class="kopf-btns"><button class="such-btn" data-statview="tabelle" aria-label="Tabelle"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M3.5 14.5h17M9 9v11"/></svg></button><button class="such-btn" data-statview="statistik" aria-label="Statistik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-3M11 16V9M16 16V5"/></svg></button><button class="such-btn" data-suche="1" aria-label="Spielerin suchen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></div>
+  <button class="such-btn vz-btn" data-vzauf="1" aria-label="Meine Vereine"></button><div class="kopf-btns"><button class="such-btn" data-statview="tabelle" aria-label="Tabelle"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M3.5 14.5h17M9 9v11"/></svg></button><button class="such-btn" data-statview="statistik" aria-label="Statistik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-3M11 16V9M16 16V5"/></svg></button><button class="such-btn" data-suche="1" aria-label="Spielerin suchen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></div>
   <div class="seg" role="tablist"><button id="tab-meldungen" role="tab" aria-selected="true" data-tab="meldungen">News</button><button id="tab-spielplan" role="tab" aria-selected="false" data-tab="spielplan">Spielplan</button><button id="tab-inside" role="tab" aria-selected="false" data-tab="inside">Inside</button></div>
 </div></header>
 
@@ -1190,8 +1194,17 @@ button.chip.pfc{cursor:pointer}
   const sektion = (nr, kat, titel, notiz) => `<div class="sk"><span class="nr">${nr} · ${esc(kat)}</span>${titel ? `<h2 class="disp">${esc(titel)}</h2>` : ""}${notiz ? `<p>${esc(notiz)}</p>` : ""}</div>`;
   const FG = [["up", "Aufwind", "Im Aufwind", "#4ADE80"], ["down", "Formtief", "Im Formtief", "#FF8A8A"], ["hold", "Stabil", "Stabil", "#8FB0FF"]];
   const formListe = key => (((IN.form || {})[key]) || []).filter(f => zeigen(f.k));
+  function vzKnopf(){
+    const gew = ALLE.filter(k => SEL.has(k)), b = document.querySelector(".vz-btn"); if (!b) return;
+    b.setAttribute("aria-pressed", VZOFFEN); b.classList.toggle("an", gew.length > 0);
+    b.innerHTML = gew.length ? gew.slice(0, 2).map(k => logo(k, 18)).join("") + (gew.length > 2 ? `<b>+${gew.length - 2}</b>` : "") : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>';
+  }
   function vereinsZeile(){
+    vzKnopf();
     const gew = ALLE.filter(k => SEL.has(k));
+    if (VZOFFEN) return `<div class="vz"><div class="vz-o">${filterBlock()}</div><button class="vz-fertig" data-vzauf="1">Fertig</button></div>`;
+    if (gew.length) return `<button class="vz-schmal" data-vzauf="1">${gew.map(k => logo(k, 14)).join("")}<span>Nur ${esc(gew.map(kname).join(", "))}</span><i>ändern</i></button>`;
+    return "";
     const kopf = `<button class="vz-k" data-vzauf="1" aria-expanded="${VZOFFEN}"><span class="l">MEINE VEREINE</span>
       <span class="w">${gew.length ? gew.map(k => logo(k, 16)).join("") + `<span style="margin-left:4px;overflow:hidden;text-overflow:ellipsis">${esc(gew.map(kname).join(", "))}</span>` : '<span class="mu" style="font-weight:500">Alle Vereine</span>'}</span>
       <span class="a">${VZOFFEN ? "fertig" : gew.length ? "ändern" : "auswählen"}</span></button>`;
@@ -1738,8 +1751,8 @@ button.chip.pfc{cursor:pointer}
     const fT = eins.reduce((a, e) => a + (e.tore || []).length, 0), fV = eins.reduce((a, e) => a + (e.vorl || 0), 0);
     const stB = st === "fit" ? ["Fit", "nichts gemeldet", STFARBE.fit] : [st === "raus" ? "Verletzt" : st === "gesperrt" ? "Gesperrt" : "Fraglich", kurzZurueck(s.status), STFARBE[st]];
     h += `<div class="pf-blick"><div><span class="k">Status</span><b style="color:${stB[2]}">${esc(stB[0])}</b><small>${esc(stB[1])}</small></div>
-      <div><span class="k">Nächster Spieltag</span><b style="color:${sf ? sf[1] : "var(--muted)"}">${esc(sf ? sf[0] : "offen")}</b><small>${wert != null ? "Einsatzwert " + wert + " %" : pr && pr.grund ? esc(pr.grund) : ""}</small></div>
-      <div><span class="k">Letzte 3 Einsätze</span><b>${eins.length ? `<span class="oe">Ø</span>${avg}'` : "0"}</b><small>${fT} ${fT === 1 ? "Tor" : "Tore"} · ${fV} ${fV === 1 ? "Vorlage" : "Vorlagen"}</small></div></div>`;
+      <div><span class="k">Nächstes Spiel</span><b style="color:${sf ? sf[1] : "var(--muted)"}">${esc(sf ? sf[0] : "offen")}</b><small>${wert != null ? "Einsatzwert " + wert + " %" : pr && pr.grund ? esc(pr.grund) : ""}</small></div>
+      <div><span class="k">Letzte 3 Spiele</span><b>${eins.length ? `<span class="oe">Ø</span>${avg}'` : "0"}</b><small>${fT || fV ? `${fT} ${fT === 1 ? "Tor" : "Tore"} · ${fV} ${fV === 1 ? "Vorl." : "Vorl."}` : "keine Torbeteiligung"}</small></div></div>`;
     // Für Kickbase
     const ART = {elfmeter: "Elfmeter", freistoesse: "Freistöße", ecken: "Ecken"};
     const std = Object.entries(s.standards || {}).map(([a, r]) => `<span class="pf-std">${ART[a] || a}${r > 1 ? ` <i>${r}. Wahl</i>` : ""}</span>`).join("");
@@ -1850,7 +1863,7 @@ button.chip.pfc{cursor:pointer}
       const y = window.scrollY; ARTIKEL ? article(ARTIKEL) : list(); window.scrollTo(0, y); return; }
     if ((x = q("[data-club]"))) { const k = x.dataset.club; SEL.has(k) ? SEL.delete(k) : SEL.add(k); saveSel(); FIDX = 0; NEWSALLE = false; neuZeichnen(); return; }
     if (q("[data-clear]")) { SEL.clear(); saveSel(); FIDX = 0; NEWSALLE = false; neuZeichnen(); return; }
-    if (q("[data-vzauf]")) { VZOFFEN = !VZOFFEN; neuZeichnen(); return; }
+    if (q("[data-vzauf]")) { if (BACK || ARTIKEL || GAME) { VZOFFEN = true; STAT_HER = null; VIEW_STAT = null; SUCHE_HER = null; PR_HER = null; PR_STAPEL = []; ARTIKEL = null; show(VIEW === "spielplan" || VIEW === "inside" ? VIEW : "meldungen"); return; } VZOFFEN = !VZOFFEN; neuZeichnen(); window.scrollTo(0, 0); return; }
     if ((x = q("[data-newsalle]"))) { NEWSALLE = x.dataset.newsalle === "1"; neuZeichnen(); return; }
     if (q("[data-weitere]")) { WEITERE = !WEITERE; neuZeichnen(); return; }
     if (q("[data-stdalle]")) { STDALLE = !STDALLE; neuZeichnen(); return; }
@@ -1873,6 +1886,7 @@ button.chip.pfc{cursor:pointer}
     if ((x = q("[data-id]"))) { SCROLL = window.scrollY; setHash(x.dataset.id); article(x.dataset.id); }
   });
 
+  vzKnopf();
   json("news.json").then(d => {
     N = d.meldungen || [];
     const h = decodeURIComponent(location.hash.slice(1));
@@ -1885,7 +1899,7 @@ button.chip.pfc{cursor:pointer}
     else if (INFO[h]) { list(); legal(h); }
     else h && N.some(m => m.id === h) ? article(h) : list();
   }).catch(() => { if (VIEW === "meldungen") $("#main").innerHTML = '<p class="leer">Die Meldungen konnten nicht geladen werden. Seite neu laden.</p>'; });
-  fetch("patchnotes.json", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(d => { PATCH = d; }).catch(() => {});
+  fetch("patchnotes.json", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(d => { PATCH = d; if (decodeURIComponent(location.hash.slice(1)) === "patches") legal("patches"); }).catch(() => {});
   loadSP();
   loadIN();
   loadUM(); setInterval(loadUM, 2 * 60000);
