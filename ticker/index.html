@@ -116,7 +116,7 @@ a{color:var(--accent)}
 .seg button[aria-selected="true"],.seg button[aria-pressed="true"]{background:#636366;font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 
 main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-right,0px)) 24px max(12px,env(safe-area-inset-left,0px))}
-.liste{display:grid;gap:10px}
+.liste{display:grid;gap:8px}
 .leer{color:var(--muted);padding:40px 4px;text-align:center}
 
 /* Bausteine */
@@ -659,7 +659,7 @@ button.chip.pfc{cursor:pointer}
   const TAGF = {TOP:["#2F5BFF","#fff"], VERLETZUNG:["#E24A4A","#fff"], SPERRE:["#9B6BE8","#fff"], "RÜCKKEHR":["#2EB872","#fff"],
     INSIDER:["#F4F5F7","#0E1726"], ANALYSE:["#F4F5F7","#0E1726"], UPDATE:["#F4F5F7","#0E1726"], PUNKT:["#2F5BFF","#fff"], UMFRAGE:["#2F5BFF","#fff"], "AUF DEN PUNKT":["#2F5BFF","#fff"],
     STANDARD:["rgba(224,150,43,.2)","#E0962B"], ROTATION:["rgba(155,107,232,.2)","#9B6BE8"], TRANSFER:["rgba(155,107,232,.2)","#9B6BE8"],
-    SPIELBERICHT:["#1D2B47","#F4F5F7"], AUFSTELLUNG:["rgba(47,91,255,.18)","#6E9BFF"]};
+    SPIELBERICHT:["#1D2B47","#F4F5F7"], AUFSTELLUNG:["rgba(47,91,255,.18)","#6E9BFF"], POKAL:["rgba(224,150,43,.2)","#F7C27A"], EUROPAPOKAL:["rgba(155,107,232,.22)","#C9AEF7"], VORBERICHT:["#1D2B47","#F4F5F7"], NATIONALTEAM:["#1D2B47","#F4F5F7"]};
   const tag = t => { const f = TAGF[String(t).toUpperCase()] || ["#1D2B47","#F4F5F7"]; return `<span class="tag" style="background:${f[0]};color:${f[1]}">${esc(t)}</span>`; };
   const kap = (t, farbe) => `<div class="kap"${farbe ? ` style="color:${farbe}"` : ""}>${esc(t)}</div>`;
   const kbBox = t => t ? `<div class="kb"><b>Für Kickbase</b><span>${esc(t)}</span></div>` : "";
@@ -719,11 +719,13 @@ button.chip.pfc{cursor:pointer}
   // Wappen als Wasserzeichen hinter Portraits: gleiche sichtbare Fläche je Verein, mittig (Union höher, weil breiter Schriftzug)
   const WMG = {"FCB": [76.4, 76.4], "WOB": [76.4, 76.4], "SGE": [76.4, 76.4], "B04": [84.0, 66.2], "KOE": [70.4, 80.0], "RBL": [84.0, 54.0], "SVW": [59.8, 90.0], "SCF": [62.8, 90.0], "FCU": [94.0, 34.1], "VFB": [71.8, 80.0], "TSG": [66.8, 80.0], "HSV": [80.0, 80.0], "FCN": [76.4, 76.4], "M05": [79.3, 73.6]};
   const wm = k => k && WMG[k] ? `<img class="wm" src="logos/wm/${esc(k)}.png" alt="" style="width:${WMG[k][0]}%;height:${WMG[k][1]}%${k === "FCU" ? ";top:30%" : ""}" onerror="this.remove()">` : "";
-  function bild(m, g){
-    const r = g > 70 ? 11 : 8, k = KURZ[m.verein], f = bildPfad(m);
-    const box = (inner, bg) => `<div class="bild" style="width:${g}px;height:${g}px;border-radius:${r}px;${bg ? `background:${bg}` : ""}" aria-hidden="true">${inner}</div>`;
+  function bild(m, g, hh){
+    const h = hh || g, r = g > 70 ? 11 : 8, k = KURZ[m.verein], f = bildPfad(m);
+    const box = (inner, bg) => `<div class="bild" style="width:${g}px;height:${h}px;border-radius:${r}px;${bg ? `background:${bg}` : ""}" aria-hidden="true">${inner}</div>`;
+    // Hochformat: Kopfmitte (cx aus fotos.json) waagerecht mittig setzen
+    const cx = (FOTOS[m.spielerin] || {}).cx, op = h > g && cx ? ` style="object-position:${Math.max(0, Math.min(100, (cx * h - g / 2) / (h - g) * 100)).toFixed(1)}% 0"` : "";
     // Neutraler Grund mit Vereinswappen als Wasserzeichen (alle Portraits sind freigestellt)
-    if (f) return box(wm(k) + `<img class="f" src="${esc(f)}" alt="" loading="lazy" onerror="this.remove()">`, "radial-gradient(circle at 50% 45%,#3A4F78 0%,#2A3B5E 70%)").replace('class="bild"', 'class="bild fg"');
+    if (f) return box(wm(k) + `<img class="f" src="${esc(f)}" alt=""${op} loading="lazy" onerror="this.remove()">`, "radial-gradient(circle at 50% 45%,#3A4F78 0%,#2A3B5E 70%)").replace('class="bild"', 'class="bild fg"');
     if (istSpielerin(m)) {
       const w = Math.round(g * .25);
       return box(SIL + (m.nr ? `<span class="nr" style="font-size:${Math.round(g * .21)}px">${esc(m.nr)}</span>` : "")
@@ -752,7 +754,7 @@ button.chip.pfc{cursor:pointer}
   function newsKarte(m){
     const a = m.aufstellung, auf = a && (a.startelf || []).length;
     const rechts = auf ? `<span class="nk-r" role="img" aria-label="${esc(m.verein)} gegen ${esc(a.gegner)}">${logo(KURZ[m.verein], 20)}${logo(KURZ[a.gegner], 20)}</span>` : plakette(meldungsStatus(m));
-    return `<button class="nk" data-id="${esc(m.id)}">${bild(m, 72)}<div class="nk-b">
+    return `<button class="nk" data-id="${esc(m.id)}">${bild(m, 76, 100)}<div class="nk-b">
       <div class="nk-top"><div class="tags">${(m.tags || []).map(tag).join("")}${auf ? tag("AUFSTELLUNG") : ""}</div>${rechts}</div>
       ${auf ? `<p class="elf">${startelfZeile(a.startelf)}</p>` : `<h2>${esc(m.headline)}</h2>`}
       <div class="meta" data-lang="${esc(metaZeile(m, auf))}" data-kurz="${esc(metaZeile(m, auf, 1))}" data-nur="${esc(metaZeile(m, auf, 2))}">${esc(metaZeile(m, auf))}</div></div></button>`;
@@ -953,7 +955,7 @@ button.chip.pfc{cursor:pointer}
       ? `<div style="display:grid;gap:8px"><div class="tags">${(m.tags || []).map(tag).join("")}${tag("AUFSTELLUNG")}</div>
           <div style="display:flex;gap:8px;align-items:center">${logo(KURZ[m.verein], 30)}<h1 class="disp" style="font-size:26px">${esc(m.headline)}</h1></div>
           <div class="dat">${esc(lang(m.zeit))}</div></div>${aufBlock(a)}`
-      : `<div style="display:grid;gap:12px"><div class="mk">${bild(m, 96)}<div class="mk-m"><div class="tags">${(m.tags || []).map(tag).join("")}</div>
+      : `<div style="display:grid;gap:12px"><div class="mk">${istSpielerin(m) && m.spielerin ? `<button class="mk-foto" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}" aria-label="Profil von ${esc(m.spielerin)}">${bild(m, 96)}</button>` : bild(m, 96)}<div class="mk-m"><div class="tags">${(m.tags || []).map(tag).join("")}</div>
           <div class="wer">${istSpielerin(m) && m.spielerin ? `<button class="wer-btn" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}">${esc(m.spielerin)}</button>` : esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc([m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
           ${st ? `<div class="mk-st">${plakette(meldungsStatus(m), 28)}<span>${st[2]}</span></div>` : ""}</div>
           <h1 class="disp" style="font-size:30px">${esc(m.headline)}</h1><div class="dat">${esc(lang(m.zeit))}</div></div>
