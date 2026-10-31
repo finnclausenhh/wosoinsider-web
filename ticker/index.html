@@ -547,7 +547,8 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 
 /* Suche und Spielerinnenprofil */
 .bar-in{position:relative}
-.kopf-btns{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:8px;display:flex;gap:6px}
+.kopf-btns{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:6px;display:flex;gap:6px}
+.bar-in .seg{margin-top:6px}
 .such-btn{width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center}.such-btn[aria-pressed=true]{background:var(--accent)}
 /* Tabelle und Statistik */
 .sv{display:grid;gap:14px}.sv h1{margin:0}.sv .dat{font-size:13px;color:var(--muted)}
@@ -569,6 +570,12 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .stk .st-erkl{font-size:12px;color:var(--muted)}.stk .st-mehr{color:var(--accent);font-weight:600;font-size:13.5px;justify-self:start}
 .st-chipl{display:flex;flex-wrap:wrap;gap:6px}.st-chipl button{display:flex;align-items:center;gap:5px;background:var(--soft);border-radius:8px;padding:4px 8px;font-size:13px;color:var(--ink)}
 .sv .st-notiz{font-size:12px;color:var(--muted)}
+.kt3{display:flex;gap:10px;font:600 12px var(--f-mono);color:var(--muted)}.kt3 span{display:flex;align-items:center;gap:4px}
+.kg,.kgr,.kr{display:inline-block;width:9px;height:12px;border-radius:2px;vertical-align:-1px}.kg{background:#F5C518}.kr{background:#E24A4A}.kgr{background:linear-gradient(135deg,#F5C518 50%,#E24A4A 50%)}
+.ft{display:grid}.ft-r{display:grid;grid-template-columns:20px 18px minmax(0,1fr) 26px 26px 26px 30px;gap:6px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px;text-align:center;width:100%;color:var(--ink)}
+.ft-r:first-child{border-top:0}.ft-r.ft-h{font:600 10px var(--f-mono);color:var(--muted);padding:4px 0}.ft-r .tb-vn{text-align:left;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ft-r .tb-pk{font-weight:800;font-family:var(--f-display);font-size:17px}.ft-r .tb-pl{font:600 12px var(--f-mono);color:var(--muted)}
+.tb-r{position:relative}.tb-r.z-cl{box-shadow:inset 3px 0 0 #2F5BFF}.tb-r.z-q{box-shadow:inset 3px 0 0 #6E9BFF}.tb-r.z-ab{box-shadow:inset 3px 0 0 #E24A4A}.tb-r .tb-pl{padding-left:4px}
+.tb-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}.tb-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 @media (max-width:370px){.tb-r{gap:3px;grid-template-columns:18px 18px minmax(0,1fr) 16px 44px 40px 26px 24px;font-size:12.5px}.sr{gap:7px}}
 .such-btn svg{width:17px;height:17px;stroke:var(--ink);fill:none;stroke-width:2}
 .pf-feld{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:12px 14px}
@@ -1358,7 +1365,8 @@ button.chip.pfc{cursor:pointer}
       <h2>Wie die Meldungen entstehen</h2>
       <p>Meldungen und Einschätzungen erstellt eine KI aus den verlinkten Quellen, nach festen Regeln und ohne etwas zu erfinden. <button class="lk" data-legal="so-entsteht">So entsteht WOSOINSIDER</button></p>
       <h2>Kontakt</h2>
-      <p>Hinweise, Korrekturen, Vereine und Presse: <a href="mailto:redaktion@wosoinsider.de">redaktion@wosoinsider.de</a></p>`,
+      <p>Hinweise, Korrekturen, Verbesserungsvorschläge, Kooperationsanfragen, Vereine und Presse: <a href="mailto:redaktion@wosoinsider.de">redaktion@wosoinsider.de</a></p>
+      <p>Direkt an Finn auf Instagram: <a href="https://www.instagram.com/finn.baut/" target="_blank" rel="noopener">@finn.baut</a></p>`,
     impressum: () => `<h1>Impressum</h1>
       <h2>Angaben gemäß § 5 DDG</h2>
       <address>Finn Clausen<br>WOSOINSIDER<br>Wiesenweg 14<br>83083 Riedering<br>Deutschland</address>
@@ -1429,10 +1437,12 @@ button.chip.pfc{cursor:pointer}
     kontakt: () => `<h1>Kontakt</h1>
       <p>Eine Adresse für alles: <a href="mailto:redaktion@wosoinsider.de">redaktion@wosoinsider.de</a></p>
       <ul>
-      <li>Fragen zu WOSOINSIDER und Wünsche für neue Funktionen</li>
+      <li>Fragen zu WOSOINSIDER, Verbesserungsvorschläge und Wünsche für neue Funktionen</li>
+      <li>Kooperationsanfragen von Vereinen, Medien und Partnern</li>
       <li>Fehler in einer Meldung oder Aufstellung, neue Informationen zu Verletzungen, Sperren oder Rückkehr, bitte mit Link zur Quelle</li>
       <li>Auskunft, Berichtigung oder Löschung personenbezogener Daten sowie Fragen zu Bild- und Markenrechten</li>
       </ul>
+      <p>Direkt an Finn Clausen auf Instagram: <a href="https://www.instagram.com/finn.baut/" target="_blank" rel="noopener">@finn.baut</a></p>
       <p>Die Postanschrift steht im Impressum.</p>`,
     "so-entsteht": () => `<h1>KI-Hinweis &amp; Methodik</h1>
       <p>WOSOINSIDER wird mit künstlicher Intelligenz erstellt. Wir kennzeichnen das offen, wie es Art. 50 Abs. 4 der europäischen KI-Verordnung für KI-erzeugte Texte von öffentlichem Interesse vorsieht.</p>
@@ -1564,7 +1574,7 @@ button.chip.pfc{cursor:pointer}
     const h = PR_HER || {typ: "meldungen"}; PR_HER = null; BACK = null; PR_STAPEL = [];
     if (h.typ === "suche") { suche(); return; }
     if (h.typ === "stat") { statView(h.art || "statistik", true); window.scrollTo(0, h.scroll || 0); return; }
-    if (h.typ === "statkader") { vereinsKader(h.k, "tabelle"); window.scrollTo(0, 0); return; }
+    if (h.typ === "statkader") { vereinsKader(h.k, h.von || "tabelle"); window.scrollTo(0, 0); return; }
     if (h.typ === "artikel" && h.id) { VIEW = "meldungen"; setHash(h.id); article(h.id); return; }
     if (h.typ === "spiel" && h.id) { VIEW = "spielplan"; spiel(h.id); return; }
     show(h.typ === "spielplan" || h.typ === "inside" ? h.typ : "meldungen"); if (h.scroll) window.scrollTo(0, h.scroll);
@@ -1572,7 +1582,7 @@ button.chip.pfc{cursor:pointer}
 
   // ---------------- Tabelle und Statistik (nur Liga, berechnet aus spielplan.json und spielerinnen.json)
   let STAUF = {};
-  const STKAT = [["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["gelb","Gelbe Karten","ohne Gelb-Rot"],["rot","Platzverweise","Rot und Gelb-Rot"]];
+  const STKAT = [["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["karten","Karten","Gelb 1, Gelb-Rot 3, Rot 5 Punkte"],["fair","Fairnesstabelle","Kartenpunkte der Spielerinnen je Verein, wenigste oben"]];
   function ligaStand(){
     const T = {}, fertig = [];
     ALLE.forEach(k => T[k] = {k, sp: 0, s: 0, u: 0, n: 0, tp: 0, tm: 0, pkt: 0});
@@ -1588,21 +1598,22 @@ button.chip.pfc{cursor:pointer}
   }
   function ligaWerte(sp){
     return SPN.spielerinnen.map(s => { const g = (s.spiele || []).filter(z => z.art === "S" || z.art === "E");
-      const v = {s, tore: 0, vorl: 0, joker: 0, zunull: 0, gelb: 0, rot: 0, minuten: 0};
+      const v = {s, tore: 0, vorl: 0, joker: 0, zunull: 0, gelb: 0, gr: 0, rot: 0, minuten: 0};
       g.forEach(z => { const t = (z.tore || []).length; v.tore += t; v.vorl += z.vorl || 0; v.minuten += z.min || 0;
-        if (z.art === "E") v.joker += t; if (z.gelb) v.gelb++; if (z.rot) v.rot++;
+        if (z.art === "E") v.joker += t; if (z.gr) v.gr++; else if (z.rot) v.rot++; else if (z.gelb) v.gelb++;
         if (s.pos === "TW" && z.art === "S" && z.erg) { const [a, b] = z.erg.split(":").map(Number); if ((z.ha === "H" ? b : a) === 0) v.zunull++; } });
-      v.scorer = v.tore + v.vorl; v.p90 = v.minuten >= 270 && v.tore ? v.tore / v.minuten * 90 : 0;
+      v.scorer = v.tore + v.vorl; v.karten = v.gelb + 3 * v.gr + 5 * v.rot; v.p90 = v.minuten >= 270 && v.tore ? v.tore / v.minuten * 90 : 0;
       v.voll = sp[s.k] > 0 && g.length === sp[s.k] && g.every(z => z.art === "S" && !z.aus && !z.rot) ? 1 : 0;
       return v; });
   }
-  const stFmt = (k, x) => k === "p90" ? x.toFixed(2).replace(".", ",") : String(x);
+  const stKarten = v => `<span class="kt3"><span><i class="kg"></i>${v.gelb}</span><span><i class="kgr"></i>${v.gr}</span><span><i class="kr"></i>${v.rot}</span></span>`;
+  const stFmt = (k, x) => k === "minuten" ? x + "'" : k === "p90" ? x.toFixed(2).replace(".", ",") : String(x);
   const stNach = s => esc(nachN(s.n));
   const stNamen = l => { const n = l.map(v => stNach(v.s)); return n.length > 5 ? n.slice(0, 4).join(", ") + ` und ${n.length - 4} weitere` : n.join(", "); };
   function stListe(k, l, n){
     const max = l.length ? l[0][k] : 1; let rang = 0, vor = null;
     return l.slice(0, n).map((v, i) => { if (v[k] !== vor) rang = i + 1; vor = v[k]; const kl = n > 3 ? 30 : 44;
-      return `<button class="sr${rang === 1 ? " r1" : ""}" data-profil="${esc(v.s.id)}"><span class="sr-rk${rang <= 3 ? " g" + rang : ""}">${rang <= 3 ? rang : rang + "."}</span>${pfFoto(v.s, kl, kl, n > 3 ? 7 : 9)}${logo(v.s.k, 18)}<span class="sr-nm"><b>${esc(v.s.n)}</b><span class="sr-bal"><i style="width:${Math.max(4, v[k] / max * 100)}%"></i></span></span><span class="sr-w">${stFmt(k, v[k])}</span></button>`; }).join("");
+      return `<button class="sr${rang === 1 ? " r1" : ""}" data-profil="${esc(v.s.id)}"><span class="sr-rk${rang <= 3 ? " g" + rang : ""}">${rang <= 3 ? rang : rang + "."}</span>${pfFoto(v.s, kl, kl, n > 3 ? 7 : 9)}${logo(v.s.k, 18)}<span class="sr-nm"><b>${esc(v.s.n)}</b>${k === "karten" ? stKarten(v) : `<span class="sr-bal"><i style="width:${Math.max(4, v[k] / max * 100)}%"></i></span>`}</span><span class="sr-w">${stFmt(k, v[k])}</span></button>`; }).join("");
   }
   function statView(art, sanft){
     BACK = "stat"; PR_STAPEL = []; setHash(art); VIEW_STAT = art;
@@ -1617,15 +1628,26 @@ button.chip.pfc{cursor:pointer}
       $("#main").innerHTML = `<div class="det sv">${zur}<h1 class="disp">Tabelle</h1><div class="dat">Google Pixel Frauen-Bundesliga, nach dem ${L.md}. Spieltag</div>
         <div class="tb"><div class="tb-r tb-h"><span>#</span><span></span><span class="tb-vn" style="font-weight:600">VEREIN</span><span>SP</span><span>S-U-N</span><span>TORE</span><span>DIFF</span><span>PKT</span></div>
         ${L.tab.map((r, i) => { const d = r.tp - r.tm, pl = i && r.pkt === L.tab[i - 1].pkt && d === L.tab[i - 1].tp - L.tab[i - 1].tm && r.tp === L.tab[i - 1].tp ? "" : i + 1;
-          return `<button class="tb-r" data-statverein="${r.k}" aria-label="${esc(kname(r.k))}, Kader öffnen"><span class="tb-pl">${pl}</span>${logo(r.k, 20)}<span class="tb-vn">${esc(kname(r.k))}</span><span class="tb-mu">${r.sp}</span><span>${r.s}-${r.u}-${r.n}</span><span class="tb-mu">${r.tp}:${r.tm}</span><span>${d > 0 ? "+" : ""}${d}</span><span class="tb-pk">${r.pkt}</span></button>`; }).join("")}</div>
-        <p class="st-notiz">Bei Punktgleichheit entscheidet die Tordifferenz, dann die Zahl der Tore. Verein antippen öffnet den Kader. Ergebnisse: Sportschau.</p></div>`;
+          const zo = i === 0 ? " z-cl" : i <= 2 ? " z-q" : i >= L.tab.length - 2 ? " z-ab" : "";
+          return `<button class="tb-r${zo}" data-statverein="${r.k}" aria-label="${esc(kname(r.k))}, Kader öffnen"><span class="tb-pl">${pl}</span>${logo(r.k, 20)}<span class="tb-vn">${esc(kname(r.k))}</span><span class="tb-mu">${r.sp}</span><span>${r.s}-${r.u}-${r.n}</span><span class="tb-mu">${r.tp}:${r.tm}</span><span>${d > 0 ? "+" : ""}${d}</span><span class="tb-pk">${r.pkt}</span></button>`; }).join("")}</div>
+        <div class="tb-leg"><span><i style="background:#2F5BFF"></i>Champions League, Ligaphase</span><span><i style="background:#6E9BFF"></i>Champions League, Qualifikation</span><span><i style="background:#E24A4A"></i>Abstieg</span></div>
+        <p class="st-notiz">Startplätze wie in der Saison 2026/27 laut DFB: Meister direkt in die Ligaphase, Platz 2 und 3 in die Qualifikation (wer dort ausscheidet, spielt im Europa Cup weiter). Die beiden Letzten steigen ab. Die UEFA kann die Zahl der Plätze über die Länderwertung ändern. Bei Punktgleichheit entscheidet die Tordifferenz, dann die Zahl der Tore. Verein antippen öffnet den Kader. Ergebnisse: Sportschau.</p></div>`;
     } else {
       const W = ligaWerte(L.spiele);
       let h = `<div class="det sv">${zur}<h1 class="disp">Statistik</h1><div class="dat">Google Pixel Frauen-Bundesliga, nach dem ${L.md}. Spieltag, nur Ligaspiele</div>
         <div class="st-chips">${STKAT.map(([k, t]) => `<button data-stsprung="${k}">${t}</button>`).join("")}</div>`;
       for (const [k, t, e] of STKAT) {
         const l = W.filter(v => v[k] > 0).sort((a, b) => b[k] - a[k] || a.minuten - b.minuten || a.s.n.localeCompare(b.s.n, "de"));
-        if (k === "voll" || k === "rot") {
+        if (k === "fair") {
+          const F = {}; ALLE.forEach(c => F[c] = {k: c, gelb: 0, gr: 0, rot: 0});
+          W.forEach(v => { const f = F[v.s.k]; if (f) { f.gelb += v.gelb; f.gr += v.gr; f.rot += v.rot; } });
+          const FL = Object.values(F).map(f => Object.assign(f, {p: f.gelb + 3 * f.gr + 5 * f.rot})).sort((a, b) => a.p - b.p || kname(a.k).localeCompare(kname(b.k), "de"));
+          h += `<section class="stk" id="st-fair"><div class="stk-k"><h2>${t}</h2><small>${e}</small></div><div class="ft"><div class="ft-r ft-h"><span>#</span><span></span><span>VEREIN</span><span><i class="kg"></i></span><span><i class="kgr"></i></span><span><i class="kr"></i></span><span>PKT</span></div>
+            ${FL.map((f, i) => `<button class="ft-r" data-statverein="${f.k}"><span class="tb-pl">${i && f.p === FL[i - 1].p ? "" : i + 1}</span>${logo(f.k, 18)}<span class="tb-vn">${esc(kname(f.k))}</span><span>${f.gelb}</span><span>${f.gr}</span><span>${f.rot}</span><span class="tb-pk">${f.p}</span></button>`).join("")}</div></section>`; continue; }
+        if (k === "voll") { const vl = W.filter(v => v.voll).length;
+          if (vl && vl <= 10) { const l2 = W.filter(v => v.minuten > 0).sort((a, b) => b.minuten - a.minuten || a.s.n.localeCompare(b.s.n, "de")), auf = STAUF.voll, n = auf ? 10 : 3, mehr = l2.length > n && l2[n].minuten === l2[n - 1].minuten ? l2.slice(n).filter(v => v.minuten === l2[n - 1].minuten) : [];
+            h += `<section class="stk${auf ? " stk-klein" : ""}" id="st-voll"><div class="stk-k"><h2>${t}</h2><small>Einsatzminuten, ${vl} ${vl === 1 ? "hat" : "haben"} jede Minute gespielt</small></div>${stListe("minuten", l2, n)}${mehr.length ? `<div class="st-erkl">Ebenfalls ${l2[n - 1].minuten}': ${stNamen(mehr)}</div>` : ""}<button class="st-mehr" data-stauf="voll">${auf ? "Weniger" : "Top 10 ›"}</button></section>`; continue; } }
+        if (k === "voll") {
           h += `<section class="stk" id="st-${k}"><div class="stk-k"><h2>${t}</h2><small>${e}</small></div>${l.length ? `<div class="st-chipl">${l.map(v => `<button data-profil="${esc(v.s.id)}">${logo(v.s.k, 14)}${stNach(v.s)}${k === "rot" && v.rot > 1 ? " " + v.rot + "x" : ""}</button>`).join("")}</div>` : '<p class="st-erkl">Noch niemand.</p>'}${k === "voll" && l.length ? `<div class="st-erkl">${l.length} Spielerinnen haben jede Minute ihres Vereins gespielt.</div>` : ""}</section>`; continue; }
         const auf = STAUF[k], n = auf ? 10 : 3, mehr = l.length > n && l[n][k] === l[n - 1][k] ? l.slice(n).filter(v => v[k] === l[n - 1][k]) : [];
         h += `<section class="stk${auf ? " stk-klein" : ""}" id="st-${k}"><div class="stk-k"><h2>${t}</h2>${e ? `<small>${e}</small>` : ""}</div>${l.length ? stListe(k, l, n) : '<p class="st-erkl">Noch niemand.</p>'}
@@ -1675,9 +1697,9 @@ button.chip.pfc{cursor:pointer}
     ladeSPN().then(zeig).catch(() => { $("#pf-erg").innerHTML = '<p class="leer">Die Profile konnten nicht geladen werden.</p>'; });
     setTimeout(() => inp.focus(), 50);
   }
-  let KADER_K = null;
+  let KADER_K = null, KADER_VON = null;
   function vereinsKader(k, von){
-    BACK = von ? "statkader" : "suche"; KADER_K = k;
+    BACK = von ? "statkader" : "suche"; KADER_K = k; KADER_VON = von;
     const L = SPN.spielerinnen.filter(s => s.k === k), ord = {TW:0, ABW:1, MF:2, ST:3};
     L.sort((a, b) => (ord[a.pos] ?? 9) - (ord[b.pos] ?? 9) || (parseInt(a.nr, 10) || 99) - (parseInt(b.nr, 10) || 99));
     const zeile = s => { const st = s.status ? s.status.s : "fit"; return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small></span><i class="pf-dot" style="background:${STFARBE[st] || STFARBE.fit}"></i></button>`; };
@@ -1790,12 +1812,12 @@ button.chip.pfc{cursor:pointer}
     if (q("[data-statzu]")) { statZu(); return; }
     if ((x = q("[data-stsprung]"))) { const z = document.getElementById("st-" + x.dataset.stsprung); if (z) z.scrollIntoView({behavior: "smooth", block: "start"}); return; }
     if ((x = q("[data-stauf]"))) { STAUF[x.dataset.stauf] = !STAUF[x.dataset.stauf]; const y = window.scrollY; statView("statistik", true); window.scrollTo(0, y); return; }
-    if ((x = q("[data-statverein]"))) { vereinsKader(x.dataset.statverein, "tabelle"); window.scrollTo(0, 0); return; }
+    if ((x = q("[data-statverein]"))) { vereinsKader(x.dataset.statverein, VIEW_STAT || "tabelle"); window.scrollTo(0, 0); return; }
     if (q("[data-suche]")) { STAT_HER = null; VIEW_STAT = null; document.querySelectorAll("[data-statview]").forEach(b => b.setAttribute("aria-pressed", false)); PR_HER = null; SUCHE_HER = {typ: document.querySelector("article.det") && ARTIKEL ? "artikel" : VIEW === "spielplan" && GAME ? "spiel" : VIEW, id: ARTIKEL || GAME, scroll: window.scrollY}; suche(); return; }
     if ((x = q("[data-suchezu]"))) { if (x.dataset.suchezu === "2") { suche(); return; } const h = SUCHE_HER || {typ: "meldungen"}; SUCHE_HER = null; PR_HER = null; BACK = null;
       if (h.typ === "artikel" && h.id) { setHash(h.id); article(h.id); } else if (h.typ === "spiel" && h.id) { VIEW = "spielplan"; spiel(h.id); } else { show(h.typ === "spielplan" || h.typ === "inside" ? h.typ : "meldungen"); if (h.scroll) window.scrollTo(0, h.scroll); } return; }
     if ((x = q("[data-suchverein]"))) { vereinsKader(x.dataset.suchverein); return; }
-    if ((x = q("[data-profil]"))) { const her = BACK === "suche" ? {typ: "suche"} : BACK === "stat" ? {typ: "stat", art: VIEW_STAT, scroll: window.scrollY} : BACK === "statkader" ? {typ: "statkader", k: KADER_K} : document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
+    if ((x = q("[data-profil]"))) { const her = BACK === "suche" ? {typ: "suche"} : BACK === "stat" ? {typ: "stat", art: VIEW_STAT, scroll: window.scrollY} : BACK === "statkader" ? {typ: "statkader", k: KADER_K, von: KADER_VON} : document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
       oeffneProfil(x.dataset.profil, her); return; }
     if ((x = q("[data-profilname]"))) { const [k, n] = x.dataset.profilname.split("|"), her = document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
       ladeSPN().then(() => { const sp = findeSP(k, n); if (sp) oeffneProfil(sp.id, her); }).catch(() => {}); return; }
