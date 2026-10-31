@@ -784,7 +784,12 @@ button.chip.pfc{cursor:pointer}
     const k = KURZ[m.verein];
     // Aufstellungen tragen pos "Spielansetzung", deshalb zuerst prüfen: zeigen, wenn einer der beiden Vereine gewählt ist
     if (m.aufstellung) return SEL.has(k) || SEL.has(KURZ[m.aufstellung.gegner]);
-    if (!k || m.pos === "Spielansetzung") return true;
+    if (!k) return true;
+    if (m.pos === "Spielansetzung") {
+      // Spielansetzungen ohne Aufstellung (Vorberichte, Nachholspiele): zeigen, wenn der Verein oder ein im Text genannter Verein gewählt ist
+      const t = [m.headline, m.spielerin].concat(m.text || []).join(" ");
+      return SEL.has(k) || ALLE.some(x => SEL.has(x) && (t.includes(kname(x)) || Object.keys(KURZ).some(v => KURZ[v] === x && t.includes(v))));
+    }
     return SEL.has(k);
   }
   // ---------------- Umfragen (umfragen.json, Stimmen in umfragen_stand.json, eigene Stimme lokal)
