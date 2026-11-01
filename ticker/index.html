@@ -745,6 +745,7 @@ button.chip.pfc{cursor:pointer}
 .bk .ns b.dim{color:var(--muted)}.bk .rr{color:#F87171;font:800 9.5px var(--f-body);margin-left:4px;vertical-align:1px}.bk .em{color:var(--muted);font-weight:500;font-size:12px;margin-left:3px}
 .af .hint{font-size:12px;color:var(--muted)}
 .af .hint .lk{color:var(--accent)}
+.btn-prog{justify-self:start;background:var(--accent);color:#fff;border-radius:10px;padding:10px 14px;font-weight:600;font-size:14px}
 </style>
 
 
@@ -1173,7 +1174,7 @@ button.chip.pfc{cursor:pointer}
           <div class="wer">${m.pos === "Spielansetzung" ? esc(m.spielerin && m.spielerin !== "Spielansetzung" ? m.spielerin : [m.verein, m.aufstellung && m.aufstellung.gegner].filter(Boolean).join(" gegen ")) : istSpielerin(m) && m.spielerin ? `<button class="wer-btn" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}">${esc(m.spielerin)}</button>` : esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc(m.pos === "Spielansetzung" ? "Vorbericht" : [m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
           ${st ? `<div class="mk-st">${plakette(meldungsStatus(m), 28)}<span>${st[2]}</span></div>` : ""}</div>
           <h1 class="disp" style="font-size:30px">${esc(m.headline)}</h1><div class="dat">${esc(lang(m.zeit))}</div></div>
-          <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>${spielAufstellung(m.spiel_aufstellung, m.verein)}`;
+          <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>${m.platzhalter && m.partie_id ? `<button class="btn-prog" data-game="${esc(m.partie_id)}" data-tabspiel="1">Unsere Prognose ansehen ›</button>` : ""}${spielAufstellung(m.spiel_aufstellung, m.verein)}`;
     // Nachweis zum gezeigten Foto: Eintrag aus fotos.json hat Vorrang, sonst der Nachweis aus der Meldung
     const fi = FOTOS[m.spielerin], fc = m.foto_credit;
     const credit = fi && fi.datei && nachweis(fi)
@@ -2106,6 +2107,7 @@ button.chip.pfc{cursor:pointer}
     if ((x = q("[data-punkt]"))) { SCROLL = window.scrollY; article(x.dataset.punkt); return; }
     if ((x = q("[data-step]"))) { blaettern(Number(x.dataset.step)); return; }
     if ((x = q("[data-md]"))) { MD = Number(x.dataset.md); spielplan(); return; }
+    if ((x = q("[data-tabspiel]"))) { const id = x.dataset.game; show("spielplan"); let n = 0; const t = setInterval(() => { if (SP || ++n > 50) { clearInterval(t); if (SP) spiel(id); } }, 200); return; }
     if ((x = q("[data-game]"))) { SCROLL = window.scrollY; spiel(x.dataset.game); return; }
     if (q("[data-back]")) { spielplan(); window.scrollTo(0, SCROLL || 0); return; }
     if (q("[data-tore]")) { TOREOFFEN = !TOREOFFEN; spiel(GAME, true); return; }
