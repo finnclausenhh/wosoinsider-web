@@ -1077,8 +1077,40 @@ button.chip.pfc{cursor:pointer}
       <rect x="4" y="3" width="92" height="134" rx="1"/><path d="M4 70h92"/><circle cx="50" cy="70" r="11"/><rect x="24" y="3" width="52" height="20"/><rect x="38" y="3" width="24" height="8"/>
       <rect x="24" y="117" width="52" height="20"/><rect x="38" y="129" width="24" height="8"/></svg>`;
   }
+  // Nur die 10 Standardformationen (Finn 01.11.2026): Reihen von hinten nach vorn mit Linienbezeichnung
+  const FORMEN = {"4-4-2": [["ABW",4],["MF",4],["ST",2]], "4-3-3": [["ABW",4],["MF",3],["ST",3]], "4-2-3-1": [["ABW",4],["DM",2],["OM",3],["ST",1]],
+    "4-1-4-1": [["ABW",4],["DM",1],["MF",4],["ST",1]], "4-4-1-1": [["ABW",4],["MF",4],["OM",1],["ST",1]], "4-3-1-2": [["ABW",4],["MF",3],["OM",1],["ST",2]],
+    "3-5-2": [["ABW",3],["MF",5],["ST",2]], "3-4-3": [["ABW",3],["MF",4],["ST",3]], "5-3-2": [["ABW",5],["MF",3],["ST",2]], "5-4-1": [["ABW",5],["MF",4],["ST",1]]};
+  let SPIDX = null;
+  function spOrt(k, s){  // Saisonpositionen aus spielerinnen.json: {y: mittlere Tiefe 0.1 TW bis 0.9 ST, x: Hauptseite}
+    if (!SPN) return null;
+    if (!SPIDX) { SPIDX = {}; SPN.spielerinnen.forEach(x => { const key = x.k + "|" + nNorm(nachN(x.n)); SPIDX[key] = SPIDX[key] === undefined ? x : null; SPIDX[x.k + "|" + nNorm(x.n)] = x; }); }
+    const x = SPIDX[k + "|" + nNorm(s.voll || "")] || SPIDX[k + "|" + nNorm(nachN(s.voll || s.n))];
+    const o = x && (x.orte || []).filter(o => o[1] > .15); if (!o || !o.length) return null;
+    const c = o.reduce((a, q) => a + q[2], 0), haupt = o.slice().sort((a, b) => b[2] - a[2])[0];
+    return {y: o.reduce((a, q) => a + q[1] * q[2], 0) / c, x: haupt[0]};
+  }
+  function standardElf(elf, form, k){
+    const tw = elf.filter(s => s.p === "TW"), feldsp = elf.filter(s => s.p !== "TW");
+    if (tw.length !== 1 || feldsp.length !== 10) return {elf, form};
+    const TIEF = {ABW: .3, DM: .45, MF: .55, OM: .65, ST: .9};
+    const info = feldsp.map((s, i) => { const o = k && spOrt(k, s); return {s, i, y: o ? o.y : (TIEF[s.p] ?? .55), x: o ? o.x : null}; });  // Saisonposition vor gemeldeter Position
+    const GR = y => y < .4 ? 0 : y >= .8 ? 2 : 1, GRL = p => p === "ABW" ? 0 : p === "ST" ? 2 : 1;
+    const sortiert = info.slice().sort((a, b) => a.y - b.y || a.i - b.i);
+    const fuelle = rows => { const out = []; let i = 0; rows.forEach(([lab, n]) => { const r = sortiert.slice(i, i + n); i += n;
+      r.sort((a, b) => (a.x ?? .5) - (b.x ?? .5) || a.i - b.i).forEach(q => out.push({...q.s, p: lab, _g: GR(q.y)})); }); return out; };
+    const kosten = f => fuelle(FORMEN[f]).reduce((a, s) => a + (GRL(s.p) !== s._g ? 1 : 0), 0);
+    let best = FORMEN[form] ? form : null;
+    if (!best) {
+      const kandidat = Object.keys(FORMEN).reduce((a, f) => kosten(f) < kosten(a) ? f : a, "4-4-2");
+      const sys = k && SPN && ((SPN.vereine || {})[k] || {}).system, sn = sys && sys.name;
+      best = sn && FORMEN[sn] && kosten(sn) <= kosten(kandidat) + 2 ? sn : kandidat;  // Stammsystem des Vereins bevorzugen
+    }
+    return {elf: tw.concat(fuelle(FORMEN[best])), form: best};
+  }
   // o: {modus: "o"|"p", seite, sel, neu: Set, formation}
   function feld(elf, k, o){
+    ({elf, form: o.formation} = standardElf(elf, o.formation, k));
     const rows = LINIE.map(p => elf.filter(s => (LINIE.includes(s.p) ? s.p : "MF") === p)).filter(r => r.length);
     const n = rows.length, H = n <= 4 ? 470 : n === 5 ? 520 : 570, F = n >= 6 ? 48 : 54;
     let h = `<div class="feld" style="height:${H}px">${feldSVG()}`;
@@ -1180,6 +1212,7 @@ button.chip.pfc{cursor:pointer}
   });
   function article(id){
     const m = N.find(x => x.id === id); if (!m) return list();
+    if (!SPN && (m.spiel_aufstellung || m.aufstellung)) ladeSPN().then(() => { SPIDX = null; if (VIEW === "meldungen" && decodeURIComponent(location.hash.slice(1)) === id) { const y = window.scrollY; article(id); window.scrollTo(0, y); } }).catch(() => {});
     if (m.typ === "punkt") { $("#main").innerHTML = `<div class="det">${zurueck()}${punktArtikel(m)}</div>`; if (window.WIKOM) window.WIKOM.mount(m.id); window.scrollTo(0, 0); return; }
     const a = m.aufstellung, auf = a && (a.startelf || []).length;
     const st = STATUS[String(meldungsStatus(m) || "").toLowerCase()];
