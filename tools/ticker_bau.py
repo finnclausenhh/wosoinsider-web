@@ -21,6 +21,17 @@ HEAD = f"""<base href="{DATEN}">
 <meta name="description" content="News, Spielplan und Inside zur Frauen-Bundesliga für Kickbase.">
 <link rel="icon" href="https://wosoinsider.de/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="https://wosoinsider.de/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="WOSOINSIDER">
+<meta property="og:title" content="WOSOINSIDER">
+<meta property="og:description" content="News, Spielplan und Inside zur Frauen-Bundesliga für Kickbase.">
+<meta property="og:url" content="https://wosoinsider.de/ticker/">
+<meta property="og:image" content="https://wosoinsider.de/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="WOSOINSIDER: Alles, was deine Aufstellung wissen muss.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://wosoinsider.de/og.png">
 <script>
 // Daten liegen auf einer anderen Adresse (base). Adresszeile trotzdem auf dieser Seite halten.
 (function(){{ var r = history.replaceState.bind(history);
