@@ -165,7 +165,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .nk .elf{margin:0;font-size:13.5px;font-weight:500;line-height:1.35;letter-spacing:-.1px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .nk .meta{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .neu{font-size:9px;font-weight:800;color:var(--s-sicher);border:1px solid var(--s-sicher);border-radius:3px;padding:0 3px;margin-left:4px;vertical-align:1px;white-space:nowrap}
-.nk .elf.eng{font-size:12.5px;letter-spacing:-.2px}
+.nk .elf.eng{font-size:12.5px;letter-spacing:-.2px}.nk .elf.eng2{font-size:11.5px;letter-spacing:-.25px;line-height:1.3}
 .elf .neu{border:0;padding:0;margin-left:1px;font-size:8.5px;vertical-align:4px;letter-spacing:0}
 .raus{font-size:9px;font-weight:800;color:var(--inj);border:1px solid var(--inj);border-radius:3px;padding:0 3px;white-space:nowrap}
 
@@ -833,7 +833,7 @@ button.chip.pfc{cursor:pointer}
   function newsKarte(m){
     const a = m.aufstellung, auf = a && (a.startelf || []).length;
     const rechts = auf ? `<span class="nk-r" role="img" aria-label="${esc(m.verein)} gegen ${esc(a.gegner)}">${logo(KURZ[m.verein], 20)}${logo(KURZ[a.gegner], 20)}</span>` : plakette(meldungsStatus(m));
-    return `<button class="nk" data-id="${esc(m.id)}">${auf ? bild(m, 40, 40) : bild(m, 84, 84)}<div class="nk-b">
+    return `<button class="nk" data-id="${esc(m.id)}">${bild(m, 84, 84)}<div class="nk-b">
       <div class="nk-top"><div class="tags">${(m.tags || []).map(tag).join("")}${auf ? tag("AUFSTELLUNG") : ""}</div>${rechts}</div>
       ${auf ? `<p class="elf">${startelfZeile(a.startelf)}</p>` : `<h2>${esc(m.kurz || m.headline)}</h2>`}
       <div class="meta" data-lang="${esc(metaZeile(m, auf))}" data-kurz="${esc(metaZeile(m, auf, 1))}" data-nur="${esc(metaZeile(m, auf, 2))}">${esc(metaZeile(m, auf))}</div></div></button>`;
@@ -961,7 +961,7 @@ button.chip.pfc{cursor:pointer}
   }
   // Meta-Zeile: Spielerin und Verein ausgeschrieben, nur wenn es nicht in eine Zeile passt, mit Vereinskürzel, sonst ohne Verein
   function metaPassen(){
-    document.querySelectorAll("#main .nk .elf").forEach(e => { e.classList.remove("eng"); const lh = parseFloat(getComputedStyle(e).lineHeight) || 18; if (e.scrollHeight > lh * 3.3) e.classList.add("eng"); });
+    document.querySelectorAll("#main .nk .elf").forEach(e => { e.classList.remove("eng"); const lh = parseFloat(getComputedStyle(e).lineHeight) || 18; if (e.scrollHeight > lh * 3.3) e.classList.add("eng"); if (e.scrollHeight > parseFloat(getComputedStyle(e).lineHeight) * 3.3) { e.classList.remove("eng"); e.classList.add("eng2"); } });
     document.querySelectorAll("#main .meta[data-kurz]").forEach(z => {
       const t = z.querySelector(".wk-mt") || z;
       t.textContent = z.dataset.lang;
