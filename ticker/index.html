@@ -836,9 +836,10 @@ button.chip.pfc{cursor:pointer}
   function metaZeile(m, auf, stufe = 0){
     const zeit = relativ(m.zeit);
     if (auf) return zeit;
-    const verein = !m.verein || (stufe === 2 && m.spielerin) ? null : stufe === 1 ? (KURZ[m.verein] || m.verein) : (KNAME[KURZ[m.verein]] || m.verein);
+    // Stufe 1 kürzt lesbar (Bayern statt FC Bayern) statt Vereinscodes wie VFB zu zeigen
+    const verein = !m.verein || (stufe === 2 && m.spielerin) ? null : stufe === 1 ? (KURZ[m.verein] === "FCB" ? "Bayern" : KNAME[KURZ[m.verein]] || m.verein) : (KNAME[KURZ[m.verein]] || m.verein);
     if (!istSpielerin(m) && String(m.pos || "").startsWith("Trainer") && m.spielerin)
-      return `${zeit} · ${[verein, `${m.pos} ${m.spielerin}`].filter(Boolean).join(", ")}`;
+      return `${zeit} · ${[stufe ? null : verein, `${m.pos} ${m.spielerin}`].filter(Boolean).join(", ")}`;
     const wer = [m.spielerin, verein].filter(x => x && x !== "Spielansetzung").join(", ");
     return wer ? `${zeit} · ${wer}` : zeit;
   }
@@ -1024,7 +1025,7 @@ button.chip.pfc{cursor:pointer}
       const tl = (t.tore || []).map(g => `<span${g.eigen ? "" : ' class="g"'}>${esc(g.min)}' ${esc(g.n)}${g.art ? " (" + esc(g.art) + ")" : ""}${g.vorlage ? " (Vorlage " + esc(g.vorlage) + ")" : ""}</span>`).join(", ");
       let h = (tl ? `<div class="zeile tl"><b>TORE</b>${tl}</div>` : "") + posZeilen(t.startelf || [], s => chip(c(s)));
       if ((t.eingewechselt || []).length) h += kap("Eingewechselt") + `<div class="chips">${t.eingewechselt.map(s => chip({...c(s), ein: true, einMin: s.ein_min})).join("")}</div>`;
-      if ((t.raus || []).length) h += `<div class="zeile"><b>NICHT IN DER STARTELF</b>${t.raus.map(r => esc(r.n) + (r.wo ? " (" + esc(r.wo) + ")" : "")).join(", ")}</div>`;
+      if ((t.raus || []).length) h += `<div class="zeile"><b>NICHT IN DER STARTELF</b>${t.raus.map(r => { const ein = (t.eingewechselt || []).some(e => e.n === r.n); return esc(r.n) + (ein ? " (eingewechselt)" : r.wo ? " (" + esc(r.wo) + ")" : ""); }).join(", ")}</div>`;
       if ((t.ohne_einsatz || []).length) h += `<div class="zeile"><b>OHNE EINSATZ</b>${t.ohne_einsatz.map(esc).join(", ")}</div>`;
       return `<div class="sa-t"${i ? " hidden" : ""}><div class="sa-k"><button class="kd-btn" data-kader="${esc(t.k || KURZ[t.verein])}">${logo(t.k || KURZ[t.verein], 22)}<span>${esc(t.verein)}</span></button><span class="w">${esc(t.wettbewerb || "")}${t.ergebnis ? " · " + esc(t.ergebnis) : ""}</span></div>
         ${t.vergleich ? `<div class="vgl">NEU und RAUS im Vergleich zur Startelf am ${esc(t.vergleich)}</div>` : ""}${h}</div>`;
@@ -1437,7 +1438,7 @@ button.chip.pfc{cursor:pointer}
       <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
       <p>Finn Clausen, Anschrift wie oben.</p>
       <h2>Einsatz von KI</h2>
-      <p>Meldungen und mögliche Aufstellungen werden automatisiert mit einem KI-System erstellt und als solche gekennzeichnet. Die redaktionelle Verantwortung trägt Finn Clausen. Einzelheiten stehen unter KI-Hinweis &amp; Methodik.</p>
+      <p>Meldungen und mögliche Aufstellungen werden automatisiert mit einem KI-System erstellt und als solche gekennzeichnet. Die redaktionelle Verantwortung trägt Finn Clausen. Einzelheiten stehen unter <button class="lk" data-legal="so-entsteht">KI-Hinweis &amp; Regeln</button>.</p>
       <h2>Unabhängigkeit</h2>
       <p>WOSOINSIDER ist ein unabhängiges Angebot. Es besteht keine Verbindung zu Kickbase, zum DFB, zur Google Pixel Frauen-Bundesliga oder zu den Vereinen. Genannte Marken und Namen gehören ihren jeweiligen Inhabern.</p>
       <h2>Bild- und Datennachweise</h2>
@@ -1571,7 +1572,7 @@ button.chip.pfc{cursor:pointer}
   }
   function loadIN(){
     return Promise.all([json("inside.json"), fetch("fotos.json", {cache: "no-store"}).then(r => r.ok ? r.json() : {}).catch(() => ({}))])
-      .then(([d, f]) => { IN = d; FOTOS = f || {}; if (BACK) return;
+      .then(([d, f]) => { IN = d; FOTOS = f || {}; if (BACK) { if (decodeURIComponent(location.hash.slice(1)) === "bildnachweise") legal("bildnachweise"); return; }
         if (VIEW === "inside") inside(); else if (VIEW === "meldungen" && document.querySelector("#main .liste")) list(); })
       .catch(() => { if (VIEW === "inside" && !IN) $("#main").innerHTML = '<p class="leer">Inside konnte nicht geladen werden. Seite neu laden.</p>'; });
   }
@@ -1899,7 +1900,7 @@ button.chip.pfc{cursor:pointer}
     if ((s.verlauf || []).length) {
       const e = s.einschaetzung;
       h += `<section class="pf-box">${kap("Status-Verlauf")}${verlaufGrafik(s)}${e ? `<div class="pf-einsch"><b class="k">UNSERE EINSCHÄTZUNG</b>${esc(e.satz)}<div class="pf-ph"${verlaufGrafik(s) ? " hidden" : ""}>${(e.phasen || []).map(x => `<div${x.prog ? ' class="prog"' : ""}><span>${esc(x.d)}</span><span>${esc(x.t)}${x.prog ? " (Einschätzung)" : ""}</span></div>`).join("")}</div>${e.vergleich ? `<p class="pf-vgl">${esc(e.vergleich)}</p>` : ""}</div>` : ""}
-        <div class="pf-tl">${s.verlauf.slice().reverse().map(v => `<div class="ev"><i style="background:${STFARBE[v.status] || "#8A95A8"}"></i><div><div class="dt">${esc(kurz(dt(v.stand)))} · ${esc({raus: "Ausfall", gesperrt: "Sperre", fraglich: "fraglich", zurueck: "zurück", fit: "fit"}[v.status] || v.status)}</div><div class="g">${esc(v.grund)}</div>${v.rueckkehr ? `<div class="q">${esc(v.rueckkehr)}</div>` : ""}${v.quelle ? `<div class="q">Quelle: ${esc(v.quelle)}</div>` : ""}</div></div>`).join("")}</div></section>`;
+        <div class="pf-tl">${s.verlauf.slice().reverse().map(v => `<div class="ev"><i style="background:${STFARBE[v.status] || "#8A95A8"}"></i><div><div class="dt">${esc(kurz(dt(v.stand)))} · ${esc({raus: "Ausfall", gesperrt: "Sperre", fraglich: "fraglich", zurueck: "zurück", fit: "fit"}[v.status] || v.status)}</div><div class="g">${esc(v.grund)}</div>${v.rueckkehr ? `<div class="q">${v.status === "gesperrt" ? "Wieder spielberechtigt" : "Rückkehr"}: ${esc(v.rueckkehr)}</div>` : ""}${v.quelle ? `<div class="q">Quelle: ${esc(v.quelle)}</div>` : ""}</div></div>`).join("")}</div></section>`;
     }
     // News
     const nw = N.filter(m => m.spielerin === s.n && m.typ !== "punkt");

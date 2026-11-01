@@ -69,7 +69,7 @@ NAV = [("/", "Start"), ("/support/", "Support"), ("/impressum/", "Impressum"), (
 
 def page(path, title, desc, body):
     nav = "".join(f'<a href="{h}"{" aria-current=\"page\"" if h == path else ""}>{t}</a>' for h, t in NAV[1:])
-    foot = "".join(f'<a href="{h}">{t}</a>' for h, t in NAV + [("/ki-hinweis/", "KI-Hinweis &amp; Methodik")])
+    foot = "".join(f'<a href="{h}">{t}</a>' for h, t in NAV + [("/ki-hinweis/", "KI-Hinweis &amp; Regeln")])
     full = "WOSOINSIDER" if path == "/" else f"{title} · WOSOINSIDER"
     return f"""<!doctype html>
 <html lang="de">
@@ -114,7 +114,7 @@ FAQ = [
     ("Was kostet WOSOINSIDER?", "Nichts. Die App ist kostenlos, ohne Werbung und ohne Abo."),
     ("Brauche ich ein Konto?", "Nein. Die App funktioniert ohne Anmeldung. Ihre Vereinsauswahl bleibt nur auf Ihrem Gerät."),
     ("Wie aktuell sind die Meldungen?", "Neue Meldungen kommen mehrmals täglich, an Spieltagen stündlich. Offizielle Aufstellungen erscheinen etwa 60 Minuten vor Anpfiff."),
-    ("Woher kommen die Inhalte?", "Aus öffentlich zugänglichen Quellen wie Vereinsseiten, DFB, Sportschau und regionalen Medien. Ein KI-System fasst sie zusammen, jede Meldung verlinkt ihre Quelle. Mehr dazu unter <a href=\"/ki-hinweis/\">KI-Hinweis &amp; Methodik</a>."),
+    ("Woher kommen die Inhalte?", "Aus öffentlich zugänglichen Quellen wie Vereinsseiten, DFB, Sportschau und regionalen Medien. Ein KI-System fasst sie zusammen, jede Meldung verlinkt ihre Quelle. Mehr dazu unter <a href=\"/ki-hinweis/\">KI-Hinweis &amp; Regeln</a>."),
     ("Ist WOSOINSIDER ein Angebot von Kickbase?", "Nein. WOSOINSIDER ist unabhängig und nicht mit Kickbase, dem DFB oder den Vereinen verbunden."),
     ("Die App zeigt keine neuen Inhalte. Was tun?", "Prüfen Sie die Internetverbindung und öffnen Sie die App neu. Hilft das nicht, schreiben Sie uns mit Gerät und iOS-Version."),
 ]
@@ -142,14 +142,14 @@ FAVICON = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect w
 def main(legal_path, out):
     L = json.load(open(legal_path, encoding="utf8"))
     doc = lambda k: f'<article class="doc">\n      {to_html(L[k]["titel"], L[k]["bloecke"])}\n</article>'
-    imp = doc("impressum").replace("KI-Hinweis &amp; Methodik", '<a href="/ki-hinweis/">KI-Hinweis &amp; Methodik</a>')
+    imp = doc("impressum").replace("KI-Hinweis &amp; Regeln", '<a href="/ki-hinweis/">KI-Hinweis &amp; Regeln</a>')
     ki = doc("so-entsteht")
     pages = {
         "index.html": page("/", "Start", "News, mögliche Aufstellungen und Analysen zur Frauen-Bundesliga für Kickbase.", START),
         "support/index.html": page("/support/", "Support", "Kontakt und Hilfe zur App WOSOINSIDER.", support()),
         "impressum/index.html": page("/impressum/", "Impressum", "Impressum von WOSOINSIDER.", imp),
         "datenschutz/index.html": page("/datenschutz/", "Datenschutz", "Datenschutzerklärung für App und Webseite WOSOINSIDER.", doc("datenschutz")),
-        "ki-hinweis/index.html": page("/ki-hinweis/", "KI-Hinweis & Methodik", "Wie WOSOINSIDER mit KI entsteht.", ki),
+        "ki-hinweis/index.html": page("/ki-hinweis/", "KI-Hinweis & Regeln", "Wie WOSOINSIDER mit KI entsteht.", ki),
         "kontakt/index.html": page("/support/", "Kontakt", "Kontakt zu WOSOINSIDER.", support()),
         "404.html": page("", "Nicht gefunden", "Seite nicht gefunden.", NOTFOUND),
     }

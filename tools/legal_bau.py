@@ -21,7 +21,7 @@ IMPRESSUM = [
     h2("Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV"),
     p("Finn Clausen, Anschrift wie oben."),
     h2("Einsatz von KI"),
-    p("Meldungen und mögliche Aufstellungen werden automatisiert mit einem KI-System erstellt und als solche gekennzeichnet. Die redaktionelle Verantwortung trägt Finn Clausen. Einzelheiten stehen unter KI-Hinweis & Methodik."),
+    p("Meldungen und mögliche Aufstellungen werden automatisiert mit einem KI-System erstellt und als solche gekennzeichnet. Die redaktionelle Verantwortung trägt Finn Clausen. Einzelheiten stehen unter KI-Hinweis & Regeln."),
     h2("Unabhängigkeit"),
     p("WOSOINSIDER ist ein unabhängiges Angebot. Es besteht keine Verbindung zu Kickbase, zum DFB, zur Google Pixel Frauen-Bundesliga oder zu den Vereinen. Genannte Marken und Namen gehören ihren jeweiligen Inhabern."),
     h2("Bild- und Datennachweise"),
