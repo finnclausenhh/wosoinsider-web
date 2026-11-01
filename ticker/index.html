@@ -561,21 +561,22 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .st-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}.st-chips button{flex:none;padding:7px 11px;border-radius:999px;background:var(--soft);color:var(--muted);font-weight:600;font-size:13px}
 .stk{background:var(--card);border-radius:14px;padding:14px;display:grid;gap:10px;scroll-margin-top:110px}
 .stk-k{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.stk-k h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:21px;text-transform:uppercase;white-space:nowrap}.stk-k small{color:var(--muted);font-size:12px}
-.sr{display:grid;grid-template-columns:22px 44px 18px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;color:var(--ink)}
-.sr .sr-rk{font:700 13px var(--f-mono);color:var(--muted);text-align:center}
+.sr{display:grid;grid-template-columns:26px 44px 18px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;color:var(--ink)}
+.sr .sr-rk{font:700 13px var(--f-mono);color:var(--muted);text-align:right;justify-self:end}
 .sr .sr-rk.g1,.sr .sr-rk.g2,.sr .sr-rk.g3{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#14181F;font-size:12px}.sr .sr-rk.g1{background:#F5C518}.sr .sr-rk.g2{background:#C7CFDA}.sr .sr-rk.g3{background:#C8865A}
 .sr .sr-nm{min-width:0;display:grid;gap:4px}.sr .sr-nm b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sr .sr-bal{height:5px;border-radius:3px;background:var(--soft);overflow:hidden}.sr .sr-bal i{display:block;height:100%;background:#6E9BFF;border-radius:3px}.sr.r1 .sr-bal i{background:var(--accent)}
 .sr .sr-w{font-family:var(--f-display);font-weight:800;font-size:22px;min-width:38px;text-align:right}
-.stk.stk-klein .sr{grid-template-columns:22px 30px 18px minmax(0,1fr) auto}.stk.stk-klein .sr-w{font-size:17px}
+.stk.stk-klein .sr{grid-template-columns:26px 30px 18px minmax(0,1fr) auto}.stk.stk-klein .sr-w{font-size:17px}
 .stk .st-erkl{font-size:12px;color:var(--muted)}.stk .st-mehr{color:var(--accent);font-weight:600;font-size:13.5px;justify-self:start}
 .st-chipl{display:flex;flex-wrap:wrap;gap:6px}.st-chipl button{display:flex;align-items:center;gap:5px;background:var(--soft);border-radius:8px;padding:4px 8px;font-size:13px;color:var(--ink)}
 .sv .st-notiz{font-size:12px;color:var(--muted)}
-.kt3{display:flex;gap:10px;font:600 12px var(--f-mono);color:var(--muted)}.kt3 span{display:flex;align-items:center;gap:4px}
+.sr-kn{display:flex!important;align-items:center;justify-content:space-between;gap:8px}.sr-kn b{flex:0 1 auto}.sr-fp{display:grid;justify-items:center;min-width:58px!important;text-align:center!important;line-height:1}.sr-fp small{font:600 8.5px/1.15 var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:3px}
+.kt3{display:flex;flex:none;gap:7px;font:600 12px var(--f-mono);color:var(--muted)}.kt3 span{display:flex;align-items:center;gap:4px}
 .kg,.kgr,.kr{display:inline-block;width:9px;height:12px;border-radius:2px;vertical-align:-1px}.kg{background:#F5C518}.kr{background:#E24A4A}.kgr{background:linear-gradient(135deg,#F5C518 50%,#E24A4A 50%)}
 .ft{display:grid}.ft-r{display:grid;grid-template-columns:20px 18px minmax(0,1fr) 26px 26px 26px 30px;gap:6px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px;text-align:center;width:100%;color:var(--ink)}
 .ft-r:first-child{border-top:0}.ft-r.ft-h{font:600 10px var(--f-mono);color:var(--muted);padding:4px 0}.ft-r .tb-vn{text-align:left;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ft-r .tb-pk{font-weight:800;font-family:var(--f-display);font-size:17px}.ft-r .tb-pl{font:600 12px var(--f-mono);color:var(--muted)}
-.tb-r{position:relative}.tb-r.z-cl{box-shadow:inset 3px 0 0 #2F5BFF}.tb-r.z-q{box-shadow:inset 3px 0 0 #6E9BFF}.tb-r.z-ab{box-shadow:inset 3px 0 0 #E24A4A}.tb-r .tb-pl{padding-left:4px}
+.tb-r{position:relative}.tb-r.z-cl{background:rgba(47,91,255,.20)}.tb-r.z-q{background:rgba(110,155,255,.09)}.tb-r.z-ab{background:rgba(226,74,74,.12)}.tb-r.z-cl,.tb-r.z-q,.tb-r.z-ab{margin:0 -10px;padding-left:10px;padding-right:10px;width:calc(100% + 20px)}.tb-r.z-cl+.tb-r.z-q,.tb-r.z-q+.tb-r.z-q,.tb-r.z-ab+.tb-r.z-ab{border-top-color:rgba(255,255,255,.06)}.tb-r .tb-pl{padding-left:4px}.tb-r.mein .tb-vn{color:#fff}.tb-r.mein{box-shadow:inset 3px 0 0 var(--vc)}.tb-r.mein .tb-vn::after{content:" ●";color:var(--vc);font-size:10px;vertical-align:2px}
 .tb-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}.tb-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 @media (max-width:370px){.tb-r{gap:3px;grid-template-columns:18px 18px minmax(0,1fr) 16px 44px 40px 26px 24px;font-size:12.5px}.sr{gap:7px}}
 .such-btn svg{width:17px;height:17px;stroke:var(--ink);fill:none;stroke-width:2}
@@ -585,12 +586,13 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .pf-liste{display:grid;gap:8px}
 .pf-tr,.pf-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border-radius:12px;padding:8px 12px 8px 8px;width:100%}
 .pf-tx{display:grid;min-width:0}.pf-tx b{font-weight:700}.pf-tx small{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pf-dot{width:10px;height:10px;border-radius:50%}
+.kd-btn{display:inline-flex;align-items:center;gap:8px;min-width:0;color:inherit;font:inherit}.tb-k .kd-btn{flex:1;min-width:0}
+.pf-dot{width:10px;height:10px;border-radius:50%}.pf-st{font:700 10px var(--f-mono);font-style:normal;text-transform:uppercase;border:1px solid;border-radius:5px;padding:2px 5px;white-space:nowrap}
 .pf-lg{width:52px;height:52px;border-radius:9px;background:var(--soft);display:grid;place-items:center}
 .pf-tipp{font-size:13px;color:var(--muted)}
 .pf-vk{display:flex;align-items:center;gap:10px}.pf-vk h1{margin:0;font-size:28px}
 .pf-card{background:var(--soft)}.pf-card .p{color:var(--accent);font-weight:600;font-size:13px}
-.pf{position:relative}.pf-teilen{position:absolute;right:0;top:4px;width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center}
+.pf{position:relative}.pf-teilen{position:absolute;right:0;top:4px;width:34px;height:34px;border-radius:50%;background:var(--soft);display:grid;place-items:center}
 .pf-teilen svg{width:17px;height:17px;stroke:var(--ink);fill:none;stroke-width:2}
 .pf-kopf{display:grid;grid-template-columns:132px minmax(0,1fr);gap:16px;align-items:end}
 .pf-kopf .bild{width:132px;height:165px}
@@ -621,6 +623,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .pf-wb{font:700 10.5px var(--f-mono);padding:3px 0;border-radius:5px;text-align:center}.pf-wb.l{background:var(--soft);color:var(--muted)}.pf-wb.p{background:rgba(224,150,43,.2);color:#F7C27A}.pf-wb.c{background:rgba(155,107,232,.22);color:#C9AEF7}
 .pf-prow{display:grid;grid-template-columns:84px minmax(0,1fr);gap:16px;align-items:center}
 .pf-pfeld{position:relative;width:84px;height:126px;border-radius:7px;background:#1E5A3E;overflow:hidden}
+.pf-slot{position:absolute;width:11px;height:11px;margin:-5.5px;border-radius:50%;border:1.5px solid rgba(255,255,255,.45);display:grid;place-items:center;font:800 8px var(--f-mono);color:#0E1726;box-sizing:border-box}.pf-slot.an{width:15px;height:15px;margin:-7.5px;background:#fff;border-color:#fff}.pf-pz.kbp{color:#F7C27A}
 .pf-pb{position:absolute;width:var(--g);height:var(--g);margin:calc(var(--g) / -2);border-radius:50%;background:#fff;color:#0E1726;font:800 9px var(--f-mono);display:grid;place-items:center}
 .pf-pinfo{display:grid;gap:6px;justify-items:start}
 .pf-pn{font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1;text-transform:uppercase}
@@ -662,8 +665,8 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 button.chip.pfc{cursor:pointer}
 
 /* Struktur Taktiktafel (Finn 31.10.): Kopf Mittelkreis, Inside Strafraum, Analyse Laufweg, Profil Eckfahne */
-.bar{background:var(--bg) url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27300%27%20height%3D%27150%27%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.07%29%27%20stroke-width%3D%271.5%27%3E%3Ccircle%20cx%3D%27150%27%20cy%3D%2738%27%20r%3D%2766%27/%3E%3Ccircle%20cx%3D%27150%27%20cy%3D%2738%27%20r%3D%272.5%27%20fill%3D%27rgba%28255%2C255%2C255%2C.07%29%27/%3E%3C/svg%3E") no-repeat center top/300px 150px}
-.bar-in .seg{background:#272E3C}
+.bar{background:var(--bg) url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27300%27%20height%3D%27120%27%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.07%29%27%20stroke-width%3D%271.5%27%3E%3Ccircle%20cx%3D%27150%27%20cy%3D%2754%27%20r%3D%2750%27/%3E%3Ccircle%20cx%3D%27150%27%20cy%3D%2754%27%20r%3D%272.5%27%20fill%3D%27rgba%28255%2C255%2C255%2C.07%29%27/%3E%3C/svg%3E") no-repeat center top/300px 120px}
+.bar-in .seg{background:rgba(118,118,128,.24)}
 .hero{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27240%27%20height%3D%27200%27%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.056%29%27%20stroke-width%3D%271.5%27%3E%3Crect%20x%3D%2750%27%20y%3D%27-2%27%20width%3D%27200%27%20height%3D%2788%27/%3E%3Crect%20x%3D%27130%27%20y%3D%27-2%27%20width%3D%27120%27%20height%3D%2734%27/%3E%3Cpath%20d%3D%27M120%2086%20A50%2050%200%200%200%20214%2086%27/%3E%3Ccircle%20cx%3D%27172%27%20cy%3D%2760%27%20r%3D%272.2%27%20fill%3D%27rgba%28255%2C255%2C255%2C.056%29%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right top}
 .akopf{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27300%27%20height%3D%27150%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.056%29%27%20stroke-width%3D%271.5%27%3E%3Crect%20x%3D%27120%27%20y%3D%27-2%27%20width%3D%27182%27%20height%3D%2780%27/%3E%3Cpath%20d%3D%27M168%2078%20A42%2042%200%200%200%20244%2078%27/%3E%3C/g%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28110%2C155%2C255%2C.17%29%27%20stroke-width%3D%271.6%27%20stroke-dasharray%3D%275%205%27%3E%3Cpath%20d%3D%27M120%2092%20C150%2072%20172%2056%20196%2040%27/%3E%3C/g%3E%3Ccircle%20cx%3D%27114%27%20cy%3D%2796%27%20r%3D%276%27%20fill%3D%27none%27%20stroke%3D%27rgba%28110%2C155%2C255%2C.17%29%27%20stroke-width%3D%271.6%27/%3E%3Cpath%20d%3D%27M186%2032%20l9%209%20m0%20-9%20l-9%209%27%20stroke%3D%27rgba%28110%2C155%2C255%2C.17%29%27%20stroke-width%3D%271.6%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right top}
 .pf-kopf{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27220%27%20height%3D%27170%27%20fill%3D%27none%27%20stroke%3D%27rgba%28255%2C255%2C255%2C0.084%29%27%20stroke-width%3D%271.5%27%3E%3Cpath%20d%3D%27M0%2014%20H206%20V170%27/%3E%3Cpath%20d%3D%27M190%2014%20A16%2016%200%200%200%20206%2030%27/%3E%3Cpath%20d%3D%27M120%2014%20V58%20H206%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right top}
@@ -673,6 +676,23 @@ button.chip.pfc{cursor:pointer}
 .vz-btn{position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:6px;width:auto;min-width:34px;padding:0 7px;display:flex;gap:2px;align-items:center;justify-content:center}.vz-btn svg{width:18px;height:18px}.vz-btn.an{background:rgba(47,91,255,.22)}.vz-btn b{font:700 11px var(--f-mono);color:var(--ink);margin-left:2px}.vz-btn[aria-pressed=true]{background:var(--accent)}
 .vz-schmal{display:flex;align-items:center;gap:4px;width:100%;margin:0 0 8px;font-size:12.5px;color:var(--muted)}.vz-schmal span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;margin-left:4px}.vz-schmal i{font-style:normal;color:var(--accent);font-weight:600}
 .vz-fertig{justify-self:end;color:var(--accent);font-weight:600;font-size:13px;padding:4px 2px}
+
+/* Status-Verlauf als Zeitstrahl (Entwurf v10) */
+.vg{background:var(--soft);border-radius:12px;padding:12px;margin-top:4px;display:grid;gap:10px}
+.vg-kopf{display:flex;align-items:center;gap:8px;font-size:13.5px}.vg-pill{font:700 10.5px var(--f-mono);background:rgba(226,74,74,.22);color:#FF9A9A;border-radius:5px;padding:3px 6px}
+.vg-gr{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vg-tag{font-family:var(--f-display);font-weight:800;font-size:18px}
+.vg-spur{position:relative;height:64px;margin:0 6px}
+.vg-linie{position:absolute;left:0;right:0;top:30px;border-top:2px dashed rgba(169,180,198,.4)}
+.vg-fertig{position:absolute;left:0;top:29px;height:4px;border-radius:2px;background:linear-gradient(90deg,#E24A4A,#E0962B)}
+.vg-band{position:absolute;top:21px;height:22px;background:rgba(46,184,114,.14);border-radius:4px}
+.vg-band i{position:absolute;bottom:24px;left:0;font:600 9.5px var(--f-mono);font-style:normal;color:#6EE7A8;white-space:nowrap}
+.vg-p{position:absolute;top:31px;width:12px;height:12px;margin:-6px;border-radius:50%;background:var(--c);z-index:2}
+.vg-p.prog{background:var(--soft);border:2px dashed var(--c)}
+.vg-d{position:absolute;top:44px;font:600 10.5px var(--f-mono);white-space:nowrap}.vg-d.prog{color:#B5CBFF}
+.vg-heute{position:absolute;top:18px;height:26px;border-left:2px solid #fff;z-index:3}.vg-heute i{position:absolute;top:-14px;left:-17px;font:700 9.5px var(--f-mono);font-style:normal;color:#fff}
+.vg-liste{display:grid;gap:4px}.vg-liste div{display:grid;grid-template-columns:10px 44px 1fr;gap:8px;align-items:center;font-size:13px}
+.vg-liste i{width:8px;height:8px;border-radius:50%;background:var(--c)}.vg-liste span:nth-child(2){color:var(--muted);font-size:12px}
+.vg-liste .prog i{background:none;border:2px dashed var(--c);width:6px;height:6px}.vg-liste .prog span:last-child{color:#B5CBFF}
 </style>
 
 
@@ -812,7 +832,7 @@ button.chip.pfc{cursor:pointer}
   function newsKarte(m){
     const a = m.aufstellung, auf = a && (a.startelf || []).length;
     const rechts = auf ? `<span class="nk-r" role="img" aria-label="${esc(m.verein)} gegen ${esc(a.gegner)}">${logo(KURZ[m.verein], 20)}${logo(KURZ[a.gegner], 20)}</span>` : plakette(meldungsStatus(m));
-    return `<button class="nk" data-id="${esc(m.id)}">${bild(m, 76, 100)}<div class="nk-b">
+    return `<button class="nk" data-id="${esc(m.id)}">${bild(m, 84, 84)}<div class="nk-b">
       <div class="nk-top"><div class="tags">${(m.tags || []).map(tag).join("")}${auf ? tag("AUFSTELLUNG") : ""}</div>${rechts}</div>
       ${auf ? `<p class="elf">${startelfZeile(a.startelf)}</p>` : `<h2>${esc(m.kurz || m.headline)}</h2>`}
       <div class="meta" data-lang="${esc(metaZeile(m, auf))}" data-kurz="${esc(metaZeile(m, auf, 1))}" data-nur="${esc(metaZeile(m, auf, 2))}">${esc(metaZeile(m, auf))}</div></div></button>`;
@@ -924,7 +944,7 @@ button.chip.pfc{cursor:pointer}
     const alle = N.filter(m => !fest.includes(m)).sort((a, b) => (dt(b.zeit) || 0) - (dt(a.zeit) || 0));
     const filter = SEL.size && !NEWSALLE;
     const rest = filter ? alle.filter(meineMeldung) : alle;
-    let A = IN && IN.analyse && IN.analyse.news_zeit && dt(IN.analyse.news_zeit) <= now ? IN.analyse : null;
+    let A = IN && IN.analyse && IN.analyse.news_zeit && dt(IN.analyse.news_zeit) <= now && (!SEL.size || NEWSALLE || !IN.analyse.verein || SEL.has(IN.analyse.verein)) ? IN.analyse : null;
     if (!fest.length && !alle.length){ $("#main").innerHTML = vereinsZeile() + '<p class="leer">Noch keine Meldungen.</p>'; return; }
     let h = fest.map(punktKarte).join("");
     if (SEL.size) h += NEWSALLE
@@ -992,7 +1012,7 @@ button.chip.pfc{cursor:pointer}
       if ((t.eingewechselt || []).length) h += kap("Eingewechselt") + `<div class="chips">${t.eingewechselt.map(s => chip({...c(s), ein: true, einMin: s.ein_min})).join("")}</div>`;
       if ((t.raus || []).length) h += `<div class="zeile"><b>NICHT IN DER STARTELF</b>${t.raus.map(r => esc(r.n) + (r.wo ? " (" + esc(r.wo) + ")" : "")).join(", ")}</div>`;
       if ((t.ohne_einsatz || []).length) h += `<div class="zeile"><b>OHNE EINSATZ</b>${t.ohne_einsatz.map(esc).join(", ")}</div>`;
-      return `<div class="sa-t"${i ? " hidden" : ""}><div class="sa-k">${logo(t.k || KURZ[t.verein], 22)}<span>${esc(t.verein)}</span><span class="w">${esc(t.wettbewerb || "")}${t.ergebnis ? " · " + esc(t.ergebnis) : ""}</span></div>
+      return `<div class="sa-t"${i ? " hidden" : ""}><div class="sa-k"><button class="kd-btn" data-kader="${esc(t.k || KURZ[t.verein])}">${logo(t.k || KURZ[t.verein], 22)}<span>${esc(t.verein)}</span></button><span class="w">${esc(t.wettbewerb || "")}${t.ergebnis ? " · " + esc(t.ergebnis) : ""}</span></div>
         ${t.vergleich ? `<div class="vgl">NEU und RAUS im Vergleich zur Startelf am ${esc(t.vergleich)}</div>` : ""}${h}</div>`;
     };
     const tabs = L.length > 1 ? `<div class="tabs">${L.map((t, i) => `<button type="button" data-sa="${i}" aria-pressed="${!i}">${esc(t.verein)}</button>`).join("")}</div>` : "";
@@ -1011,7 +1031,7 @@ button.chip.pfc{cursor:pointer}
     const st = STATUS[String(meldungsStatus(m) || "").toLowerCase()];
     const kopf = auf
       ? `<div style="display:grid;gap:8px"><div class="tags">${(m.tags || []).map(tag).join("")}${tag("AUFSTELLUNG")}</div>
-          <div style="display:flex;gap:8px;align-items:center">${logo(KURZ[m.verein], 30)}<h1 class="disp" style="font-size:26px">${esc(m.headline)}</h1></div>
+          <div style="display:flex;gap:8px;align-items:center"><button class="kd-btn" data-kader="${esc(KURZ[m.verein])}" aria-label="Kader ${esc(m.verein)}">${logo(KURZ[m.verein], 30)}</button><h1 class="disp" style="font-size:26px">${esc(m.headline)}</h1></div>
           <div class="dat">${esc(lang(m.zeit))}</div></div>${aufBlock(a)}${(m.text || []).length ? `<div class="body">${m.text.map(p => `<p>${esc(p)}</p>`).join("")}</div>` : ""}`
       : `<div style="display:grid;gap:12px"><div class="mk">${istSpielerin(m) && m.spielerin ? `<button class="mk-foto" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}" aria-label="Profil von ${esc(m.spielerin)}">${bild(m, 96)}</button>` : bild(m, 96)}<div class="mk-m"><div class="tags">${(m.tags || []).map(tag).join("")}</div>
           <div class="wer">${m.pos === "Spielansetzung" ? esc(m.spielerin && m.spielerin !== "Spielansetzung" ? m.spielerin : [m.verein, m.aufstellung && m.aufstellung.gegner].filter(Boolean).join(" gegen ")) : istSpielerin(m) && m.spielerin ? `<button class="wer-btn" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}">${esc(m.spielerin)}</button>` : esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc(m.pos === "Spielansetzung" ? "Vorbericht" : [m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
@@ -1154,7 +1174,7 @@ button.chip.pfc{cursor:pointer}
     if (a && (a.startelf || []).length) inh = a.typ === "offiziell" ? offiziell(a, k) : prognose(a, seite);
     else inh = '<p class="dat">Noch keine Aufstellung.</p>';
     const badge = a ? (a.typ === "offiziell" ? '<span class="badge off">OFFIZIELL</span>' : '<span class="badge ein">EINSCHÄTZUNG</span>') : "";
-    return `<div class="kartebox"><div class="tb-k">${logo(k, 22)}<span class="n">${esc(name)}</span>${a && a.formation ? `<span class="f">${esc(a.formation)}</span>` : ""}${badge}</div>${inh}</div>`;
+    return `<div class="kartebox"><div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${a && a.formation ? `<span class="f">${esc(a.formation)}</span>` : ""}${badge}</div>${inh}</div>`;
   }
   function offiziell(a, k){
     const c = s => ({n: s.n, tore: s.tore || 0, rot: s.rot, gelb: s.gelb, gelbMin: s.gelb_min, rotMin: s.rot_min, prof: k ? k + "|" + (s.voll || s.n) : null});
@@ -1353,7 +1373,7 @@ button.chip.pfc{cursor:pointer}
   }
   function inside(){
     if (!IN){ $("#main").innerHTML = '<p class="leer">Inside wird geladen …</p>'; return; }
-    const ph = IN.punkt_hinweis, pm = ph && N.find(m => m.id === ph.id), A = IN.analyse;
+    const ph = IN.punkt_hinweis, pm = ph && N.find(m => m.id === ph.id), A = IN.analyse && (!SEL.size || !IN.analyse.verein || SEL.has(IN.analyse.verein)) ? IN.analyse : null;
     $("#main").innerHTML = vereinsZeile() + `<div class="iv">
       ${pm ? `<button class="phl" data-punkt="${esc(ph.id)}"><b>Keine Zeit?</b> ${esc(ph.text)} ›</button>` : ""}
       ${IN.ausgabe ? hero(IN.ausgabe) : ""}${formSektion()}${standardSektion()}${spieleSektion()}${IN.kalender ? kalenderSektion(IN.kalender) : ""}
@@ -1583,6 +1603,25 @@ button.chip.pfc{cursor:pointer}
     if (s.stand) { const tage = Math.max(0, Math.round((Date.now() - dt(s.stand)) / 864e5)); return tage ? "seit " + tage + " Tagen" : "seit heute"; }
     return "";
   }
+
+  function verlaufGrafik(s){
+    const e = s.einschaetzung, sl = (s.verlauf || []).slice(-1)[0];
+    if (!e || !e.seit || !(e.phasen || []).some(x => x.iso)) return "";
+    const t0 = new Date(e.seit + "T12:00"), heute = new Date(), tag = d => Math.round((d - t0) / 864e5);
+    const ph = e.phasen.filter(x => x.iso), ende = Math.max(tag(new Date(ph[ph.length - 1].iso + "T12:00")), tag(heute) + 4, 1);
+    const pos = d => Math.min(100, Math.max(0, tag(d) / ende * 100));
+    const ht = tag(heute), farbe = {verletzung: "#E24A4A", reha: "#E0962B", kader: "#6E9BFF", startelf: "#2EB872"};
+    const ausr = i => i === 0 ? "translateX(-6px)" : i === ph.length - 1 ? "translateX(calc(-100% + 6px))" : "translateX(-50%)";
+    const band = e.typisch ? `<span class="vg-band" style="left:${e.typisch[0] / ende * 100}%;width:${(e.typisch[1] - e.typisch[0]) / ende * 100}%"><i>üblich ${e.typisch[0]} bis ${e.typisch[1]} Tage</i></span>` : "";
+    const art = sl && sl.status === "gesperrt" ? "SPERRE" : "AUSFALL";
+    return `<div class="vg">
+      <div class="vg-kopf"><span class="vg-pill">${art}</span><span class="vg-gr">${esc(((sl && sl.grund) || "").split(",")[0])}</span><span class="vg-tag">Tag ${ht}</span></div>
+      <div class="vg-spur">${band}<span class="vg-linie"></span><span class="vg-fertig" style="width:${pos(heute)}%"></span>
+        ${ph.map((x, i) => `<span class="vg-p${x.prog ? " prog" : ""}" style="left:${pos(new Date(x.iso + "T12:00"))}%;--c:${farbe[x.typ] || "#A9B4C6"}"></span><span class="vg-d${x.prog ? " prog" : ""}" style="left:${pos(new Date(x.iso + "T12:00"))}%;transform:${ausr(i)}">${esc(x.d)}</span>`).join("")}
+        <span class="vg-heute" style="left:${pos(heute)}%"><i>HEUTE</i></span></div>
+      <div class="vg-liste">${ph.map(x => `<div${x.prog ? ' class="prog"' : ""}><i style="--c:${farbe[x.typ] || "#A9B4C6"}"></i><span>${esc(x.d)}</span><span>${esc(x.t)}${x.prog ? " (Einschätzung)" : ""}</span></div>`).join("")}</div>
+    </div>`;
+  }
   function oeffneProfil(id, her){
     if (!PR_STAPEL.length) PR_HER = her || PR_HER || {typ: VIEW};
     BACK = "profil";
@@ -1636,7 +1675,7 @@ button.chip.pfc{cursor:pointer}
   function stListe(k, l, n){
     const max = l.length ? l[0][k] : 1; let rang = 0, vor = null;
     return l.slice(0, n).map((v, i) => { if (v[k] !== vor) rang = i + 1; vor = v[k]; const kl = n > 3 ? 30 : 44;
-      return `<button class="sr${rang === 1 ? " r1" : ""}" data-profil="${esc(v.s.id)}"><span class="sr-rk${rang <= 3 ? " g" + rang : ""}">${rang <= 3 ? rang : rang + "."}</span>${pfFoto(v.s, kl, kl, n > 3 ? 7 : 9)}${logo(v.s.k, 18)}<span class="sr-nm"><b>${esc(v.s.n)}</b>${k === "karten" ? stKarten(v) : `<span class="sr-bal"><i style="width:${Math.max(4, v[k] / max * 100)}%"></i></span>`}</span><span class="sr-w">${stFmt(k, v[k])}</span></button>`; }).join("");
+      return `<button class="sr${rang === 1 ? " r1" : ""}" data-profil="${esc(v.s.id)}"><span class="sr-rk${rang <= 3 ? " g" + rang : ""}">${rang <= 3 ? rang : rang + "."}</span>${pfFoto(v.s, kl, kl, n > 3 ? 7 : 9)}${logo(v.s.k, 18)}${k === "karten" ? `<span class="sr-nm sr-kn"><b>${stNach(v.s)}</b>${stKarten(v)}</span><span class="sr-w sr-fp">${v[k]}<small>Fairness-<br>Punkte</small></span>` : `<span class="sr-nm"><b>${esc(v.s.n)}</b><span class="sr-bal"><i style="width:${Math.max(4, v[k] / max * 100)}%"></i></span></span><span class="sr-w">${stFmt(k, v[k])}</span>`}</button>`; }).join("");
   }
   function statView(art, sanft){
     BACK = "stat"; PR_STAPEL = []; setHash(art); VIEW_STAT = art;
@@ -1652,12 +1691,12 @@ button.chip.pfc{cursor:pointer}
         <div class="tb"><div class="tb-r tb-h"><span>#</span><span></span><span class="tb-vn" style="font-weight:600">VEREIN</span><span>SP</span><span>S-U-N</span><span>TORE</span><span>DIFF</span><span>PKT</span></div>
         ${L.tab.map((r, i) => { const d = r.tp - r.tm, pl = i && r.pkt === L.tab[i - 1].pkt && d === L.tab[i - 1].tp - L.tab[i - 1].tm && r.tp === L.tab[i - 1].tp ? "" : i + 1;
           const zo = i === 0 ? " z-cl" : i <= 2 ? " z-q" : i >= L.tab.length - 2 ? " z-ab" : "";
-          return `<button class="tb-r${zo}" data-statverein="${r.k}" aria-label="${esc(kname(r.k))}, Kader öffnen"><span class="tb-pl">${pl}</span>${logo(r.k, 20)}<span class="tb-vn">${esc(kname(r.k))}</span><span class="tb-mu">${r.sp}</span><span>${r.s}-${r.u}-${r.n}</span><span class="tb-mu">${r.tp}:${r.tm}</span><span>${d > 0 ? "+" : ""}${d}</span><span class="tb-pk">${r.pkt}</span></button>`; }).join("")}</div>
-        <div class="tb-leg"><span><i style="background:#2F5BFF"></i>Champions League, Ligaphase</span><span><i style="background:#6E9BFF"></i>Champions League, Qualifikation</span><span><i style="background:#E24A4A"></i>Abstieg</span></div>
+          return `<button class="tb-r${zo}${SEL.has(r.k) ? " mein" : ""}" ${SEL.has(r.k) ? `style="--vc:${ring(r.k)}" ` : ""}data-statverein="${r.k}" aria-label="${esc(kname(r.k))}, Kader öffnen"><span class="tb-pl">${pl}</span>${logo(r.k, 20)}<span class="tb-vn">${esc(kname(r.k))}</span><span class="tb-mu">${r.sp}</span><span>${r.s}-${r.u}-${r.n}</span><span class="tb-mu">${r.tp}:${r.tm}</span><span>${d > 0 ? "+" : ""}${d}</span><span class="tb-pk">${r.pkt}</span></button>`; }).join("")}</div>
+        <div class="tb-leg"><span><i style="background:rgba(47,91,255,.55)"></i>Champions League, Ligaphase</span><span><i style="background:rgba(110,155,255,.3)"></i>Champions League, Qualifikation</span><span><i style="background:rgba(226,74,74,.45)"></i>Abstieg</span></div>
         <p class="st-notiz">Startplätze wie in der Saison 2026/27 laut DFB: Meister direkt in die Ligaphase, Platz 2 und 3 in die Qualifikation (wer dort ausscheidet, spielt im Europa Cup weiter). Die beiden Letzten steigen ab. Die UEFA kann die Zahl der Plätze über die Länderwertung ändern. Bei Punktgleichheit entscheidet die Tordifferenz, dann die Zahl der Tore. Verein antippen öffnet den Kader. Ergebnisse: Sportschau.</p></div>`;
     } else {
       const W = ligaWerte(L.spiele);
-      let h = `<div class="det sv">${zur}<h1 class="disp">Statistik</h1><div class="dat">Google Pixel Frauen-Bundesliga, nach dem ${L.md}. Spieltag, nur Ligaspiele</div>
+      let h = `<div class="det sv">${zur}<h1 class="disp">Statistik</h1><div class="dat">Nur Liga, nach dem ${L.md}. Spieltag</div>
         <div class="st-chips">${STKAT.map(([k, t]) => `<button data-stsprung="${k}">${t}</button>`).join("")}</div>`;
       for (const [k, t, e] of STKAT) {
         const l = W.filter(v => v[k] > 0).sort((a, b) => b[k] - a[k] || a.minuten - b.minuten || a.s.n.localeCompare(b.s.n, "de"));
@@ -1668,11 +1707,11 @@ button.chip.pfc{cursor:pointer}
           h += `<section class="stk" id="st-fair"><div class="stk-k"><h2>${t}</h2><small>${e}</small></div><div class="ft"><div class="ft-r ft-h"><span>#</span><span></span><span>VEREIN</span><span><i class="kg"></i></span><span><i class="kgr"></i></span><span><i class="kr"></i></span><span>PKT</span></div>
             ${FL.map((f, i) => `<button class="ft-r" data-statverein="${f.k}"><span class="tb-pl">${i && f.p === FL[i - 1].p ? "" : i + 1}</span>${logo(f.k, 18)}<span class="tb-vn">${esc(kname(f.k))}</span><span>${f.gelb}</span><span>${f.gr}</span><span>${f.rot}</span><span class="tb-pk">${f.p}</span></button>`).join("")}</div></section>`; continue; }
         if (k === "voll") { const vl = W.filter(v => v.voll).length;
-          if (vl && vl <= 10) { const l2 = W.filter(v => v.minuten > 0).sort((a, b) => b.minuten - a.minuten || a.s.n.localeCompare(b.s.n, "de")), auf = STAUF.voll, n = auf ? 10 : 3, mehr = l2.length > n && l2[n].minuten === l2[n - 1].minuten ? l2.slice(n).filter(v => v.minuten === l2[n - 1].minuten) : [];
+          if (vl && vl <= 10) { const l2 = W.filter(v => v.minuten > 0).sort((a, b) => b.minuten - a.minuten || a.s.n.localeCompare(b.s.n, "de")), auf = STAUF.voll, n = auf ? 10 : 3, mehr = auf && l2.length > n && l2[n].minuten === l2[n - 1].minuten ? l2.slice(n).filter(v => v.minuten === l2[n - 1].minuten) : [];
             h += `<section class="stk${auf ? " stk-klein" : ""}" id="st-voll"><div class="stk-k"><h2>${t}</h2><small>Einsatzminuten, ${vl} ${vl === 1 ? "hat" : "haben"} jede Minute gespielt</small></div>${stListe("minuten", l2, n)}${mehr.length ? `<div class="st-erkl">Ebenfalls ${l2[n - 1].minuten}': ${stNamen(mehr)}</div>` : ""}<button class="st-mehr" data-stauf="voll">${auf ? "Weniger" : "Top 10 ›"}</button></section>`; continue; } }
         if (k === "voll") {
           h += `<section class="stk" id="st-${k}"><div class="stk-k"><h2>${t}</h2><small>${e}</small></div>${l.length ? `<div class="st-chipl">${l.map(v => `<button data-profil="${esc(v.s.id)}">${logo(v.s.k, 14)}${stNach(v.s)}${k === "rot" && v.rot > 1 ? " " + v.rot + "x" : ""}</button>`).join("")}</div>` : '<p class="st-erkl">Noch niemand.</p>'}${k === "voll" && l.length ? `<div class="st-erkl">${l.length} Spielerinnen haben jede Minute ihres Vereins gespielt.</div>` : ""}</section>`; continue; }
-        const auf = STAUF[k], n = auf ? 10 : 3, mehr = l.length > n && l[n][k] === l[n - 1][k] ? l.slice(n).filter(v => v[k] === l[n - 1][k]) : [];
+        const auf = STAUF[k], n = auf ? 10 : 3, mehr = auf && l.length > n && l[n][k] === l[n - 1][k] ? l.slice(n).filter(v => v[k] === l[n - 1][k]) : [];
         h += `<section class="stk${auf ? " stk-klein" : ""}" id="st-${k}"><div class="stk-k"><h2>${t}</h2>${e ? `<small>${e}</small>` : ""}</div>${l.length ? stListe(k, l, n) : '<p class="st-erkl">Noch niemand.</p>'}
           ${mehr.length ? `<div class="st-erkl">Ebenfalls ${stFmt(k, l[n - 1][k])}: ${stNamen(mehr)}</div>` : ""}${l.length > 3 ? `<button class="st-mehr" data-stauf="${k}">${auf ? "Weniger" : "Top 10 ›"}</button>` : ""}</section>`;
       }
@@ -1697,7 +1736,7 @@ button.chip.pfc{cursor:pointer}
       if (!SPN) return;
       const t = normS(inp.value.trim()), L = SPN.spielerinnen;
       const zeile = s => { const st = s.status ? s.status.s : "fit";
-        return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 52, 52, 9)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc((KBNAME[s.pos] || s.pos || "").toLowerCase().replace(/^./, c => c.toUpperCase()))}${s.nr ? " · Nr. " + esc(s.nr) : ""}</small></span><i class="pf-dot" style="background:${STFARBE[st] || STFARBE.fit}" title="${esc(st)}"></i></button>`; };
+        return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 52, 52, 9)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc((KBNAME[s.pos] || s.pos || "").toLowerCase().replace(/^./, c => c.toUpperCase()))}${s.nr ? " · Nr. " + esc(s.nr) : ""}</small></span>${st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${{raus: "verletzt", gesperrt: "gesperrt", fraglich: "fraglich"}[st] || esc(st)}</i>` : ""}</button>`; };
       let h = "";
       if (!t) {
         const zl = zuletzt().map(spById).filter(Boolean);
@@ -1720,13 +1759,13 @@ button.chip.pfc{cursor:pointer}
     ladeSPN().then(zeig).catch(() => { $("#pf-erg").innerHTML = '<p class="leer">Die Profile konnten nicht geladen werden.</p>'; });
     setTimeout(() => inp.focus(), 50);
   }
-  let KADER_K = null, KADER_VON = null;
+  let KADER_K = null, KADER_VON = null, KADER_HER = null;
   function vereinsKader(k, von){
-    BACK = von ? "statkader" : "suche"; KADER_K = k; KADER_VON = von;
+    BACK = von === "zurueck" ? "kaderzu" : von ? "statkader" : "suche"; KADER_K = k; KADER_VON = von;
     const L = SPN.spielerinnen.filter(s => s.k === k), ord = {TW:0, ABW:1, MF:2, ST:3};
     L.sort((a, b) => (ord[a.pos] ?? 9) - (ord[b.pos] ?? 9) || (parseInt(a.nr, 10) || 99) - (parseInt(b.nr, 10) || 99));
-    const zeile = s => { const st = s.status ? s.status.s : "fit"; return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small></span><i class="pf-dot" style="background:${STFARBE[st] || STFARBE.fit}"></i></button>`; };
-    $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>
+    const zeile = s => { const st = s.status ? s.status.s : "fit"; return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small></span>${st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${{raus: "verletzt", gesperrt: "gesperrt", fraglich: "fraglich"}[st] || esc(st)}</i>` : ""}</button>`; };
+    $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>
       ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}</div>`;
     window.scrollTo(0, 0);
   }
@@ -1748,11 +1787,13 @@ button.chip.pfc{cursor:pointer}
       <div class="pf-tags">${stTag}<span class="pf-tag">${esc(KBNAME[s.pos] || s.pos || "")}</span></div></div></div>`;
     // Auf einen Blick
     const eins = sp.filter(e => e.art === "S" || e.art === "E").slice(-3), avg = eins.length ? Math.round(eins.reduce((a, e) => a + e.min, 0) / eins.length) : 0;
-    const fT = eins.reduce((a, e) => a + (e.tore || []).length, 0), fV = eins.reduce((a, e) => a + (e.vorl || 0), 0);
+    const fT = eins.reduce((a, e) => a + (e.tore || []).length, 0), fV = eins.reduce((a, e) => a + (e.vorl || 0), 0), istTW = s.pos === "TW";
+    const gegenT = e => { const [a, b] = String(e.erg || "").split(":").map(Number); return isNaN(a) ? null : (e.ha === "H" ? b : a); };
+    const zn3 = eins.filter(e => e.art === "S" && gegenT(e) === 0).length;
     const stB = st === "fit" ? ["Fit", "nichts gemeldet", STFARBE.fit] : [st === "raus" ? "Verletzt" : st === "gesperrt" ? "Gesperrt" : "Fraglich", kurzZurueck(s.status), STFARBE[st]];
     h += `<div class="pf-blick"><div><span class="k">Status</span><b style="color:${stB[2]}">${esc(stB[0])}</b><small>${esc(stB[1])}</small></div>
-      <div><span class="k">Nächstes Spiel</span><b style="color:${sf ? sf[1] : "var(--muted)"}">${esc(sf ? sf[0] : "offen")}</b><small>${wert != null ? "Einsatzwert " + wert + " %" : pr && pr.grund ? esc(pr.grund) : ""}</small></div>
-      <div><span class="k">Letzte 3 Spiele</span><b>${eins.length ? `<span class="oe">Ø</span>${avg}'` : "0"}</b><small>${fT || fV ? `${fT} ${fT === 1 ? "Tor" : "Tore"} · ${fV} ${fV === 1 ? "Vorl." : "Vorl."}` : "keine Torbeteiligung"}</small></div></div>`;
+      <div><span class="k">${pr && pr.md ? pr.md + ". Spieltag" : "Nächster Spieltag"}</span><b style="color:${sf ? sf[1] : "var(--muted)"}">${esc(sf ? sf[0] : "offen")}</b><small>${wert != null ? "Einsatzwert " + wert + " %" : pr && pr.grund ? esc(pr.grund) : ""}</small></div>
+      <div><span class="k">Letzte 3 Spiele</span><b>${eins.length ? `<span class="oe">Ø</span>${avg}'` : "0"}</b><small>${istTW ? `${zn3}x zu Null` : fT || fV ? `${fT} ${fT === 1 ? "Tor" : "Tore"} · ${fV} Vorl.` : "keine Torbeteiligung"}</small></div></div>`;
     // Für Kickbase
     const ART = {elfmeter: "Elfmeter", freistoesse: "Freistöße", ecken: "Ecken"};
     const std = Object.entries(s.standards || {}).map(([a, r]) => `<span class="pf-std">${ART[a] || a}${r > 1 ? ` <i>${r}. Wahl</i>` : ""}</span>`).join("");
@@ -1765,7 +1806,28 @@ button.chip.pfc{cursor:pointer}
     h += `<section class="pf-box pf-kb">${kap("Für Kickbase")}${pr ? `<p class="pf-w">${esc(warumSatz(s, pr))}</p>` : `<p class="pf-w">Für den nächsten Spieltag gibt es noch keine Prognose.</p>`}
       ${std ? kap("Standards") + `<div class="pf-stds">${std}</div>` : ""}
       ${komH ? `<div class="kap">Nächste Spiele${dicht >= 3 ? ` <span class="pf-warn">${dicht} Spiele in 8 Tagen</span>` : ""}</div>${komH}` : ""}</section>`;
-    // Ihre Position
+    // Ihre Position im Vereinssystem (Finn 01.11.: feste Plätze der Formation, gespielte ausgemalt)
+    const sys = ((SPN && SPN.vereine && SPN.vereine[s.k]) || {}).system;
+    if (s.slots && s.slots.length && sys) {
+      const LY = {TW: .06, ABW: .24, DM: sys.slots.some(t => t[0] === "MF") ? .4 : .44, MF: .53, OM: .68, ST: .86};
+      const starts = s.slots.reduce((a, t) => a + t[3], 0), kader = sp.filter(e => e.art !== "X").length;
+      const q = kader ? starts / kader : 0, rolleS = q >= .75 ? ["STAMMPLATZ", "#2EB872"] : q >= .4 ? ["ROTATION", "#E0962B"] : ["HERAUSFORDERIN", "#A9B4C6"];
+      const stS = sp.filter(e => e.art === "S"), avgS = stS.length ? Math.round(stS.reduce((a, e) => a + e.min, 0) / stS.length) : 0;
+      const key = t => t[0] + "|" + t[2], meine = {}; s.slots.forEach(t => meine[key(t)] = (meine[key(t)] || 0) + t[3]);
+      const punkte = sys.slots.map(t => ({lp: t[0], x: t[1], c: meine[key(t)] || 0}));
+      s.slots.forEach(t => { if (!sys.slots.some(u => key(u) === key(t))) punkte.push({lp: t[0], x: t[1], c: t[3]}); });
+      const mx = Math.max(...punkte.map(p => p.c), 1);
+      const KBP = {TW: "Torhüterin", ABW: "Abwehr", MF: "Mittelfeld", ST: "Sturm"}, grob = r => r === "Tor" ? "TW" : /verteidig|Schiene/.test(r) ? "ABW" : /Sturm|stürm/.test(r) ? "ST" : "MF";
+      const ers = (s.ersatz || []).map(r => `<div class="pf-er"><b>${esc(r.n)}</b><span>${[r.s ? r.s + "x für sie in der Startelf" : "", r.w ? r.w + "x für sie eingewechselt" : ""].filter(Boolean).join(" · ")}</span></div>`).join("");
+      h += `<section class="pf-box">${kap("Ihre Position")}<div class="pf-prow"><div class="pf-pfeld">${rasen(false)}${punkte.map(p => `<span class="pf-slot${p.c ? " an" : ""}" style="left:${Math.min(88, Math.max(12, fx(p.x)))}%;top:${fy(LY[p.lp] ?? .5)}%;${p.c ? `opacity:${.55 + .45 * p.c / mx}` : ""}">${p.c && s.slots.length > 1 ? p.c : ""}</span>`).join("")}</div>
+        <div class="pf-pinfo"><b class="pf-pn">${esc(s.slots[0][2])}</b><span class="pf-rolle" style="color:${rolleS[1]};border-color:${rolleS[1]}">${rolleS[0]}</span>
+        <div class="pf-pz mu">${esc(kname(s.k))} spielt meist ${esc(sys.name)}</div>
+        <div class="pf-pz"><b>${starts}</b> von ${kader} Spielen in der Startelf</div>
+        <div class="pf-pz"><b><span class="oe">Ø</span>${avgS}'</b> wenn sie beginnt</div>
+        ${s.slots.length > 1 ? `<div class="pf-pz mu">auch: ${s.slots.slice(1).map(t => esc(t[2]) + " " + t[3] + "x").join(", ")}</div>` : ""}
+        ${s.pos && KBP[s.pos] && grob(s.slots[0][2]) !== s.pos && !(s.pos === "ST" && grob(s.slots[0][2]) === "MF") ? `<div class="pf-pz kbp">Kickbase führt sie als ${KBP[s.pos]}</div>` : ""}</div></div>
+        ${kap("Wer sie ersetzt")}${ers || '<div class="pf-er"><span>Bisher keine, sie hat immer selbst gespielt.</span></div>'}</section>`;
+    } else
     if (haupt) {
       const ol = s.orte.map(([x, y, c]) => ({x, y, c})), starts = ol.reduce((a, o) => a + o.c, 0), kader = sp.filter(e => e.art !== "X").length;
       ol.forEach((o, i) => { o.px = Math.min(84, Math.max(16, fx(o.x))); o.py = fy(o.y);
@@ -1785,8 +1847,8 @@ button.chip.pfc{cursor:pointer}
       const min = e.art === "S" ? Number(e.aus || 90) : e.art === "E" ? Math.max(1, 90 - Number(e.ein || 90)) : 0;
       return {...e, typ: /pokal/i.test(e.wb || "") ? "Pokal" : "CL", min, tore: e.tore ? Array(e.tore).fill("") : [], gk: KURZ[e.gegner]}; }))
       .sort((a, b) => String(a.datum || "").localeCompare(String(b.datum || "")));
-    const tore = sp.reduce((a, e) => a + (e.tore || []).length, 0), vorl = sp.reduce((a, e) => a + (e.vorl || 0), 0), min = sp.reduce((a, e) => a + (e.min || 0), 0), karten = sp.filter(e => e.gelb || e.rot).length;
-    h += `<section class="pf-box">${kap("Saison Bundesliga")}<div class="pf-zahlen"><div><b>${sp.filter(e => e.art === "S").length}/${sp.length}</b><span>Startelf</span></div><div><b>${zahlDE(min)}</b><span>Minuten</span></div><div><b>${tore}</b><span>Tore</span></div><div><b>${vorl}</b><span>Vorlagen</span></div><div><b>${karten}</b><span>Karten</span></div></div>
+    const tore = sp.reduce((a, e) => a + (e.tore || []).length, 0), vorl = sp.reduce((a, e) => a + (e.vorl || 0), 0), min = sp.reduce((a, e) => a + (e.min || 0), 0), karten = sp.filter(e => e.gelb || e.rot).length, fairP = sp.reduce((a, e) => a + (e.gr ? 3 : e.rot ? 5 : e.gelb ? 1 : 0), 0);
+    h += `<section class="pf-box">${kap("Saison Bundesliga")}<div class="pf-zahlen"><div><b>${sp.filter(e => e.art === "S").length}/${sp.length}</b><span>Startelf</span></div><div><b>${zahlDE(min)}</b><span>Minuten</span></div>${istTW ? `<div><b>${sp.filter(e => e.art === "S" && gegenT(e) === 0).length}</b><span>Zu Null</span></div><div><b>${sp.filter(e => e.art === "S").reduce((a, e) => a + (gegenT(e) || 0), 0)}</b><span>Gegentore</span></div>` : `<div><b>${tore}</b><span>Tore</span></div><div><b>${vorl}</b><span>Vorlagen</span></div>`}<div><b>${fairP}</b><span>Fairness-Pkt.</span></div></div>
       ${alle.length ? `<div class="pf-saeulen">${alle.map((e, i) => { const hoch = e.art === "S" || e.art === "E" ? Math.max(8, Math.min(120, e.min) / 120 * 100) : 8;
         const lab = e.typ === "Liga" ? e.md + "." : e.typ === "Pokal" ? "P" : "CL";
         return `<button class="pf-sae${e.typ !== "Liga" ? " cup " + (e.typ === "Pokal" ? "po" : "cl") : ""}" data-sae="${i}" aria-pressed="false" aria-label="${esc(lab + " " + e.gegner)}"><span class="tz">${(e.tore || []).length ? "⚽".repeat(Math.min(3, e.tore.length)) : ""}${e.vorl ? "<i>V</i>" : ""}</span>
@@ -1796,7 +1858,7 @@ button.chip.pfc{cursor:pointer}
     // Status-Verlauf
     if ((s.verlauf || []).length) {
       const e = s.einschaetzung;
-      h += `<section class="pf-box">${kap("Status-Verlauf")}${e ? `<div class="pf-einsch"><b class="k">UNSERE EINSCHÄTZUNG</b>${esc(e.satz)}<div class="pf-ph">${(e.phasen || []).map(x => `<div${x.prog ? ' class="prog"' : ""}><span>${esc(x.d)}</span><span>${esc(x.t)}${x.prog ? " (Einschätzung)" : ""}</span></div>`).join("")}</div>${e.vergleich ? `<p class="pf-vgl">${esc(e.vergleich)}</p>` : ""}</div>` : ""}
+      h += `<section class="pf-box">${kap("Status-Verlauf")}${verlaufGrafik(s)}${e ? `<div class="pf-einsch"><b class="k">UNSERE EINSCHÄTZUNG</b>${esc(e.satz)}<div class="pf-ph"${verlaufGrafik(s) ? " hidden" : ""}>${(e.phasen || []).map(x => `<div${x.prog ? ' class="prog"' : ""}><span>${esc(x.d)}</span><span>${esc(x.t)}${x.prog ? " (Einschätzung)" : ""}</span></div>`).join("")}</div>${e.vergleich ? `<p class="pf-vgl">${esc(e.vergleich)}</p>` : ""}</div>` : ""}
         <div class="pf-tl">${s.verlauf.slice().reverse().map(v => `<div class="ev"><i style="background:${STFARBE[v.status] || "#8A95A8"}"></i><div><div class="dt">${esc(kurz(dt(v.stand)))} · ${esc({raus: "Ausfall", gesperrt: "Sperre", fraglich: "fraglich", zurueck: "zurück", fit: "fit"}[v.status] || v.status)}</div><div class="g">${esc(v.grund)}</div>${v.rueckkehr ? `<div class="q">${esc(v.rueckkehr)}</div>` : ""}${v.quelle ? `<div class="q">Quelle: ${esc(v.quelle)}</div>` : ""}</div></div>`).join("")}</div></section>`;
     }
     // News
@@ -1836,12 +1898,14 @@ button.chip.pfc{cursor:pointer}
     if (q("[data-statzu]")) { statZu(); return; }
     if ((x = q("[data-stsprung]"))) { const z = document.getElementById("st-" + x.dataset.stsprung); if (z) z.scrollIntoView({behavior: "smooth", block: "start"}); return; }
     if ((x = q("[data-stauf]"))) { STAUF[x.dataset.stauf] = !STAUF[x.dataset.stauf]; const y = window.scrollY; statView("statistik", true); window.scrollTo(0, y); return; }
+    if ((x = q("[data-kader]"))) { KADER_HER = {artikel: document.querySelector("article.det") && ARTIKEL, game: VIEW === "spielplan" && GAME, scroll: window.scrollY}; ladeSPN().then(() => { vereinsKader(x.dataset.kader, "zurueck"); window.scrollTo(0, 0); }).catch(() => {}); return; }
+    if (q("[data-kaderzu]")) { const h = KADER_HER || {}; KADER_HER = null; BACK = null; if (h.artikel) { setHash(h.artikel); article(h.artikel); } else if (h.game) { VIEW = "spielplan"; spiel(h.game); } else show(VIEW); window.scrollTo(0, h.scroll || 0); return; }
     if ((x = q("[data-statverein]"))) { vereinsKader(x.dataset.statverein, VIEW_STAT || "tabelle"); window.scrollTo(0, 0); return; }
     if (q("[data-suche]")) { STAT_HER = null; VIEW_STAT = null; document.querySelectorAll("[data-statview]").forEach(b => b.setAttribute("aria-pressed", false)); PR_HER = null; SUCHE_HER = {typ: document.querySelector("article.det") && ARTIKEL ? "artikel" : VIEW === "spielplan" && GAME ? "spiel" : VIEW, id: ARTIKEL || GAME, scroll: window.scrollY}; suche(); return; }
     if ((x = q("[data-suchezu]"))) { if (x.dataset.suchezu === "2") { suche(); return; } const h = SUCHE_HER || {typ: "meldungen"}; SUCHE_HER = null; PR_HER = null; BACK = null;
       if (h.typ === "artikel" && h.id) { setHash(h.id); article(h.id); } else if (h.typ === "spiel" && h.id) { VIEW = "spielplan"; spiel(h.id); } else { show(h.typ === "spielplan" || h.typ === "inside" ? h.typ : "meldungen"); if (h.scroll) window.scrollTo(0, h.scroll); } return; }
     if ((x = q("[data-suchverein]"))) { vereinsKader(x.dataset.suchverein); return; }
-    if ((x = q("[data-profil]"))) { const her = BACK === "suche" ? {typ: "suche"} : BACK === "stat" ? {typ: "stat", art: VIEW_STAT, scroll: window.scrollY} : BACK === "statkader" ? {typ: "statkader", k: KADER_K, von: KADER_VON} : document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
+    if ((x = q("[data-profil]"))) { const her = BACK === "suche" ? {typ: "suche"} : BACK === "stat" ? {typ: "stat", art: VIEW_STAT, scroll: window.scrollY} : BACK === "statkader" || BACK === "kaderzu" ? {typ: "statkader", k: KADER_K, von: KADER_VON} : document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
       oeffneProfil(x.dataset.profil, her); return; }
     if ((x = q("[data-profilname]"))) { const [k, n] = x.dataset.profilname.split("|"), her = document.querySelector("article.det") && ARTIKEL ? {typ: "artikel", id: ARTIKEL} : VIEW === "spielplan" && GAME ? {typ: "spiel", id: GAME} : {typ: VIEW, scroll: window.scrollY};
       ladeSPN().then(() => { const sp = findeSP(k, n); if (sp) oeffneProfil(sp.id, her); }).catch(() => {}); return; }
