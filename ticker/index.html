@@ -162,10 +162,11 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .nk-top .tags{flex:1}
 .nk-r{display:flex;gap:2px;flex:none;align-self:flex-start}
 .nk h2{margin:0;font-size:16px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.nk .elf{margin:0;font-size:14.5px;font-weight:500;line-height:1.35;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.nk .elf{margin:0;font-size:13.5px;font-weight:500;line-height:1.35;letter-spacing:-.1px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .nk .meta{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .neu{font-size:9px;font-weight:800;color:var(--s-sicher);border:1px solid var(--s-sicher);border-radius:3px;padding:0 3px;margin-left:4px;vertical-align:1px;white-space:nowrap}
-.elf .neu{border:0;padding:0;margin-left:3px}
+.nk .elf.eng{font-size:12.5px;letter-spacing:-.2px}
+.elf .neu{border:0;padding:0;margin-left:1px;font-size:8.5px;vertical-align:4px;letter-spacing:0}
 .raus{font-size:9px;font-weight:800;color:var(--inj);border:1px solid var(--inj);border-radius:3px;padding:0 3px;white-space:nowrap}
 
 /* Auf den Punkt */
@@ -621,9 +622,9 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .pf-km .gg{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pf-km .gg small{color:var(--muted);font-size:11.5px}.pf-km .r{color:var(--muted);font-size:12.5px;white-space:nowrap}
 .pf-km.pause{color:var(--muted);font-style:italic}
 .pf-wb{font:700 10.5px var(--f-mono);padding:3px 0;border-radius:5px;text-align:center}.pf-wb.l{background:var(--soft);color:var(--muted)}.pf-wb.p{background:rgba(224,150,43,.2);color:#F7C27A}.pf-wb.c{background:rgba(155,107,232,.22);color:#C9AEF7}
-.pf-prow{display:grid;grid-template-columns:84px minmax(0,1fr);gap:16px;align-items:center}
+.pf-prow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
 .pf-pfeld{position:relative;width:84px;height:126px;border-radius:7px;background:#1E5A3E;overflow:hidden}
-.pf-slot{position:absolute;width:11px;height:11px;margin:-5.5px;border-radius:50%;border:1.5px solid rgba(255,255,255,.45);display:grid;place-items:center;font:800 8px var(--f-mono);color:#0E1726;box-sizing:border-box}.pf-slot.an{width:15px;height:15px;margin:-7.5px;background:#fff;border-color:#fff}.pf-pz.kbp{color:#F7C27A}
+.pf-pfeld2{width:100px;height:150px}.pf-sys{position:absolute;left:5px;top:5px;font:700 9px var(--f-mono);color:rgba(255,255,255,.75);background:rgba(0,0,0,.25);border-radius:4px;padding:1px 4px;z-index:2}.pf-slot{position:absolute;width:12px;height:12px;margin:-6px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);display:grid;place-items:center;font:800 9px var(--f-mono);color:#fff;box-sizing:border-box}.pf-slot.an{width:20px;height:20px;margin:-10px;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 3px rgba(47,91,255,.35)}.pf-pz.kbp{color:#F7C27A}
 .pf-pb{position:absolute;width:var(--g);height:var(--g);margin:calc(var(--g) / -2);border-radius:50%;background:#fff;color:#0E1726;font:800 9px var(--f-mono);display:grid;place-items:center}
 .pf-pinfo{display:grid;gap:6px;justify-items:start}
 .pf-pn{font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1;text-transform:uppercase}
@@ -703,7 +704,7 @@ button.chip.pfc{cursor:pointer}
 </div></header>
 
 <main id="main"><p class="leer">Meldungen werden geladen …</p></main>
-<footer class="legal"><nav aria-label="Rechtliches"><button data-legal="ueber">Über WOSOINSIDER</button><button data-legal="impressum">Impressum</button><button data-legal="datenschutz">Datenschutz</button><button data-legal="kontakt">Kontakt</button><button data-legal="so-entsteht">KI-Hinweis &amp; Methodik</button><button data-legal="bildnachweise">Bildnachweise</button><button data-legal="patches">Patches</button></nav>
+<footer class="legal"><nav aria-label="Rechtliches"><button data-legal="ueber">Über WOSOINSIDER</button><button data-legal="impressum">Impressum</button><button data-legal="datenschutz">Datenschutz</button><button data-legal="kontakt">Kontakt</button><button data-legal="so-entsteht">KI-Hinweis &amp; Regeln</button><button data-legal="bildnachweise">Bildnachweise</button><button data-legal="patches">Patches</button></nav>
 <small>WOSOINSIDER ist ein unabhängiges Angebot und nicht mit Kickbase, dem DFB oder den Vereinen verbunden. Meldungen werden mit KI erstellt.</small></footer>
 
 <script>
@@ -832,7 +833,7 @@ button.chip.pfc{cursor:pointer}
   function newsKarte(m){
     const a = m.aufstellung, auf = a && (a.startelf || []).length;
     const rechts = auf ? `<span class="nk-r" role="img" aria-label="${esc(m.verein)} gegen ${esc(a.gegner)}">${logo(KURZ[m.verein], 20)}${logo(KURZ[a.gegner], 20)}</span>` : plakette(meldungsStatus(m));
-    return `<button class="nk" data-id="${esc(m.id)}">${bild(m, 84, 84)}<div class="nk-b">
+    return `<button class="nk" data-id="${esc(m.id)}">${auf ? bild(m, 40, 40) : bild(m, 84, 84)}<div class="nk-b">
       <div class="nk-top"><div class="tags">${(m.tags || []).map(tag).join("")}${auf ? tag("AUFSTELLUNG") : ""}</div>${rechts}</div>
       ${auf ? `<p class="elf">${startelfZeile(a.startelf)}</p>` : `<h2>${esc(m.kurz || m.headline)}</h2>`}
       <div class="meta" data-lang="${esc(metaZeile(m, auf))}" data-kurz="${esc(metaZeile(m, auf, 1))}" data-nur="${esc(metaZeile(m, auf, 2))}">${esc(metaZeile(m, auf))}</div></div></button>`;
@@ -960,6 +961,7 @@ button.chip.pfc{cursor:pointer}
   }
   // Meta-Zeile: Spielerin und Verein ausgeschrieben, nur wenn es nicht in eine Zeile passt, mit Vereinskürzel, sonst ohne Verein
   function metaPassen(){
+    document.querySelectorAll("#main .nk .elf").forEach(e => { e.classList.remove("eng"); const lh = parseFloat(getComputedStyle(e).lineHeight) || 18; if (e.scrollHeight > lh * 3.3) e.classList.add("eng"); });
     document.querySelectorAll("#main .meta[data-kurz]").forEach(z => {
       const t = z.querySelector(".wk-mt") || z;
       t.textContent = z.dataset.lang;
@@ -980,7 +982,7 @@ button.chip.pfc{cursor:pointer}
     let h = (o.stufe ? stufeSym(o.stufe) : "") + (o.ein && !o.einMin ? '<span class="ein" aria-label="eingewechselt">↑</span>' : "") + `<span class="cn">${esc(o.n)}</span>`;
     if (o.tore > 0) h += BALL + (o.tore > 1 ? `<b class="tz">${o.tore}</b>` : "");
     if (o.gelb && !o.rot) h += karte(false) + (o.gelbMin ? `<span class="km" aria-label="Minute ${esc(o.gelbMin)}">${esc(o.gelbMin)}'</span>` : "");
-    if (o.rot) h += karte(true) + (o.rotMin ? `<span class="km" aria-label="Minute ${esc(o.rotMin)}">${esc(o.rotMin)}'</span>` : "");
+    if (o.rot) h += (o.gr ? `<span class="krt" style="background:linear-gradient(135deg,#F5C518 50%,#E24A4A 50%)" role="img" aria-label="Gelb-Rote Karte"></span>` : karte(true)) + (o.rotMin ? `<span class="km" aria-label="Minute ${esc(o.rotMin)}">${esc(o.rotMin)}'</span>` : "");
     if (o.aus) h += `<span class="aus" aria-label="ausgewechselt in Minute ${esc(o.aus)}">↓${esc(o.aus)}'</span>`;
     if (o.einMin) h += `<span class="ein" aria-label="eingewechselt in Minute ${esc(o.einMin)}">↑${esc(o.einMin)}'</span>`;
     if (o.grund) h += `<span class="gr">${esc(o.grund)}</span>`;
@@ -1006,7 +1008,7 @@ button.chip.pfc{cursor:pointer}
     if (!Array.isArray(L) || !L.length) return "";
     L = L.slice().sort((a, b) => (b.verein === verein) - (a.verein === verein));  // eigener Verein zuerst
     const team = (t, i) => {
-      const c = s => ({n: s.n, tore: s.tore || 0, gelb: s.gelb, rot: s.rot, gelbMin: s.gelb_min, rotMin: s.rot_min, mark: s.f, aus: s.aus, prof: (t.k || KURZ[t.verein]) + "|" + s.n});
+      const c = s => ({n: s.n, tore: s.tore || 0, gelb: s.gelb, rot: s.rot, gr: s.gr, gelbMin: s.gelb_min, rotMin: s.rot_min, mark: s.f, aus: s.aus, prof: (t.k || KURZ[t.verein]) + "|" + s.n});
       const tl = (t.tore || []).map(g => `<span${g.eigen ? "" : ' class="g"'}>${esc(g.min)}' ${esc(g.n)}${g.art ? " (" + esc(g.art) + ")" : ""}${g.vorlage ? " (Vorlage " + esc(g.vorlage) + ")" : ""}</span>`).join(", ");
       let h = (tl ? `<div class="zeile tl"><b>TORE</b>${tl}</div>` : "") + posZeilen(t.startelf || [], s => chip(c(s)));
       if ((t.eingewechselt || []).length) h += kap("Eingewechselt") + `<div class="chips">${t.eingewechselt.map(s => chip({...c(s), ein: true, einMin: s.ein_min})).join("")}</div>`;
@@ -1177,7 +1179,7 @@ button.chip.pfc{cursor:pointer}
     return `<div class="kartebox"><div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${a && a.formation ? `<span class="f">${esc(a.formation)}</span>` : ""}${badge}</div>${inh}</div>`;
   }
   function offiziell(a, k){
-    const c = s => ({n: s.n, tore: s.tore || 0, rot: s.rot, gelb: s.gelb, gelbMin: s.gelb_min, rotMin: s.rot_min, prof: k ? k + "|" + (s.voll || s.n) : null});
+    const c = s => ({n: s.n, tore: s.tore || 0, rot: s.rot, gelb: s.gelb, gr: s.gr, gelbMin: s.gelb_min, rotMin: s.rot_min, prof: k ? k + "|" + (s.voll || s.n) : null});
     let h = posZeilen(a.startelf, s => chip({...c(s), aus: s.aus}));
     const bank = a.bank || [], rein = bank.filter(s => s.ein === true), draussen = bank.filter(s => s.ein !== true), bekannt = bank.some(s => s.ein != null);
     if (bekannt) {
@@ -1487,7 +1489,7 @@ button.chip.pfc{cursor:pointer}
       </ul>
       <p>Direkt an Finn Clausen auf Instagram: <a href="https://www.instagram.com/finn.baut/" target="_blank" rel="noopener">@finn.baut</a></p>
       <p>Die Postanschrift steht im Impressum.</p>`,
-    "so-entsteht": () => `<h1>KI-Hinweis &amp; Methodik</h1>
+    "so-entsteht": () => `<h1>KI-Hinweis, Methodik &amp; Regeln</h1>
       <p>WOSOINSIDER wird mit künstlicher Intelligenz erstellt. Wir kennzeichnen das offen, wie es Art. 50 Abs. 4 der europäischen KI-Verordnung für KI-erzeugte Texte von öffentlichem Interesse vorsieht.</p>
       <h2>So entsteht eine Meldung</h2>
       <ul><li>Mehrmals täglich, an Spieltagen stündlich, sammelt ein Skript öffentlich zugängliche Meldungen: Vereinsseiten, DFB, Sportschau und regionale Medien.</li>
@@ -1504,7 +1506,16 @@ button.chip.pfc{cursor:pointer}
       <h2>Kickbase-Einordnung</h2>
       <p>Die Einordnung „Für Kickbase“ ist eine Meinung und keine Empfehlung mit Erfolgsgarantie.</p>
       <h2>Fehler gefunden?</h2>
-      <p>Hinweise bitte an <a href="mailto:${mail("redaktion")}">${mail("redaktion")}</a>. Korrekturen werden in der Meldung mit dem Tag UPDATE nachgetragen.</p>`
+      <p>Hinweise bitte an <a href="mailto:${mail("redaktion")}">${mail("redaktion")}</a>. Korrekturen werden in der Meldung mit dem Tag UPDATE nachgetragen.</p>
+      <h2 id="kommentarregeln">Kommentarregeln</h2>
+      <p>Hier geht es um Fußball. Diskutiere fair, auch wenn es hitzig wird.</p>
+      <ul><li>Keine Beleidigungen, keine Hetze, keine Drohungen. Das gilt besonders gegenüber Spielerinnen, Trainerinnen und Trainern, Schiedsrichterinnen und anderen Fans.</li>
+      <li>Keine Kommentare über Aussehen, Körper oder Privatleben von Spielerinnen.</li>
+      <li>Keine Werbung, kein Spam, keine Links zu fremden Angeboten.</li>
+      <li>Keine Gerüchte als Tatsache. Verletzungs- oder Aufstellungsinfos gern als Hinweis an ${mail("redaktion")}.</li>
+      <li>Nichts Rechtswidriges, keine persönlichen Daten anderer.</li></ul>
+      <p>Ein Wortfilter hält manche Kommentare zurück, bis die Redaktion sie prüft. Kommentare, die mehrfach gemeldet werden, werden automatisch ausgeblendet und geprüft. Bei Verstößen können wir Kommentare ausblenden oder löschen und Profile zeitweise oder dauerhaft sperren. Den Grund siehst du bei deinem Kommentar.</p>
+      <p>Rechtswidrige Inhalte bitte über „Melden“ oder an ${mail("redaktion")}. Für deine Kommentare bist du selbst verantwortlich.</p>`
   };
   const INFO = Object.assign({}, LEGAL, {
     bildnachweise: () => `<h1>Bildnachweise</h1><p class="mu">Fotos von Wikimedia Commons unter freien Lizenzen, teils zugeschnitten. Vereinsportraits der Spielerinnen und Funktionsteams mit Genehmigung der jeweiligen Vereine. Vereinslogos mit Genehmigung der Vereine.</p>
@@ -1644,7 +1655,7 @@ button.chip.pfc{cursor:pointer}
 
   // ---------------- Tabelle und Statistik (nur Liga, berechnet aus spielplan.json und spielerinnen.json)
   let STAUF = {};
-  const STKAT = [["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["karten","Karten","Gelb 1, Gelb-Rot 3, Rot 5 Punkte"],["fair","Fairnesstabelle","Kartenpunkte der Spielerinnen je Verein, wenigste oben"]];
+  const STKAT = [["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["sch","Torschüsse","Sportschau-Spielstatistik"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["zkw","Zweikämpfe gewonnen","Sportschau-Spielstatistik"],["gef","Gefoult worden","Sportschau-Spielstatistik"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["karten","Karten","Gelb 1, Gelb-Rot 3, Rot 5 Punkte"],["fouls","Fouls","Sportschau-Spielstatistik"],["fair","Fairnesstabelle","Kartenpunkte der Spielerinnen je Verein, wenigste oben"]];
   function ligaStand(){
     const T = {}, fertig = [];
     ALLE.forEach(k => T[k] = {k, sp: 0, s: 0, u: 0, n: 0, tp: 0, tm: 0, pkt: 0});
@@ -1664,7 +1675,7 @@ button.chip.pfc{cursor:pointer}
       g.forEach(z => { const t = (z.tore || []).length; v.tore += t; v.vorl += z.vorl || 0; v.minuten += z.min || 0;
         if (z.art === "E") v.joker += t; if (z.gr) v.gr++; else if (z.rot) v.rot++; else if (z.gelb) v.gelb++;
         if (s.pos === "TW" && z.art === "S" && z.erg) { const [a, b] = z.erg.split(":").map(Number); if ((z.ha === "H" ? b : a) === 0) v.zunull++; } });
-      v.scorer = v.tore + v.vorl; v.karten = v.gelb + 3 * v.gr + 5 * v.rot; v.p90 = v.minuten >= 270 && v.tore ? v.tore / v.minuten * 90 : 0;
+      const st = s.stat || {}; v.sch = st.sch || 0; v.zkw = st.zk_w || 0; v.gef = st.gef || 0; v.fouls = st.fouls || 0; v.scorer = v.tore + v.vorl; v.karten = v.gelb + 3 * v.gr + 5 * v.rot; v.p90 = v.minuten >= 270 && v.tore ? v.tore / v.minuten * 90 : 0;
       v.voll = sp[s.k] > 0 && g.length === sp[s.k] && g.every(z => z.art === "S" && !z.aus && !z.rot) ? 1 : 0;
       return v; });
   }
@@ -1715,7 +1726,7 @@ button.chip.pfc{cursor:pointer}
         h += `<section class="stk${auf ? " stk-klein" : ""}" id="st-${k}"><div class="stk-k"><h2>${t}</h2>${e ? `<small>${e}</small>` : ""}</div>${l.length ? stListe(k, l, n) : '<p class="st-erkl">Noch niemand.</p>'}
           ${mehr.length ? `<div class="st-erkl">Ebenfalls ${stFmt(k, l[n - 1][k])}: ${stNamen(mehr)}</div>` : ""}${l.length > 3 ? `<button class="st-mehr" data-stauf="${k}">${auf ? "Weniger" : "Top 10 ›"}</button>` : ""}</section>`;
       }
-      h += `<p class="st-notiz">Tore, Vorlagen, Karten und Minuten aus den offiziellen Aufstellungen und dem Liveticker der Sportschau. Bei Gleichstand teilen sich Spielerinnen den Platz, weiter oben steht, wer weniger Minuten gebraucht hat. Namen antippen öffnet das Profil.</p></div>`;
+      h += `<p class="st-notiz">Tore, Vorlagen, Karten und Minuten aus den offiziellen Aufstellungen und dem Liveticker der Sportschau. Torschüsse, Zweikämpfe und Fouls aus der Sportschau-Spielstatistik${SPN.stat_md ? `, Stand nach dem ${SPN.stat_md}. Spieltag (wird dienstags aktualisiert)` : ""}. Bei Gleichstand teilen sich Spielerinnen den Platz, weiter oben steht, wer weniger Minuten gebraucht hat. Namen antippen öffnet das Profil.</p></div>`;
       $("#main").innerHTML = h;
     }
     if (!sanft) window.scrollTo(0, 0);
@@ -1819,9 +1830,8 @@ button.chip.pfc{cursor:pointer}
       const mx = Math.max(...punkte.map(p => p.c), 1);
       const KBP = {TW: "Torhüterin", ABW: "Abwehr", MF: "Mittelfeld", ST: "Sturm"}, grob = r => r === "Tor" ? "TW" : /verteidig|Schiene/.test(r) ? "ABW" : /Sturm|stürm/.test(r) ? "ST" : "MF";
       const ers = (s.ersatz || []).map(r => `<div class="pf-er"><b>${esc(r.n)}</b><span>${[r.s ? r.s + "x für sie in der Startelf" : "", r.w ? r.w + "x für sie eingewechselt" : ""].filter(Boolean).join(" · ")}</span></div>`).join("");
-      h += `<section class="pf-box">${kap("Ihre Position")}<div class="pf-prow"><div class="pf-pfeld">${rasen(false)}${punkte.map(p => `<span class="pf-slot${p.c ? " an" : ""}" style="left:${Math.min(88, Math.max(12, fx(p.x)))}%;top:${fy(LY[p.lp] ?? .5)}%;${p.c ? `opacity:${.55 + .45 * p.c / mx}` : ""}">${p.c && s.slots.length > 1 ? p.c : ""}</span>`).join("")}</div>
+      h += `<section class="pf-box">${kap("Ihre Position")}<div class="pf-prow"><div class="pf-pfeld pf-pfeld2">${rasen(false)}<span class="pf-sys">${esc(sys.name)}</span>${punkte.map(p => `<span class="pf-slot${p.c ? " an" : ""}" style="left:${Math.min(88, Math.max(12, fx(p.x)))}%;top:${fy(LY[p.lp] ?? .5)}%;${p.c ? `opacity:${.55 + .45 * p.c / mx}` : ""}">${p.c && s.slots.length > 1 ? p.c : ""}</span>`).join("")}</div>
         <div class="pf-pinfo"><b class="pf-pn">${esc(s.slots[0][2])}</b><span class="pf-rolle" style="color:${rolleS[1]};border-color:${rolleS[1]}">${rolleS[0]}</span>
-        <div class="pf-pz mu">${esc(kname(s.k))} spielt meist ${esc(sys.name)}</div>
         <div class="pf-pz"><b>${starts}</b> von ${kader} Spielen in der Startelf</div>
         <div class="pf-pz"><b><span class="oe">Ø</span>${avgS}'</b> wenn sie beginnt</div>
         ${s.slots.length > 1 ? `<div class="pf-pz mu">auch: ${s.slots.slice(1).map(t => esc(t[2]) + " " + t[3] + "x").join(", ")}</div>` : ""}
@@ -1971,6 +1981,6 @@ button.chip.pfc{cursor:pointer}
 </script>
 
 <script src="https://wosoinsider.de/kommentare/supabase.js?v=2.118.0"></script>
-<script src="https://wosoinsider.de/kommentare/config.js?v=7"></script>
-<script src="https://wosoinsider.de/kommentare/kommentare.js?v=7"></script>
+<script src="https://wosoinsider.de/kommentare/config.js?v=8"></script>
+<script src="https://wosoinsider.de/kommentare/kommentare.js?v=8"></script>
 </body></html>

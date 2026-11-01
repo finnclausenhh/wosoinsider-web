@@ -206,7 +206,7 @@
         '<button data-kaktion="sort" data-sort="top" aria-pressed="' + (S.sort === "top") + '">Top</button></div>' : "") +
       "</div>";
     h += namensZeile() + formular(null);
-    h += '<details class="wk-regeln"' + (S.offenRegeln ? " open" : "") + '><summary>Kommentarregeln</summary>' + REGELN + "</details>";
+    h += '<p class="wk-mu" style="font-size:11.5px;margin:0">Mit dem Absenden gelten unsere <button class="wk-rl" data-legal="so-entsteht">Kommentarregeln</button>.</p>';
     if (S.fehler && S.fehlerAn === null) h += '<p class="wk-fehler" role="alert">' + esc(S.fehler) + "</p>";
     if (!S.geladen) h += '<p class="wk-mu">Kommentare werden geladen …</p>';
     haupt.slice(0, S.zeige).forEach(function (k) {
@@ -371,6 +371,7 @@
 
   var css = document.createElement("style");
   css.textContent =
+    ".wk-rl{color:inherit;font:inherit;text-decoration:underline;text-underline-offset:2px;padding:0;background:none;border:0}" +
     ".wk{display:grid;gap:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:4px}" +
     ".wk-top{display:flex;justify-content:space-between;align-items:center}.wk-top h2{margin:0}" +
     ".wk-sort{display:flex;gap:4px;background:var(--card);border-radius:9px;padding:3px}" +
