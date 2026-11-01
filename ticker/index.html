@@ -733,6 +733,7 @@ button.chip.pfc{cursor:pointer}
 .feld .fm{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.08);border-radius:8px;padding:4px 8px;font:600 12px var(--f-body)}
 .wb{background:var(--soft);border-radius:12px;padding:10px;display:grid;gap:8px}
 .wb h4{margin:0;font:800 16px var(--f-display);text-transform:uppercase;letter-spacing:.3px}
+.spl .ex .vl,.mk .vl{font:800 9px var(--f-body);color:#22C55E;background:rgba(34,197,94,.18);border-radius:3px;padding:0 2px;line-height:11px}.wx .mk{display:inline-flex;gap:2px;align-items:center;margin-left:5px;vertical-align:-1px}.wx .mk .ball{width:11px;height:11px}.wx .mk .krt{width:7px;height:10px;display:inline-block;border-radius:1px}
 .wx{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;background:var(--card);border-radius:10px;padding:7px 10px}
 .wx .p{display:flex;align-items:center;gap:8px;min-width:0}.wx .p.r{flex-direction:row-reverse;text-align:right}
 .wx .p .t{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1059,11 +1060,11 @@ button.chip.pfc{cursor:pointer}
 
   // ---------------- Aufstellung als Spielfeld (Finn 01.11.2026): Fotos mit Schulter, NEU am Foto, Symbole nur bei Prognose
   const VK = Object.assign({}, KURZ, {"FC Bayern München":"FCB","Bayer 04 Leverkusen":"B04","1. FC Union Berlin":"FCU","1. FSV Mainz 05":"M05"});
-  let AFIDX = null;
+  let AFIDX = null, AFIDX_N = -1;
   const nNorm = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
   function fotoSp(k, s){
     const v = s.voll && FOTOS[s.voll]; if (v && (v.portrait || v.datei)) return v.portrait || v.datei;
-    if (!AFIDX) { AFIDX = {}; Object.keys(FOTOS).forEach(n => { const f = FOTOS[n], kk = VK[f.verein]; if (!kk || f.stab || !(f.portrait || f.datei)) return;
+    const nF = Object.keys(FOTOS || {}).length; if (!AFIDX || AFIDX_N !== nF) { AFIDX = {}; AFIDX_N = nF; Object.keys(FOTOS).forEach(n => { const f = FOTOS[n], kk = VK[f.verein]; if (!kk || f.stab || !(f.portrait || f.datei)) return;
       const nach = nNorm(n.split(" ").slice(-1)[0]), key = kk + "|" + nach; AFIDX[key] = AFIDX[key] === undefined ? (f.portrait || f.datei) : null; }); }
     const n = nNorm(String(s.voll || s.n).split(" ").slice(-1)[0]);
     return AFIDX[k + "|" + n] || null;
@@ -1090,7 +1091,7 @@ button.chip.pfc{cursor:pointer}
         const badge = o.modus === "p" && STUFE[s.st] ? `<span class="sb">${stufeSym(s.st, 16)}</span>` : "";
         const neu = o.modus === "o" && (s.f === "neu" || (o.neu && o.neu.has(s.n))) ? '<span class="nb">NEU</span>' : "";
         let ex = "";
-        if (o.modus === "o") { if (s.tore > 0) ex += BALL + (s.tore > 1 ? s.tore : ""); if (s.rot) ex += karte(true); else if (s.gelb) ex += karte(false); }
+        if (o.modus === "o") { if (s.tore > 0) ex += BALL + (s.tore > 1 ? s.tore : ""); if (s.vorl > 0) ex += `<span class="vl" title="Vorlage">V${s.vorl > 1 ? s.vorl : ""}</span>`; if (s.rot) ex += karte(true); else if (s.gelb) ex += karte(false); }
         const unten = o.modus === "o" && s.aus ? `<small>↓${esc(s.aus)}'</small>` : "";
         const tag = o.modus === "p" && s.warum ? "button" : (k ? "button" : "div");
         const attr = o.modus === "p" && s.warum ? ` data-chip="${esc(o.seite + "|" + s.n)}" title="${esc(s.warum)}"` : (k ? ` data-profilname="${esc(k + "|" + (s.voll || s.n))}"` : "");
@@ -1101,7 +1102,7 @@ button.chip.pfc{cursor:pointer}
   }
   function wxZeile(k, a, b, ka, kb, mitte){
     const mf = s => { const src = fotoSp(k, s); return `<span class="mf"${src ? "" : ` style="background:${KFARBE[k] || "var(--soft)"}"`}>${src ? `<img src="${esc(src)}" alt="" loading="lazy">` : `<b>${initialen(s.voll || s.n)}</b>`}</span>`; };
-    const seite = (s, kl, r) => s ? `<div class="p${r ? " r" : ""}">${mf(s)}<div style="min-width:0"><div class="t">${esc(s.n)}</div><span class="kk ${kl[0]}">${kl[1]}</span></div></div>` : "<div></div>";
+    const seite = (s, kl, r) => s ? `<div class="p${r ? " r" : ""}">${mf(s)}<div style="min-width:0"><div class="t">${esc(s.n)}${s.mk || ""}</div><span class="kk ${kl[0]}">${kl[1]}</span></div></div>` : "<div></div>";
     return `<div class="wx">${seite(a, ka)}<span class="m">${a && b ? mitte : ""}</span>${seite(b, kb, true)}</div>`;
   }
   // Paare nach Positionsgruppe (gleiche Linie zuerst), Rest der Reihe nach
@@ -1147,14 +1148,26 @@ button.chip.pfc{cursor:pointer}
     if (!Array.isArray(L) || !L.length) return "";
     L = L.slice().sort((a, b) => (b.verein === verein) - (a.verein === verein));  // eigener Verein zuerst
     const team = (t, i) => {
-      const c = s => ({n: s.n, tore: s.tore || 0, gelb: s.gelb, rot: s.rot, gr: s.gr, gelbMin: s.gelb_min, rotMin: s.rot_min, mark: s.f, aus: s.aus, prof: (t.k || KURZ[t.verein]) + "|" + s.n});
+      const k = t.k || KURZ[t.verein], nk = x => normS(nachN(x || ""));
+      const vorlVon = n => (t.tore || []).filter(g => g.eigen && g.vorlage && nk(g.vorlage) === nk(n)).length;
+      const torVon = n => (t.tore || []).filter(g => g.eigen && g.art !== "Eigentor" && nk(g.n) === nk(n)).length;
+      const pl = s => ({n: s.n, p: s.p, f: s.f, tore: s.tore || torVon(s.n), vorl: s.vorl || vorlVon(s.n), gelb: s.gelb, rot: s.rot || s.gr, aus: s.aus});
+      const mk = s => { let x = ""; for (let j = 0; j < (s.tore || 0); j++) x += BALL; if (s.vorl) x += `<span class="vl">V${s.vorl > 1 ? s.vorl : ""}</span>`; if (s.rot) x += karte(true); else if (s.gelb) x += karte(false); return x ? `<span class="mk">${x}</span>` : ""; };
       const tl = (t.tore || []).map(g => `<span${g.eigen ? "" : ' class="g"'}>${esc(g.min)}' ${esc(g.n)}${g.art ? " (" + esc(g.art) + ")" : ""}${g.vorlage ? " (Vorlage " + esc(g.vorlage) + ")" : ""}</span>`).join(", ");
-      let h = (tl ? `<div class="zeile tl"><b>TORE</b>${tl}</div>` : "") + posZeilen(t.startelf || [], s => chip(c(s)));
-      if ((t.eingewechselt || []).length) h += kap("Eingewechselt") + `<div class="chips">${t.eingewechselt.map(s => chip({...c(s), ein: true, einMin: s.ein_min})).join("")}</div>`;
-      if ((t.raus || []).length) h += `<div class="zeile"><b>NICHT IN DER STARTELF</b>${t.raus.map(r => { const ein = (t.eingewechselt || []).some(e => e.n === r.n); return esc(r.n) + (ein ? " (eingewechselt)" : r.wo ? " (" + esc(r.wo) + ")" : ""); }).join(", ")}</div>`;
-      if ((t.ohne_einsatz || []).length) h += `<div class="zeile"><b>OHNE EINSATZ</b>${t.ohne_einsatz.map(esc).join(", ")}</div>`;
-      return `<div class="sa-t"${i ? " hidden" : ""}><div class="sa-k"><button class="kd-btn" data-kader="${esc(t.k || KURZ[t.verein])}">${logo(t.k || KURZ[t.verein], 22)}<span>${esc(t.verein)}</span></button><span class="w">${esc(t.wettbewerb || "")}${t.ergebnis ? " · " + esc(t.ergebnis) : ""}</span></div>
-        ${t.vergleich ? `<div class="vgl">NEU und RAUS im Vergleich zur Startelf am ${esc(t.vergleich)}</div>` : ""}${h}</div>`;
+      const es = (t.elfmeterschiessen || []).map(x => `<span${x.eigen ? "" : ' class="g"'}>${esc(x.stand)} ${esc(nachN(x.n))}${x.trifft ? "" : " (verschossen)"}</span>`).join(", ");
+      const elf = (t.startelf || []).map(pl);
+      let h = (tl ? `<div class="zeile tl"><b>TORE</b>${tl}</div>` : "") + (es ? `<div class="zeile tl"><b>ELFMETERSCHIESSEN${t.ergebnis_ie ? " " + esc(t.ergebnis_ie) : ""}</b>${es}</div>` : "");
+      h += `<div class="af">${feld(elf, k, {modus: "o"})}`;
+      // Wechsel: Eingewechselte mit Minute, gepaart mit der ausgewechselten Spielerin derselben Minute
+      const frei = elf.filter(s => s.aus);
+      const ein = (t.eingewechselt || []).map(s => ({...pl(s), em: s.ein_min})).sort((a, b) => parseInt(a.em, 10) - parseInt(b.em, 10));
+      if (ein.length) h += `<div class="wb"><h4>Wechsel</h4>${ein.map(x => { const j = frei.findIndex(y => String(y.aus) === String(x.em)), y = j >= 0 ? frei.splice(j, 1)[0] : null;
+        return wxZeile(k, {...x, mk: mk(x)}, y ? {...y, mk: ""} : null, ["n", "EIN"], ["r", "AUS"], esc(x.em || "") + "'"); }).join("")}</div>`;
+      const neu = elf.filter(s => s.f === "neu"), raus = t.raus || [];
+      if (neu.length || raus.length) h += aenderungen(k, neu, raus, t.vergleich ? `Änderungen zur Startelf am ${t.vergleich}` : "Änderungen zum letzten Ligaspiel");
+      if ((t.ohne_einsatz || []).length) h += `<div class="wb"><h4>Ohne Einsatz</h4><div class="bk" style="grid-template-columns:1fr"><span class="ns">${t.ohne_einsatz.map(n => `<b class="dim">${esc(n)}</b>`).join("")}</span></div></div>`;
+      h += `</div>`;
+      return `<div class="sa-t"${i ? " hidden" : ""}><div class="sa-k"><button class="kd-btn" data-kader="${esc(k)}">${logo(k, 22)}<span>${esc(t.verein)}</span></button><span class="w">${esc(t.wettbewerb || "")}${t.ergebnis ? " · " + esc(t.ergebnis) : ""}${t.ergebnis_ie ? ", " + esc(t.ergebnis_ie) + " i.E." : ""}</span></div>${h}</div>`;
     };
     const tabs = L.length > 1 ? `<div class="tabs">${L.map((t, i) => `<button type="button" data-sa="${i}" aria-pressed="${!i}">${esc(t.verein)}</button>`).join("")}</div>` : "";
     return `<section class="sa">${kap("Aufstellung im Spiel")}${tabs}${L.map(team).join("")}</section>`;
