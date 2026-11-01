@@ -349,7 +349,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .uo.mein{border-color:var(--accent)}.uo.mein .ubar{background:rgba(47,91,255,.38)}
 .uo.richtig{border-color:#22C55E}.uo.richtig .ubar{background:rgba(34,197,94,.28)}
 .uo .bi{position:relative;width:42px;height:42px;border-radius:50%;overflow:hidden;flex:none;display:grid;place-items:center}
-.uo .bi img{width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.uo .bi img{width:100%;height:100%;object-fit:cover;object-position:50% 0}.uo .bi:not(.lg) img{transform:scale(1.45);transform-origin:50% 10%}
 .uo .bi.lg{background:#fff}.uo .bi.lg img{width:30px;height:30px;object-fit:contain}
 .uo .tx{position:relative;flex:1;min-width:0;display:grid;gap:1px}
 .uo .tx b{font-size:15px;font-weight:600}
@@ -887,7 +887,9 @@ button.chip.pfc{cursor:pointer}
     return SEL.has(k);
   }
   // ---------------- Umfragen (umfragen.json, Stimmen in umfragen_stand.json, eigene Stimme lokal)
-  const umfrageZu = mid => UM.find(u => u.meldung === mid);
+  // Finn 01.11.: nie eine Umfrage mit Spielerin ohne Foto (Spielerinnen-Optionen erkennt man an "nachname"); vor dem Laden der Fotos keine Umfrage
+  const umfrageFotosOk = u => Object.keys(FOTOS).length && !(u.optionen || []).some(o => o.nachname && !o.logo && o.bild !== false && !((FOTOS[o.n] || {}).portrait || (FOTOS[o.n] || {}).datei));
+  const umfrageZu = mid => UM.find(u => u.meldung === mid && umfrageFotosOk(u));
   const MIN_STIMMEN = 10;
   function umfrageAufloesung(u){
     if (!u.ende || dt(u.ende) > Date.now()) return null;
@@ -1176,18 +1178,18 @@ button.chip.pfc{cursor:pointer}
           <button class="tbtn" data-tore="1" aria-expanded="${TOREOFFEN}">${TOREOFFEN ? "Tore im Detail ausblenden" : "Tore im Detail mit Vorlage"}</button>${TOREOFFEN ? `<div class="tdet">${det}</div>` : ""}` : ""}
       </div>
       ${prog ? `<button class="hk" data-legal="so-entsteht">${stufeSym("erwartet", 14)}<span>Mögliche Aufstellungen sind unsere Einschätzung, die offizielle kommt ca. 60 Minuten vor Anpfiff. <span class="lk">So entsteht sie</span></span></button>` : ""}
-      ${pv.length ? `<div class="kartebox">${kap("Platzverweise")}${pv.map(x => `<div style="display:flex;gap:8px;align-items:center;font-size:14px">${karte(true)}<span style="flex:1">${esc(x.n)} (${esc(x.min)}')</span>${logo(x.seite === "heim" ? p.heim_k : p.gast_k, 20)}</div>`).join("")}</div>` : ""}
+      ${pv.length ? `<div class="kartebox">${kap("Platzverweise")}${pv.map(x => `<div style="display:flex;gap:8px;align-items:center;font-size:14px">${karte(true)}<span style="flex:1">${x.n ? esc(x.n) : '<span class="mu">ohne Namen im Spielbericht</span>'} (${esc(x.min)}')</span>${logo(x.seite === "heim" ? p.heim_k : p.gast_k, 20)}</div>`).join("")}</div>` : ""}
       ${bs.length ? `<div class="kartebox" style="gap:8px">${kap("Englische Woche")}${bs.map(([n, b]) => `<div style="display:grid;gap:2px"><b style="font-size:14px;font-weight:600">${esc(n)}: ${esc(b.text)}</b><span class="dat">${(b.spiele || []).map(esc).join(" · ")}</span></div>`).join("")}${prog ? '<span style="font-size:12px;color:var(--frag)">Deshalb stufen wir Feldspielerinnen höchstens als Erwartet ein.</span>' : ""}</div>` : ""}
-      ${!p.heim_aufstellung && !p.gast_aufstellung ? '<p class="dat">Die mögliche Aufstellung erscheint, sobald dieser Spieltag als nächster ansteht. Die offizielle kommt ca. 60 Minuten vor Anpfiff.</p>'
-        : teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim") + teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast")}
+      ${!p.heim_aufstellung && !p.gast_aufstellung && p.status === "beendet" ? '<p class="dat">Zu diesem Spiel hat der Spielbericht keine offizielle Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : !p.heim_aufstellung && !p.gast_aufstellung ? '<p class="dat">Die mögliche Aufstellung erscheint, sobald dieser Spieltag als nächster ansteht. Die offizielle kommt ca. 60 Minuten vor Anpfiff.</p>'
+        : teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", p.status === "beendet") + teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", p.status === "beendet")}
       ${prog ? `<div class="leg">${Object.keys(STUFE).map(k => `<span>${stufeSym(k, 14)}${STUFE[k][2]}</span>`).join("")}</div>` : ""}
     </div>`;
     window.scrollTo(0, halten ? y : 0);
   }
-  function teamBlock(name, k, a, seite){
+  function teamBlock(name, k, a, seite, vorbei){
     let inh;
     if (a && (a.startelf || []).length) inh = a.typ === "offiziell" ? offiziell(a, k) : prognose(a, seite);
-    else inh = '<p class="dat">Noch keine Aufstellung.</p>';
+    else inh = vorbei ? '<p class="dat">Der Spielbericht enthält keine Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : '<p class="dat">Noch keine Aufstellung.</p>';
     const badge = a ? (a.typ === "offiziell" ? '<span class="badge off">OFFIZIELL</span>' : '<span class="badge ein">EINSCHÄTZUNG</span>') : "";
     return `<div class="kartebox"><div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${a && a.formation ? `<span class="f">${esc(a.formation)}</span>` : ""}${badge}</div>${inh}</div>`;
   }
@@ -1573,7 +1575,7 @@ button.chip.pfc{cursor:pointer}
   function loadIN(){
     return Promise.all([json("inside.json"), fetch("fotos.json", {cache: "no-store"}).then(r => r.ok ? r.json() : {}).catch(() => ({}))])
       .then(([d, f]) => { IN = d; FOTOS = f || {}; if (BACK) { if (decodeURIComponent(location.hash.slice(1)) === "bildnachweise") legal("bildnachweise"); return; }
-        if (VIEW === "inside") inside(); else if (VIEW === "meldungen" && document.querySelector("#main .liste")) list(); })
+        if (VIEW === "inside") inside(); else if (VIEW === "meldungen" && document.querySelector("#main .liste")) list(); else if (VIEW === "meldungen" && ARTIKEL && umfrageZu(ARTIKEL)) { const y = window.scrollY; article(ARTIKEL); window.scrollTo(0, y); } })
       .catch(() => { if (VIEW === "inside" && !IN) $("#main").innerHTML = '<p class="leer">Inside konnte nicht geladen werden. Seite neu laden.</p>'; });
   }
   function show(v){
@@ -1733,7 +1735,8 @@ button.chip.pfc{cursor:pointer}
           W.forEach(v => { const f = F[v.s.k]; if (f) { f.gelb += v.gelb; f.gr += v.gr; f.rot += v.rot; } });
           const FL = Object.values(F).map(f => Object.assign(f, {p: f.gelb + 3 * f.gr + 5 * f.rot})).sort((a, b) => a.p - b.p || kname(a.k).localeCompare(kname(b.k), "de"));
           h += `<section class="stk" id="st-fair"><div class="stk-k"><h2>${t}</h2><small>${e}</small></div><div class="ft"><div class="ft-r ft-h"><span>#</span><span></span><span>VEREIN</span><span><i class="kg"></i></span><span><i class="kgr"></i></span><span><i class="kr"></i></span><span>PKT</span></div>
-            ${FL.map((f, i) => `<button class="ft-r" data-statverein="${f.k}"><span class="tb-pl">${i && f.p === FL[i - 1].p ? "" : i + 1}</span>${logo(f.k, 18)}<span class="tb-vn">${esc(kname(f.k))}</span><span>${f.gelb}</span><span>${f.gr}</span><span>${f.rot}</span><span class="tb-pk">${f.p}</span></button>`).join("")}</div></section>`; continue; }
+            ${FL.map((f, i) => `<button class="ft-r" data-statverein="${f.k}"><span class="tb-pl">${i && f.p === FL[i - 1].p ? "" : i + 1}</span>${logo(f.k, 18)}<span class="tb-vn">${esc(kname(f.k))}</span><span>${f.gelb}</span><span>${f.gr}</span><span>${f.rot}</span><span class="tb-pk">${f.p}</span></button>`).join("")}</div>${(() => { const oN = alleSpiele().filter(p => p.status === "beendet").flatMap(p => (p.platzverweise || []).filter(x => !x.n).map(x => `${kname(x.seite === "heim" ? p.heim_k : p.gast_k)} (${p.md}. Spieltag gegen ${kname(x.seite === "heim" ? p.gast_k : p.heim_k)}, ${x.min}.)`));
+            return `<p class="st-notiz" style="margin:10px 0 0">Karten kommen aus den offiziellen Spielberichten. Steht dort kein Name, können wir die Karte keiner Spielerin zuordnen${oN.length ? `, sie fehlt dann hier: Platzverweis ohne Namen bei ${oN.join(", ")}` : ""}.</p>`; })()}</section>`; continue; }
         if (k === "voll") { const vl = W.filter(v => v.voll).length;
           if (vl && vl <= 10) { const l2 = W.filter(v => v.minuten > 0).sort((a, b) => b.minuten - a.minuten || a.s.n.localeCompare(b.s.n, "de")), auf = STAUF.voll, n = auf ? 10 : 3, mehr = auf && l2.length > n && l2[n].minuten === l2[n - 1].minuten ? l2.slice(n).filter(v => v.minuten === l2[n - 1].minuten) : [];
             h += `<section class="stk${auf ? " stk-klein" : ""}" id="st-voll"><div class="stk-k"><h2>${t}</h2><small>Einsatzminuten, ${vl} ${vl === 1 ? "hat" : "haben"} jede Minute gespielt</small></div>${stListe("minuten", l2, n)}${mehr.length ? `<div class="st-erkl">Ebenfalls ${l2[n - 1].minuten}': ${stNamen(mehr)}</div>` : ""}<button class="st-mehr" data-stauf="voll">${auf ? "Weniger" : "Top 10 ›"}</button></section>`; continue; } }
