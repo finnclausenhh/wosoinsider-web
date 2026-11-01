@@ -863,7 +863,8 @@ button.chip.pfc{cursor:pointer}
         + `<span class="wap" style="width:${w + 6}px;height:${w + 6}px">${logo(k, w)}</span>`,
         `linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.18)),${KFARBE[k] || "var(--soft)"}`);
     }
-    return box(logo(k, Math.round(g * .66)));
+    // Nur Vereinslogo: gleicher Lichtkegel wie bei den Portraits (Finn 01.11.2026), damit alle Karten einheitlich wirken
+    return box(logo(k, Math.round(g * .66)), "radial-gradient(circle at 50% 45%,#3A4F78 0%,#2A3B5E 70%)").replace('class="bild"', 'class="bild fg"');
   }
 
   // ---------------- News
