@@ -706,12 +706,51 @@ button.chip.pfc{cursor:pointer}
 .vg-liste{display:grid;gap:4px}.vg-liste div{display:grid;grid-template-columns:10px 44px 1fr;gap:8px;align-items:center;font-size:13px}
 .vg-liste i{width:8px;height:8px;border-radius:50%;background:var(--c)}.vg-liste span:nth-child(2){color:var(--muted);font-size:12px}
 .vg-liste .prog i{background:none;border:2px dashed var(--c);width:6px;height:6px}.vg-liste .prog span:last-child{color:#B5CBFF}
+
+/* Kopfzeile Variante A (Finn 01.11.2026): Logo links, Symbole ohne Kacheln, kein Mittelkreis, kein Vereinsfilter */
+.bar{background:var(--bg)!important}
+.bar-in .logo{justify-self:start;justify-items:center;height:34px;align-content:center;margin-top:6px}
+.kopf-btns{top:6px;gap:2px}.kopf-btns .such-btn{background:none;color:var(--muted);width:40px}.kopf-btns .such-btn svg{stroke:currentColor}
+.kopf-btns .such-btn[aria-pressed=true]{background:none;color:var(--accent)}
+.vz-btn,.vz-schmal{display:none!important}
+/* Aufstellung als Spielfeld (Finn 01.11.2026) */
+.af{display:grid;gap:10px}
+.feld{position:relative;border-radius:14px;overflow:hidden;background:#1C2333}
+.feld>svg.fl{position:absolute;inset:0;width:100%;height:100%}
+.spl{position:absolute;transform:translate(-50%,-50%);display:grid;justify-items:center;gap:3px;width:84px;text-align:center;color:var(--ink);background:none;border:0;padding:0;font:inherit}
+.spl .fo{position:relative;border-radius:50%}
+.spl .cl{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);display:grid;place-items:center}
+.spl .cl img{width:100%;height:100%;object-fit:cover;object-position:50% 0;transform:scale(1.04) translateY(4%)}
+.spl .cl b{font:800 15px var(--f-display);color:#fff}
+.spl .sb{position:absolute;left:50%;bottom:-7px;transform:translateX(-50%)}.spl .sb .sym{border:2px solid #1C2333;box-sizing:content-box}
+.spl .nb{position:absolute;top:-6px;right:-12px;background:#22C55E;color:#06210f;font:800 9px var(--f-body);padding:2px 4px;border-radius:4px;letter-spacing:.3px}
+.spl .ex{position:absolute;top:-4px;left:-10px;display:flex;gap:2px;align-items:center;background:rgba(14,23,38,.85);border-radius:6px;padding:1px 3px;font:700 10px var(--f-body)}
+.spl .ex .ball{width:10px;height:10px}.spl .ex .krt{width:7px;height:10px}
+.spl .nm{font:600 12px var(--f-body);white-space:nowrap;max-width:84px;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.spl .nm small{display:block;font:600 10px var(--f-body);color:var(--muted)}
+.spl.sel .cl{box-shadow:0 0 0 2px var(--accent)}
+.feld .fm{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.08);border-radius:8px;padding:4px 8px;font:600 12px var(--f-body)}
+.wb{background:var(--soft);border-radius:12px;padding:10px;display:grid;gap:8px}
+.wb h4{margin:0;font:800 16px var(--f-display);text-transform:uppercase;letter-spacing:.3px}
+.wx{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;background:var(--card);border-radius:10px;padding:7px 10px}
+.wx .p{display:flex;align-items:center;gap:8px;min-width:0}.wx .p.r{flex-direction:row-reverse;text-align:right}
+.wx .p .t{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wx .mf{width:34px;height:34px;flex:none;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.05);display:grid;place-items:center}.wx .mf img{width:100%;height:100%;object-fit:cover;object-position:50% 0}.wx .mf b{font:800 12px var(--f-display);color:#fff}
+.wx .r .mf{opacity:.75}.wx .m{color:var(--muted);font-size:12px}
+.kk{font:800 9.5px var(--f-body);padding:2px 5px;border-radius:4px;display:inline-block;margin-top:2px}
+.kk.n{background:rgba(34,197,94,.18);color:#22C55E}.kk.r{background:rgba(248,113,113,.15);color:#F87171}.kk.a{background:rgba(169,180,198,.15);color:var(--muted)}.kk.u{background:rgba(245,158,11,.18);color:#F59E0B}
+.bk{display:grid;grid-template-columns:36px 1fr;row-gap:6px;column-gap:4px;font-size:14px}
+.bk .ps{font:600 10.5px var(--f-mono);color:var(--muted);letter-spacing:.6px;padding-top:3px}
+.bk .ns{display:flex;flex-wrap:wrap}.bk .ns b{font-weight:600}.bk .ns b:not(:first-child)::before{content:"·";color:var(--muted);font-weight:400;margin:0 7px}
+.bk .ns b.dim{color:var(--muted)}.bk .rr{color:#F87171;font:800 9.5px var(--f-body);margin-left:4px;vertical-align:1px}.bk .em{color:var(--muted);font-weight:500;font-size:12px;margin-left:3px}
+.af .hint{font-size:12px;color:var(--muted)}
+.af .hint .lk{color:var(--accent)}
 </style>
 
 
 <header class="bar"><div class="bar-in">
   <div class="logo" aria-label="WOSOINSIDER"><b>WOSO</b><i>INSIDER</i></div>
-  <button class="such-btn vz-btn" data-vzauf="1" aria-label="Meine Vereine"></button><div class="kopf-btns"><button class="such-btn" data-statview="tabelle" aria-label="Tabelle"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M3.5 14.5h17M9 9v11"/></svg></button><button class="such-btn" data-statview="statistik" aria-label="Statistik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-3M11 16V9M16 16V5"/></svg></button><button class="such-btn" data-suche="1" aria-label="Spielerin suchen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></div>
+  <div class="kopf-btns"><button class="such-btn" data-statview="tabelle" aria-label="Tabelle"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M3.5 9h17M3.5 14.5h17M9 9v11"/></svg></button><button class="such-btn" data-statview="statistik" aria-label="Statistik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-3M11 16V9M16 16V5"/></svg></button><button class="such-btn" data-suche="1" aria-label="Spielerin suchen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></div>
   <div class="seg" role="tablist"><button id="tab-meldungen" role="tab" aria-selected="true" data-tab="meldungen">News</button><button id="tab-spielplan" role="tab" aria-selected="false" data-tab="spielplan">Spielplan</button><button id="tab-inside" role="tab" aria-selected="false" data-tab="inside">Inside</button></div>
 </div></header>
 
@@ -795,7 +834,7 @@ button.chip.pfc{cursor:pointer}
   let UM = [], UST = {}, STIMMEN = {}, ARTIKEL = null;
   try { STIMMEN = JSON.parse(localStorage.getItem("woso-umfragen") || "{}") || {}; } catch(e) {}
   let SEL = new Set(), VZOFFEN = false, NEWSALLE = false, WEITERE = false, STDALLE = false;
-  try { SEL = new Set(JSON.parse(localStorage.getItem("woso-vereine") || "[]")); } catch(e) {}
+  /* Vereinsfilter entfernt (Finn 01.11.2026): gespeicherte Auswahl wird nicht mehr angewendet */
   const saveSel = () => { try { localStorage.setItem("woso-vereine", JSON.stringify([...SEL])); } catch(e) {} };
   const zeigen = (...ks) => !SEL.size || ks.some(k => k && SEL.has(k));
   const setHash = h => { try { history.replaceState(null, "", h ? "#" + h : location.pathname + location.search); } catch(e) {} };
@@ -1012,11 +1051,91 @@ button.chip.pfc{cursor:pointer}
     return `<div class="rasen">${POS.concat(sonst).map(p => { const xs = l.filter(x => (x.p || "") === p);
       return xs.length ? `<div class="pz"><i>${esc(p)}</i><div class="chips">${xs.map(f).join("")}</div></div>` : ""; }).join("")}</div>`;
   }
-  function aufBlock(a){
-    return `<div class="kartebox">${kap("Startelf")}${posZeilen(a.startelf || [], s => chip({n: s.n, info: s.i, mark: s.f}))}
-      ${(a.bank || []).length ? kap("Bank") + `<div class="chips">${sortiert(a.bank).map(s => chip({n: s.n, info: s.i, mark: s.f})).join("")}</div>` : ""}
-      ${(a.fehlt || []).length ? kap("Nicht im Kader") + `<div class="chips">${sortiert(a.fehlt).map(s => chip({n: s.n, info: s.i, mark: s.f, dim: true})).join("")}</div>` : ""}
-      <div class="leg"><span><b class="neu" style="margin:0;border:0;padding:0">NEU</b> und <b class="raus" style="border:0;padding:0">RAUS</b> im Vergleich zum letzten Spiel</span></div></div>`;
+
+  // ---------------- Aufstellung als Spielfeld (Finn 01.11.2026): Fotos mit Schulter, NEU am Foto, Symbole nur bei Prognose
+  const VK = Object.assign({}, KURZ, {"FC Bayern München":"FCB","Bayer 04 Leverkusen":"B04","1. FC Union Berlin":"FCU","1. FSV Mainz 05":"M05"});
+  let AFIDX = null;
+  const nNorm = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+  function fotoSp(k, s){
+    const v = s.voll && FOTOS[s.voll]; if (v && (v.portrait || v.datei)) return v.portrait || v.datei;
+    if (!AFIDX) { AFIDX = {}; Object.keys(FOTOS).forEach(n => { const f = FOTOS[n], kk = VK[f.verein]; if (!kk || f.stab || !(f.portrait || f.datei)) return;
+      const nach = nNorm(n.split(" ").slice(-1)[0]), key = kk + "|" + nach; AFIDX[key] = AFIDX[key] === undefined ? (f.portrait || f.datei) : null; }); }
+    const n = nNorm(String(s.voll || s.n).split(" ").slice(-1)[0]);
+    return AFIDX[k + "|" + n] || null;
+  }
+  const LINIE = ["ST","OM","MF","DM","ABW","TW"];
+  const GRUPPE = p => ({DM: "MF", OM: "MF"}[p] || p || "MF");
+  const initialen = n => esc(String(n || "").split(/\s+/).map(w => w[0] || "").join("").slice(0, 2).toUpperCase());
+  function feldSVG(){
+    return `<svg class="fl" viewBox="0 0 100 140" preserveAspectRatio="none" fill="none" stroke="rgba(255,255,255,.12)" stroke-width=".5" aria-hidden="true">
+      <rect x="4" y="3" width="92" height="134" rx="1"/><path d="M4 70h92"/><circle cx="50" cy="70" r="11"/><rect x="24" y="3" width="52" height="20"/><rect x="38" y="3" width="24" height="8"/>
+      <rect x="24" y="117" width="52" height="20"/><rect x="38" y="129" width="24" height="8"/></svg>`;
+  }
+  // o: {modus: "o"|"p", seite, sel, neu: Set, formation}
+  function feld(elf, k, o){
+    const rows = LINIE.map(p => elf.filter(s => (LINIE.includes(s.p) ? s.p : "MF") === p)).filter(r => r.length);
+    const n = rows.length, H = n <= 4 ? 470 : n === 5 ? 520 : 570, F = n >= 6 ? 48 : 54;
+    let h = `<div class="feld" style="height:${H}px">${feldSVG()}`;
+    rows.forEach((r, ri) => {
+      const y = n === 1 ? 50 : 11 + ri * (78 / (n - 1));
+      r.forEach((s, i) => {
+        const x = (i + 1) / (r.length + 1) * 100, src = fotoSp(k, s);
+        const inner = src ? `<img src="${esc(src)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='<b>${initialen(s.voll || s.n)}</b>'">` : `<b>${initialen(s.voll || s.n)}</b>`;
+        const bg = src ? "" : ` style="background:${KFARBE[k] || "var(--soft)"}"`;
+        const badge = o.modus === "p" && STUFE[s.st] ? `<span class="sb">${stufeSym(s.st, 16)}</span>` : "";
+        const neu = o.modus === "o" && (s.f === "neu" || (o.neu && o.neu.has(s.n))) ? '<span class="nb">NEU</span>' : "";
+        let ex = "";
+        if (o.modus === "o") { if (s.tore > 0) ex += BALL + (s.tore > 1 ? s.tore : ""); if (s.rot) ex += karte(true); else if (s.gelb) ex += karte(false); }
+        const unten = o.modus === "o" && s.aus ? `<small>↓${esc(s.aus)}'</small>` : "";
+        const tag = o.modus === "p" && s.warum ? "button" : (k ? "button" : "div");
+        const attr = o.modus === "p" && s.warum ? ` data-chip="${esc(o.seite + "|" + s.n)}" title="${esc(s.warum)}"` : (k ? ` data-profilname="${esc(k + "|" + (s.voll || s.n))}"` : "");
+        h += `<${tag} class="spl${o.sel === s.n ? " sel" : ""}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%"${attr}><span class="fo" style="width:${F}px;height:${F}px"><span class="cl"${bg}>${inner}</span>${badge}${neu}${ex ? `<span class="ex">${ex}</span>` : ""}</span><span class="nm">${esc(s.n)}${unten}</span></${tag}>`;
+      });
+    });
+    return h + (o.formation ? `<span class="fm">${esc(o.formation)}</span>` : "") + `</div>`;
+  }
+  function wxZeile(k, a, b, ka, kb, mitte){
+    const mf = s => { const src = fotoSp(k, s); return `<span class="mf"${src ? "" : ` style="background:${KFARBE[k] || "var(--soft)"}"`}>${src ? `<img src="${esc(src)}" alt="" loading="lazy">` : `<b>${initialen(s.voll || s.n)}</b>`}</span>`; };
+    const seite = (s, kl, r) => s ? `<div class="p${r ? " r" : ""}">${mf(s)}<div style="min-width:0"><div class="t">${esc(s.n)}</div><span class="kk ${kl[0]}">${kl[1]}</span></div></div>` : "<div></div>";
+    return `<div class="wx">${seite(a, ka)}<span class="m">${a && b ? mitte : ""}</span>${seite(b, kb, true)}</div>`;
+  }
+  // Paare nach Positionsgruppe (gleiche Linie zuerst), Rest der Reihe nach
+  function paare(neu, raus){
+    const r = raus.slice(), out = [];
+    neu.forEach(x => { const j = r.findIndex(y => GRUPPE(y.p) === GRUPPE(x.p)); out.push([x, j >= 0 ? r.splice(j, 1)[0] : null]); });
+    out.forEach(pz => { if (!pz[1] && r.length) pz[1] = r.shift(); });
+    r.forEach(y => out.push([null, y]));
+    return out;
+  }
+  function aenderungen(k, neu, raus, titel){
+    if (!neu.length && !raus.length) return "";
+    return `<div class="wb"><h4>${esc(titel || "Änderungen zum letzten Ligaspiel")}</h4>${paare(neu, raus).map(([a, b]) => wxZeile(k, a, b, ["n", "NEU"], ["r", "RAUS"], "für")).join("")}</div>`;
+  }
+  function bankNamen(bank, rausSet, titel){
+    if (!bank.length) return "";
+    const g = {}; bank.forEach(s => (g[GRUPPE(s.p)] = g[GRUPPE(s.p)] || []).push(s));
+    return `<div class="wb"><h4>${esc(titel || "Bank")}</h4><div class="bk">${["TW","ABW","MF","ST"].concat(Object.keys(g).filter(x => !["TW","ABW","MF","ST"].includes(x))).filter(p => g[p]).map(p =>
+      `<span class="ps">${esc(p)}</span><span class="ns">${g[p].map(s => `<b${s.dim ? ' class="dim"' : ""}>${esc(s.n)}${s.em ? `<span class="em">${esc(s.em)}</span>` : ""}${rausSet && rausSet.has(s.n) ? '<span class="rr">RAUS</span>' : ""}</b>`).join("")}</span>`).join("")}</div></div>`;
+  }
+  // Letzte offizielle Liga-Startelf eines Vereins vor einem Anstoß (für NEU und RAUS im Spielplan)
+  function vorherElf(k, anstoss){
+    let best = null;
+    alleSpiele().forEach(p => { if (p.status !== "beendet" || !(p.anstoss < anstoss)) return;
+      ["heim", "gast"].forEach(sd => { const a = p[sd + "_aufstellung"]; if (p[sd + "_k"] === k && a && a.typ === "offiziell" && (!best || p.anstoss > best[0])) best = [p.anstoss, a]; }); });
+    return best ? best[1] : null;
+  }
+  function aufBlock(a, k){
+    const elf = a.startelf || [], neu = elf.filter(s => s.f === "neu");
+    const rausBank = (a.bank || []).filter(s => s.f === "raus"), rausFehlt = (a.fehlt || []).filter(s => s.f === "raus");
+    const rausNamen = new Set(rausBank.map(s => s.n));
+    let raus = rausBank.concat(rausFehlt, (a.nicht_startelf || []).filter(x => !rausNamen.has(x.n)));
+    const bank = sortiert(a.bank || []).map(s => ({...s, p: GRUPPE(s.p)}));
+    const fehlt = (a.fehlt || []).filter(s => s.f !== "raus" || !rausNamen.has(s.n));
+    return `<div class="af">${feld(elf, k, {modus: "o", formation: a.formation})}
+      ${bankNamen(bank, rausNamen)}
+      ${aenderungen(k, neu, raus)}
+      ${fehlt.length ? `<div class="wb"><h4>Nicht im Kader</h4><div class="bk" style="grid-template-columns:1fr"><span class="ns">${sortiert(fehlt).map(s => `<b class="dim">${esc(s.n)}${s.i ? `<span class="em">(${esc(s.i)})</span>` : ""}</b>`).join("")}</span></div></div>` : ""}
+</div>`;
   }
   // Aufstellung aus Pokal und Europapokal unter dem Spielbericht (Feld spiel_aufstellung), NEU/RAUS gegenüber dem letzten Ligaspiel
   function spielAufstellung(L, verein){
@@ -1049,7 +1168,7 @@ button.chip.pfc{cursor:pointer}
     const kopf = auf
       ? `<div style="display:grid;gap:8px"><div class="tags">${(m.tags || []).map(tag).join("")}${tag("AUFSTELLUNG")}</div>
           <div style="display:flex;gap:8px;align-items:center"><button class="kd-btn" data-kader="${esc(KURZ[m.verein])}" aria-label="Kader ${esc(m.verein)}">${logo(KURZ[m.verein], 30)}</button><h1 class="disp" style="font-size:26px">${esc(m.headline)}</h1></div>
-          <div class="dat">${esc(lang(m.zeit))}</div></div>${aufBlock(a)}${(m.text || []).length ? `<div class="body">${m.text.map(p => `<p>${esc(p)}</p>`).join("")}</div>` : ""}`
+          <div class="dat">${esc(lang(m.zeit))}</div></div>${aufBlock(a, KURZ[m.verein])}${(m.text || []).length ? `<div class="body">${m.text.map(p => `<p>${esc(p)}</p>`).join("")}</div>` : ""}`
       : `<div style="display:grid;gap:12px"><div class="mk">${istSpielerin(m) && m.spielerin ? `<button class="mk-foto" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}" aria-label="Profil von ${esc(m.spielerin)}">${bild(m, 96)}</button>` : bild(m, 96)}<div class="mk-m"><div class="tags">${(m.tags || []).map(tag).join("")}</div>
           <div class="wer">${m.pos === "Spielansetzung" ? esc(m.spielerin && m.spielerin !== "Spielansetzung" ? m.spielerin : [m.verein, m.aufstellung && m.aufstellung.gegner].filter(Boolean).join(" gegen ")) : istSpielerin(m) && m.spielerin ? `<button class="wer-btn" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}">${esc(m.spielerin)}</button>` : esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc(m.pos === "Spielansetzung" ? "Vorbericht" : [m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
           ${st ? `<div class="mk-st">${plakette(meldungsStatus(m), 28)}<span>${st[2]}</span></div>` : ""}</div>
@@ -1177,54 +1296,54 @@ button.chip.pfc{cursor:pointer}
         ${tore.length ? `<div class="tore"><div class="h">${schuetzinnen(tore, "heim")}</div>${BALL}<div>${schuetzinnen(tore, "gast")}</div></div>
           <button class="tbtn" data-tore="1" aria-expanded="${TOREOFFEN}">${TOREOFFEN ? "Tore im Detail ausblenden" : "Tore im Detail mit Vorlage"}</button>${TOREOFFEN ? `<div class="tdet">${det}</div>` : ""}` : ""}
       </div>
-      ${prog ? `<button class="hk" data-legal="so-entsteht">${stufeSym("erwartet", 14)}<span>Mögliche Aufstellungen sind unsere Einschätzung, die offizielle kommt ca. 60 Minuten vor Anpfiff. <span class="lk">So entsteht sie</span></span></button>` : ""}
+      
       ${pv.length ? `<div class="kartebox">${kap("Platzverweise")}${pv.map(x => `<div style="display:flex;gap:8px;align-items:center;font-size:14px">${karte(true)}<span style="flex:1">${x.n ? esc(x.n) : '<span class="mu">ohne Namen im Spielbericht</span>'} (${esc(x.min)}')</span>${logo(x.seite === "heim" ? p.heim_k : p.gast_k, 20)}</div>`).join("")}</div>` : ""}
       ${bs.length ? `<div class="kartebox" style="gap:8px">${kap("Englische Woche")}${bs.map(([n, b]) => `<div style="display:grid;gap:2px"><b style="font-size:14px;font-weight:600">${esc(n)}: ${esc(b.text)}</b><span class="dat">${(b.spiele || []).map(esc).join(" · ")}</span></div>`).join("")}${prog ? '<span style="font-size:12px;color:var(--frag)">Deshalb stufen wir Feldspielerinnen höchstens als Erwartet ein.</span>' : ""}</div>` : ""}
       ${!p.heim_aufstellung && !p.gast_aufstellung && p.status === "beendet" ? '<p class="dat">Zu diesem Spiel hat der Spielbericht keine offizielle Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : !p.heim_aufstellung && !p.gast_aufstellung ? '<p class="dat">Die mögliche Aufstellung erscheint, sobald dieser Spieltag als nächster ansteht. Die offizielle kommt ca. 60 Minuten vor Anpfiff.</p>'
-        : teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", p.status === "beendet") + teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", p.status === "beendet")}
-      ${prog ? `<div class="leg">${Object.keys(STUFE).map(k => `<span>${stufeSym(k, 14)}${STUFE[k][2]}</span>`).join("")}</div>` : ""}
+        : teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", p.status === "beendet", p.anstoss) + teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", p.status === "beendet", p.anstoss)}
+      ${prog ? `<div class="leg" style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)">${Object.keys(STUFE).filter(k => ["sicher","erwartet","unsicher"].includes(k)).map(k => `<span>${stufeSym(k, 14)}${STUFE[k][2]}</span>`).join("")}</div><button class="hk" data-legal="so-entsteht" style="background:none;padding:6px 0"><span class="mu" style="font-size:12px">Prognose von WOSOINSIDER, die offizielle Aufstellung kommt ca. 60 Minuten vor Anpfiff und ersetzt sie hier. <span class="lk">So entsteht sie</span></span></button>` : ""}
     </div>`;
     window.scrollTo(0, halten ? y : 0);
   }
-  function teamBlock(name, k, a, seite, vorbei){
+  function teamBlock(name, k, a, seite, vorbei, anstoss){
     let inh;
-    if (a && (a.startelf || []).length) inh = a.typ === "offiziell" ? offiziell(a, k) : prognose(a, seite);
+    if (a && (a.startelf || []).length) inh = a.typ === "offiziell" ? offiziell(a, k, anstoss) : prognose(a, seite, k);
     else inh = vorbei ? '<p class="dat">Der Spielbericht enthält keine Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : '<p class="dat">Noch keine Aufstellung.</p>';
-    const badge = a ? (a.typ === "offiziell" ? '<span class="badge off">OFFIZIELL</span>' : '<span class="badge ein">EINSCHÄTZUNG</span>') : "";
-    return `<div class="kartebox"><div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${a && a.formation ? `<span class="f">${esc(a.formation)}</span>` : ""}${badge}</div>${inh}</div>`;
+    const badge = a ? (a.typ === "offiziell" ? '<span class="badge off">OFFIZIELL</span>' : '<span class="badge ein">PROGNOSE</span>') : "";
+    return `<div class="kartebox"><div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${badge}</div>${inh}</div>`;
   }
-  function offiziell(a, k){
-    const c = s => ({n: s.n, tore: s.tore || 0, rot: s.rot, gelb: s.gelb, gr: s.gr, gelbMin: s.gelb_min, rotMin: s.rot_min, prof: k ? k + "|" + (s.voll || s.n) : null});
-    let h = posZeilen(a.startelf, s => chip({...c(s), aus: s.aus}));
+  function offiziell(a, k, anstoss){
+    const elf = a.startelf || [], vor = anstoss ? vorherElf(k, anstoss) : null;
+    const vorNamen = vor ? new Set((vor.startelf || []).map(s => s.n)) : null;
+    const neuSet = vorNamen ? new Set(elf.filter(s => !vorNamen.has(s.n)).map(s => s.n)) : new Set();
+    const elfNamen = new Set(elf.map(s => s.n));
+    const raus = vor ? (vor.startelf || []).filter(s => !elfNamen.has(s.n)) : [];
+    let h = `<div class="af">${feld(elf, k, {modus: "o", neu: neuSet, formation: a.formation})}`;
     const bank = a.bank || [], rein = bank.filter(s => s.ein === true), draussen = bank.filter(s => s.ein !== true), bekannt = bank.some(s => s.ein != null);
+    const rausSet = new Set(raus.map(s => s.n));
     if (bekannt) {
       rein.sort((x, y) => (parseInt(x.ein_min, 10) || 99) - (parseInt(y.ein_min, 10) || 99));
-      if (rein.length) h += kap("Eingewechselt") + `<div class="chips">${rein.map(s => chip({...c(s), ein: true, einMin: s.ein_min})).join("")}</div>`;
-      if (draussen.length) h += `<div class="zeile"><b>OHNE EINSATZ</b>${draussen.map(s => esc(s.n)).join(", ")}</div>`;
-    } else if (bank.length) h += kap("Bank") + `<div class="chips">${bank.map(s => chip(c(s))).join("")}</div>`;
-    return h;
+      h += bankNamen(rein.map(s => ({...s, p: GRUPPE(s.p), em: s.ein_min ? "↑" + s.ein_min + "'" : ""})), null, "Eingewechselt");
+      h += bankNamen(draussen.map(s => ({...s, p: GRUPPE(s.p), dim: true})), rausSet, "Ohne Einsatz");
+    } else h += bankNamen(bank.map(s => ({...s, p: GRUPPE(s.p)})), rausSet);
+    h += aenderungen(k, elf.filter(s => neuSet.has(s.n)), raus);
+    return h + `</div>`;
   }
-  function prognose(a, seite){
+  function prognose(a, seite, k){
     const alle = (a.startelf || []).concat(a.bank || [], a.ausgeschlossen || []);
     const sel = CHIPSEL[seite];
-    const ch = s => chip({n: s.n, stufe: s.st, grund: s.grund, dim: s.st === "ausgeschlossen", sel: sel === s.n, btn: s.warum ? `${seite}|${s.n}` : null, title: s.warum});
-    let h = posZeilen(a.startelf, ch);
-    const offen = [];
-    a.startelf.filter(s => s.st === "unsicher" || s.st === "unwahrscheinlich").forEach(s => {
-      const alt = (a.alternativ || []).find(x => x.statt === s.n);
-      offen.push({pos: s.p || "", n: s.n, warum: s.warum || "", alt: alt && alt.fuer, altWarum: alt ? ((alle.find(x => x.n === alt.fuer) || {}).warum || "") : ""}); });
-    (a.alternativ || []).filter(x => !offen.some(o => o.n === x.statt)).forEach(x => { const s = alle.find(y => y.n === x.statt) || {};
-      offen.push({pos: x.p || s.p || "", n: x.statt || "", warum: s.warum || "", alt: x.fuer, altWarum: (alle.find(y => y.n === x.fuer) || {}).warum || ""}); });
-    if (offen.length) h += `<div class="opbox"><div class="kh">${stufeSym("unsicher", 14)}${kap(offen.length > 1 ? "Offene Positionen" : "Offene Position")}</div>
-      ${offen.map(o => `<div class="opg"><i>${esc(o.pos)}</i><span><b>${esc(o.n)}</b> <span class="mu">${esc(o.warum)}</span></span>${o.alt ? `<i>ALT.</i><span><b>${esc(o.alt)}</b> <span class="mu">${esc(o.altWarum)}</span></span>` : ""}</div>`).join("")}</div>`;
+    let h = `<div class="af">${feld(a.startelf || [], k, {modus: "p", seite, sel, formation: a.formation})}`;
+    // Alternativen: gleich aufgebaut wie die Änderungen (Alternative für Unsichere)
+    const zeilen = [];
+    (a.alternativ || []).forEach(x => { const st = alle.find(y => y.n === x.statt) || {n: x.statt}, al = alle.find(y => y.n === x.fuer) || {n: x.fuer}; zeilen.push([al, st]); });
+    (a.startelf || []).filter(s => (s.st === "unsicher" || s.st === "unwahrscheinlich") && !zeilen.some(z => z[1].n === s.n)).forEach(s => zeilen.push([null, s]));
+    if (zeilen.length) h += `<div class="wb"><h4>Alternativen</h4>${zeilen.map(([al, st]) => wxZeile(k, al, st, ["a", "ALTERNATIVE"], ["u", STUFE[st.st] ? STUFE[st.st][2].toUpperCase() : "UNSICHER"], "für")).join("")}</div>`;
     const g = sel && alle.find(x => x.n === sel);
-    h += `<div class="begr">${kap("Begründung")}${g ? `<span class="begr1"><b>${esc(nachN(g.voll || g.n))}</b> · ${esc(kurzWarum(g.warum))}</span>` : '<span class="mu">Name antippen, dann steht hier, warum wir sie so einschätzen.</span>'}</div>`;
-    if (a.datenluecke) h += `<p class="dat" style="font-size:11px">Datenlücke: ${esc(a.datenluecke)}, deshalb ohne Einstufung.</p>`;
-    // Bank höchstens Unsicher: wer nicht in der Startelf steht, kann nicht Erwartet oder Sicher sein
-    const bankCh = s => ch(s.st === "sicher" || s.st === "erwartet" ? {...s, st: "unsicher"} : s);
-    if ((a.bank || []).length) h += kap("Bank (wahrscheinlich)") + `<div class="chips">${a.bank.map(bankCh).join("")}</div>`;
+    h += `<div class="begr">${kap("Begründung")}${g ? `<span class="begr1"><b>${esc(nachN(g.voll || g.n))}</b> · ${esc(kurzWarum(g.warum))}</span>` : '<span class="mu">Spielerin antippen, dann steht hier, warum wir sie so einschätzen.</span>'}</div>`;
+    if ((a.bank || []).length) h += bankNamen(a.bank.map(s => ({...s, p: GRUPPE(s.p)})), null, "Bank (wahrscheinlich)");
     if ((a.ausgeschlossen || []).length) h += `<div class="zeile"><b>FEHLEN</b>${a.ausgeschlossen.map(s => esc(s.n) + (s.grund ? ` (${esc(s.grund)})` : "")).join(", ")}</div>`;
-    return h;
+    if (a.datenluecke) h += `<p class="dat" style="font-size:11px">Datenlücke: ${esc(a.datenluecke)}, deshalb ohne Einstufung.</p>`;
+    return h + `</div>`;
   }
 
   // ---------------- Inside
