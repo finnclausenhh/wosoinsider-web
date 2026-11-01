@@ -1127,15 +1127,15 @@ button.chip.pfc{cursor:pointer}
   }
   function aufBlock(a, k){
     const elf = a.startelf || [], neu = elf.filter(s => s.f === "neu");
-    const rausBank = (a.bank || []).filter(s => s.f === "raus"), rausFehlt = (a.fehlt || []).filter(s => s.f === "raus");
+    const rausBank = (a.bank || []).filter(s => s.f === "raus"), rausFehlt = (a.fehlt || []).filter(s => s.f === "raus" && s.war !== "Bank");
     const rausNamen = new Set(rausBank.map(s => s.n));
     let raus = rausBank.concat(rausFehlt, (a.nicht_startelf || []).filter(x => !rausNamen.has(x.n)));
     const bank = sortiert(a.bank || []).map(s => ({...s, p: GRUPPE(s.p)}));
-    const fehlt = (a.fehlt || []).filter(s => s.f !== "raus" || !rausNamen.has(s.n));
+    const fehlt = (a.fehlt || []).filter(s => (s.f === "raus" || s.i) && !rausNamen.has(s.n));  // nur wer zuletzt dabei war oder einen bekannten Grund hat
     return `<div class="af">${feld(elf, k, {modus: "o", formation: a.formation})}
       ${bankNamen(bank, rausNamen)}
       ${aenderungen(k, neu, raus)}
-      ${fehlt.length ? `<div class="wb"><h4>Nicht im Kader</h4><div class="bk" style="grid-template-columns:1fr"><span class="ns">${sortiert(fehlt).map(s => `<b class="dim">${esc(s.n)}${s.i ? `<span class="em">(${esc(s.i)})</span>` : ""}</b>`).join("")}</span></div></div>` : ""}
+      ${fehlt.length ? `<div class="wb"><h4>Nicht im Kader</h4><div class="bk" style="grid-template-columns:1fr"><span class="ns">${sortiert(fehlt).map(s => `<b class="dim">${esc(s.n)}${s.i ? `<span class="em">(${esc(s.i)})</span>` : s.war ? `<span class="em">(zuletzt ${s.war === "Bank" ? "Bank" : "Startelf"}, Grund unbekannt)</span>` : ""}</b>`).join("")}</span></div></div>` : ""}
 </div>`;
   }
   // Aufstellung aus Pokal und Europapokal unter dem Spielbericht (Feld spiel_aufstellung), NEU/RAUS gegenüber dem letzten Ligaspiel
