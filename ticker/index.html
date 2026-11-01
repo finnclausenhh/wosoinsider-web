@@ -710,7 +710,7 @@ button.chip.pfc{cursor:pointer}
 /* Kopfzeile Variante A (Finn 01.11.2026): Logo links, Symbole ohne Kacheln, kein Mittelkreis, kein Vereinsfilter */
 .bar{background:var(--bg)!important}
 .bar-in .logo{justify-self:start;justify-items:center;height:34px;align-content:center;margin-top:6px}
-.kopf-btns{top:6px;gap:2px}.kopf-btns .such-btn{background:none;color:var(--muted);width:40px}.kopf-btns .such-btn svg{stroke:currentColor}
+.kopf-btns{top:14px;gap:4px;align-items:center;height:34px;right:max(4px,calc(env(safe-area-inset-right,0px) - 8px))}.kopf-btns .such-btn{background:none;color:var(--muted);width:40px;height:34px}.kopf-btns .such-btn svg{stroke:currentColor;width:24px;height:24px;stroke-width:1.9}
 .kopf-btns .such-btn[aria-pressed=true]{background:none;color:var(--accent)}
 .vz-btn,.vz-schmal{display:none!important}
 /* Aufstellung als Spielfeld (Finn 01.11.2026) */
@@ -1094,7 +1094,7 @@ button.chip.pfc{cursor:pointer}
         h += `<${tag} class="spl${o.sel === s.n ? " sel" : ""}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%"${attr}><span class="fo" style="width:${F}px;height:${F}px"><span class="cl"${bg}>${inner}</span>${badge}${neu}${ex ? `<span class="ex">${ex}</span>` : ""}</span><span class="nm">${esc(s.n)}${unten}</span></${tag}>`;
       });
     });
-    return h + (o.formation ? `<span class="fm">${esc(o.formation)}</span>` : "") + `</div>`;
+    return h + (o.formation ? `<span class="fm">${esc(o.formation)}${o.gesch ? " (geschätzt)" : ""}</span>` : "") + `</div>`;
   }
   function wxZeile(k, a, b, ka, kb, mitte){
     const mf = s => { const src = fotoSp(k, s); return `<span class="mf"${src ? "" : ` style="background:${KFARBE[k] || "var(--soft)"}"`}>${src ? `<img src="${esc(src)}" alt="" loading="lazy">` : `<b>${initialen(s.voll || s.n)}</b>`}</span>`; };
@@ -1133,7 +1133,7 @@ button.chip.pfc{cursor:pointer}
     let raus = rausBank.concat(rausFehlt, (a.nicht_startelf || []).filter(x => !rausNamen.has(x.n)));
     const bank = sortiert(a.bank || []).map(s => ({...s, p: GRUPPE(s.p)}));
     const fehlt = (a.fehlt || []).filter(s => (s.f === "raus" || s.i) && !rausNamen.has(s.n));  // nur wer zuletzt dabei war oder einen bekannten Grund hat
-    return `<div class="af">${feld(elf, k, {modus: "o", formation: a.formation})}
+    return `<div class="af">${feld(elf, k, {modus: "o", formation: a.formation, gesch: a.geschaetzt})}${a.geschaetzt ? `<p class="ki">Positionen geschätzt, nicht offiziell. ${esc(a.hinweis || "")}</p>` : ""}
       ${bankNamen(bank, rausNamen)}
       ${aenderungen(k, neu, raus)}
       ${fehlt.length ? `<div class="wb"><h4>Nicht im Kader</h4><div class="bk" style="grid-template-columns:1fr"><span class="ns">${sortiert(fehlt).map(s => `<b class="dim">${esc(s.n)}${s.i ? `<span class="em">(${esc(s.i)})</span>` : s.war ? `<span class="em">(zuletzt ${s.war === "Bank" ? "Bank" : "Startelf"}, Grund unbekannt)</span>` : ""}</b>`).join("")}</span></div></div>` : ""}
@@ -1320,7 +1320,7 @@ button.chip.pfc{cursor:pointer}
     const neuSet = vorNamen ? new Set(elf.filter(s => !vorNamen.has(s.n)).map(s => s.n)) : new Set();
     const elfNamen = new Set(elf.map(s => s.n));
     const raus = vor ? (vor.startelf || []).filter(s => !elfNamen.has(s.n)) : [];
-    let h = `<div class="af">${feld(elf, k, {modus: "o", neu: neuSet, formation: a.formation})}`;
+    let h = `<div class="af">${feld(elf, k, {modus: "o", neu: neuSet, formation: a.formation, gesch: a.geschaetzt})}${a.geschaetzt ? `<p class="ki">Positionen geschätzt, nicht offiziell. ${esc(a.hinweis || "")}</p>` : ""}`;
     const bank = a.bank || [], rein = bank.filter(s => s.ein === true), draussen = bank.filter(s => s.ein !== true), bekannt = bank.some(s => s.ein != null);
     const rausSet = new Set(raus.map(s => s.n));
     if (bekannt) {
