@@ -618,6 +618,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .pf-mk{position:absolute;right:0;top:2px;width:46px;height:69px;border-radius:5px;background:#1E5A3E;overflow:hidden}
 .pf-mk i{position:absolute;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:#fff}
 .pf-rasen{position:absolute;inset:0;width:100%;height:100%}
+.tz{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.tz > div{background:var(--card);border-radius:12px;padding:11px 12px;display:grid;gap:3px;min-width:0}.tz .k{font:600 10px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}.tz b{font:800 24px/28px var(--f-display);display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}.tz b em{font:500 12px var(--f-body);font-style:normal;color:var(--muted)}.tz small{font-size:12px;font-weight:600}
 .pf-blick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .pf-blick > div{background:var(--card);border-radius:12px;padding:10px 8px 9px;display:grid;grid-template-rows:14px 26px 16px;gap:3px;min-width:0;text-align:center;justify-items:center;align-items:center}
 .pf-blick .k{font:600 10px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
@@ -1931,11 +1932,61 @@ button.chip.pfc{cursor:pointer}
     window.scrollTo(0, 0);
   }
 
+
+  // Team in Zahlen (Finn 01.11.2026): Vereinswerte mit Ligarang, die auffälligsten 6 zuerst
+  let TEAMW = null;
+  function teamWerte(){
+    if (TEAMW) return TEAMW;
+    const T = {};
+    SPN.spielerinnen.forEach(s => { const t = T[s.k] = T[s.k] || {sp: {}, tore: 0, spaet: 0, joker: 0, karten: 0, fouls: 0, zkw: 0, zkg: 0, pok: 0, pges: 0, sch: 0};
+      (s.spiele || []).forEach(e => { if (e.erg) t.sp[e.md] = e;
+        const tr = e.tore || []; t.tore += tr.length; t.spaet += tr.filter(m => parseInt(m, 10) >= 75).length; if (e.art === "E") t.joker += tr.length;
+        t.karten += (e.gelb ? 1 : 0) + (e.gr ? 1 : 0) + (e.rot ? 1 : 0); });
+      const st = s.stat || {}; t.fouls += st.fouls || 0; t.zkw += st.zk_w || 0; t.zkg += st.zk_ges || 0; t.pok += st.p_ok || 0; t.pges += st.p_ges || 0; t.sch += st.sch || 0; });
+    Object.values(T).forEach(t => { const sp = Object.values(t.sp), n = sp.length || 1;
+      const b = ha => { const r = {s: 0, u: 0, n: 0, pkt: 0, sp: 0}; sp.filter(e => e.ha === ha).forEach(e => { const [x, y] = e.erg.split(":").map(Number), f = ha === "H" ? x : y, g = ha === "H" ? y : x;
+        r.sp++; if (f > g) { r.s++; r.pkt += 3; } else if (f === g) { r.u++; r.pkt++; } else r.n++; }); return r; };
+      const ge = sp.reduce((a, e) => { const [x, y] = e.erg.split(":").map(Number); return a + (e.ha === "H" ? y : x); }, 0);
+      const zn = sp.filter(e => { const [x, y] = e.erg.split(":").map(Number); return (e.ha === "H" ? y : x) === 0; }).length;
+      t.n = sp.length; t.H = b("H"); t.A = b("A");
+      t.w = {heim: t.H.sp ? t.H.pkt / t.H.sp : null, ausw: t.A.sp ? t.A.pkt / t.A.sp : null, tps: t.tore / n, gps: ge / n, zn,
+        spaet: t.tore >= 4 ? t.spaet / t.tore * 100 : null, joker: t.joker, karten: t.karten, fouls: t.fouls / n,
+        zk: t.zkg ? t.zkw / t.zkg * 100 : null, pq: t.pges ? t.pok / t.pges * 100 : null, sch: t.sch / n}; });
+    return TEAMW = T;
+  }
+  function teamZahlen(k){
+    const T = teamWerte(), me = T[k]; if (!me || !me.n) return "";
+    const k1 = (x, d = 1) => x.toLocaleString("de-DE", {minimumFractionDigits: d, maximumFractionDigits: d});
+    const F = [  // [Schlüssel, Titel, Format, Richtung (+1 hoch ist gut, -1 niedrig ist gut), Unterzeile]
+      ["heim", "Punkte pro Heimspiel", v => k1(v), 1, t => `${t.H.s}S ${t.H.u}U ${t.H.n}N`],
+      ["ausw", "Punkte pro Auswärtsspiel", v => k1(v), 1, t => `${t.A.s}S ${t.A.u}U ${t.A.n}N`],
+      ["tps", "Tore pro Spiel", v => k1(v), 1],
+      ["gps", "Gegentore pro Spiel", v => k1(v), -1],
+      ["zn", "Spiele zu Null", v => String(v), 1],
+      ["spaet", "Tore ab der 75. Minute", v => Math.round(v) + " %", 0],
+      ["joker", "Jokertore", v => String(v), 1],
+      ["sch", "Torschüsse pro Spiel", v => k1(v), 1],
+      ["zk", "Zweikampfquote", v => Math.round(v) + " %", 1],
+      ["pq", "Passquote", v => Math.round(v) + " %", 1],
+      ["fouls", "Fouls pro Spiel", v => k1(v), -1],
+      ["karten", "Karten", v => String(v), -1]];
+    const fakten = F.map(([key, titel, fmt, dir, sub], i) => { const v = me.w[key]; if (v == null) return null;
+      const alle = Object.values(T).map(t => t.w[key]).filter(x => x != null), N = alle.length, rang = 1 + alle.filter(x => x > v + 1e-9).length, unten = 1 + alle.filter(x => x < v - 1e-9).length;
+      const top = rang === 1, flop = unten === 1, gut = dir > 0 ? rang <= 3 : dir < 0 ? unten <= 3 : false, schlecht = dir > 0 ? unten <= 3 : dir < 0 ? rang <= 3 : false;
+      const ORD = ["", "", "Zweit", "Dritt", "Viert"], geteilt = alle.filter(x => Math.abs(x - v) < 1e-9).length > 1 ? " (geteilt)" : "";
+      const rt = (rang <= unten ? (rang === 1 ? "Höchster Wert der Liga" : rang <= 4 ? ORD[rang] + "höchster Wert der Liga" : `Platz ${rang} von ${N}`)
+        : (unten === 1 ? "Niedrigster Wert der Liga" : unten <= 4 ? ORD[unten] + "niedrigster Wert der Liga" : `Platz ${rang} von ${N}`)) + geteilt;
+      return {i, titel, wert: fmt(v), sub: sub ? sub(me) : "", rt, farbe: gut ? STFARBE.fit : schlecht ? STFARBE.raus : "var(--muted)", auff: Math.min(rang - 1, unten - 1)}; }).filter(Boolean)
+      .sort((a, b) => a.auff - b.auff || a.i - b.i).slice(0, 6);
+    if (!fakten.length) return "";
+    return kap("Team in Zahlen") + `<div class="tz">${fakten.map(f => `<div><span class="k">${esc(f.titel)}</span><b>${esc(f.wert)}${f.sub ? `<em>${esc(f.sub)}</em>` : ""}</b><small style="color:${f.farbe}">${esc(f.rt)}</small></div>`).join("")}</div><p class="ki">Liga, ${me.n} Spiele. Gezeigt werden die Werte, in denen sich das Team am stärksten vom Rest der Liga abhebt.</p>`;
+  }
   // Stammelf und Saison in Zahlen unter dem Kader (Finn 01.11.2026)
   function kaderExtras(k, L){
     const mds = [...new Set(L.flatMap(s => (s.spiele || []).filter(e => e.erg).map(e => e.md)))].sort((a, b) => a - b);
     if (!mds.length) return "";
     let h = "";  // Stammelf wieder raus (Finn 01.11.2026: Formationen aus Einzelpositionen wirken unrealistisch)
+    h += teamZahlen(k);
     const sum = (s, f) => (s.spiele || []).reduce((a, e) => a + f(e), 0);
     const gegen = e => { const [a, b] = String(e.erg || "").split(":").map(Number); return isNaN(a) ? null : (e.ha === "H" ? b : a); };
     const best = (f, filt) => { const r = L.filter(filt || (() => true)).map(s => [s, f(s)]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]); if (!r.length) return null; return [r.filter(x => x[1] === r[0][1]).map(x => x[0]), r[0][1]]; };
