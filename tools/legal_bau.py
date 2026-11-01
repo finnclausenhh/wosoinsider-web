@@ -89,9 +89,11 @@ DATENSCHUTZ = [
 
 KONTAKT = [
     p(f"Eine Adresse für alles: {ML}"),
-    li("Fragen zu WOSOINSIDER und Wünsche für neue Funktionen"),
+    li("Fragen zu WOSOINSIDER, Verbesserungsvorschläge und Wünsche für neue Funktionen"),
+    li("Kooperationsanfragen von Vereinen, Medien und Partnern"),
     li("Fehler in einer Meldung oder Aufstellung, neue Informationen zu Verletzungen, Sperren oder Rückkehr, bitte mit Link zur Quelle"),
     li("Auskunft, Berichtigung oder Löschung personenbezogener Daten sowie Fragen zu Bild- und Markenrechten"),
+    p("Direkt an Finn Clausen auf Instagram: [@finn.baut](https://www.instagram.com/finn.baut/)"),
     p("Die Postanschrift steht im Impressum."),
 ]
 
