@@ -429,7 +429,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .mb{display:grid;gap:2px}
 .mb .bars{display:flex;gap:3px;align-items:flex-end;height:48px}
 .mb .bars > div{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
-.mb .bars .d{width:5px;height:5px;border-radius:50%}
+.mb .bars .d{width:5px;height:5px;border-radius:50%}.mb .bars.tb{height:62px}.mb .tb .tz{font:800 12px var(--f-display);color:#F5B041;min-height:13px}.mb .tb .b{width:100%;border-radius:3px}.mb .tb .mm{font:600 8.5px var(--f-mono);color:var(--muted)}
 .mb .bars .d.t{background:var(--pokal)}
 .mb .bars .b{width:100%;border-radius:2px}
 .mb .ax{display:flex;justify-content:space-between;font-size:9px;color:var(--muted)}
@@ -573,8 +573,8 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .st-chipl{display:flex;flex-wrap:wrap;gap:6px}.st-chipl button{display:flex;align-items:center;gap:5px;background:var(--soft);border-radius:8px;padding:4px 8px;font-size:13px;color:var(--ink)}
 .sv .st-notiz{font-size:12px;color:var(--muted)}
 .sr-kn{display:flex!important;align-items:center;justify-content:space-between;gap:8px}.sr-kn b{flex:0 1 auto}.sr-fp{display:grid;justify-items:center;min-width:58px!important;text-align:center!important;line-height:1}.sr-fp small{font:600 8.5px/1.15 var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:3px}
-.kt3{display:flex;flex:none;gap:7px;font:600 12px var(--f-mono);color:var(--muted)}.kt3 span{display:flex;align-items:center;gap:4px}
-.kg,.kgr,.kr{display:inline-block;width:9px;height:12px;border-radius:2px;vertical-align:-1px}.kg{background:#F5C518}.kr{background:#E24A4A}.kgr{background:linear-gradient(135deg,#F5C518 50%,#E24A4A 50%)}
+.kt3{display:flex;flex:none;gap:7px;font:800 17px var(--f-display);color:var(--ink)}.kt3 span{display:flex;align-items:center;gap:3px}
+.kg,.kgr,.kr{display:inline-block;width:12px;height:16px;border-radius:2px;vertical-align:-3px}.kg{background:#F5C518}.kr{background:#E24A4A}.kgr{background:linear-gradient(135deg,#F5C518 50%,#E24A4A 50%)}
 .ft{display:grid}.ft-r{display:grid;grid-template-columns:20px 18px minmax(0,1fr) 26px 26px 26px 30px;gap:6px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px;text-align:center;width:100%;color:var(--ink)}
 .ft-r:first-child{border-top:0}.ft-r.ft-h{font:600 10px var(--f-mono);color:var(--muted);padding:4px 0}.ft-r .tb-vn{text-align:left;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ft-r .tb-pk{font-weight:800;font-family:var(--f-display);font-size:17px}.ft-r .tb-pl{font:600 12px var(--f-mono);color:var(--muted)}
 .tb-r{position:relative}.tb-r.z-cl{background:rgba(47,91,255,.20)}.tb-r.z-q{background:rgba(110,155,255,.09)}.tb-r.z-ab{background:rgba(226,74,74,.12)}.tb-r.z-cl,.tb-r.z-q,.tb-r.z-ab{margin:0 -10px;padding-left:10px;padding-right:10px;width:calc(100% + 20px)}.tb-r.z-cl+.tb-r.z-q,.tb-r.z-q+.tb-r.z-q,.tb-r.z-ab+.tb-r.z-ab{border-top-color:rgba(255,255,255,.06)}.tb-r .tb-pl{padding-left:4px}.tb-r.mein .tb-vn{color:#fff}.tb-r.mein{box-shadow:inset 3px 0 0 var(--vc)}.tb-r.mein .tb-vn::after{content:" ●";color:var(--vc);font-size:10px;vertical-align:2px}
@@ -587,6 +587,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .pf-liste{display:grid;gap:8px}
 .pf-tr,.pf-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--card);border-radius:12px;padding:8px 12px 8px 8px;width:100%}
 .pf-tx{display:grid;min-width:0}.pf-tx b{font-weight:700}.pf-tx small{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kd-l{display:inline-flex;cursor:pointer}.begr1{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kd-btn{display:inline-flex;align-items:center;gap:8px;min-width:0;color:inherit;font:inherit}.tb-k .kd-btn{flex:1;min-width:0}
 .pf-dot{width:10px;height:10px;border-radius:50%}.pf-st{font:700 10px var(--f-mono);font-style:normal;text-transform:uppercase;border:1px solid;border-radius:5px;padding:2px 5px;white-space:nowrap}
 .pf-lg{width:52px;height:52px;border-radius:9px;background:var(--soft);display:grid;place-items:center}
@@ -832,7 +833,7 @@ button.chip.pfc{cursor:pointer}
   }
   function newsKarte(m){
     const a = m.aufstellung, auf = a && (a.startelf || []).length;
-    const rechts = auf ? `<span class="nk-r" role="img" aria-label="${esc(m.verein)} gegen ${esc(a.gegner)}">${logo(KURZ[m.verein], 20)}${logo(KURZ[a.gegner], 20)}</span>` : plakette(meldungsStatus(m));
+    const rechts = auf ? `<span class="nk-r" role="img" aria-label="${esc(m.verein)} gegen ${esc(a.gegner)}"><span class="kd-l" data-kader="${esc(KURZ[m.verein])}">${logo(KURZ[m.verein], 20)}</span><span class="kd-l" data-kader="${esc(KURZ[a.gegner])}">${logo(KURZ[a.gegner], 20)}</span></span>` : plakette(meldungsStatus(m));
     return `<button class="nk" data-id="${esc(m.id)}">${bild(m, 84, 84)}<div class="nk-b">
       <div class="nk-top"><div class="tags">${(m.tags || []).map(tag).join("")}${auf ? tag("AUFSTELLUNG") : ""}</div>${rechts}</div>
       ${auf ? `<p class="elf">${startelfZeile(a.startelf)}</p>` : `<h2>${esc(m.kurz || m.headline)}</h2>`}
@@ -1094,7 +1095,7 @@ button.chip.pfc{cursor:pointer}
   function partieZeile(p, mitTag){
     const bs = belSeiten(p), mk = meinK(p), klein = SEL.size && !mk;
     return `<button class="pr${mk ? " mein" : ""}" ${mk ? `style="--vc:${ring(mk)}" ` : ""}data-game="${esc(p.id)}">${mitTag ? `<div class="dat" style="font-size:11px">${esc(terminiert(p) ? wtLang(p.anstoss) : "Termin offen")}</div>` : ""}<div class="pr-z">
-      <span class="pr-t h"><span data-kname="${esc(KNAME[p.heim_k] || "")}" title="${esc(p.heim)}">${esc(KNAME[p.heim_k] || p.heim)}</span>${logo(p.heim_k, 30)}</span>${mitte(p)}<span class="pr-t">${logo(p.gast_k, 30)}<span data-kname="${esc(KNAME[p.gast_k] || "")}" title="${esc(p.gast)}">${esc(KNAME[p.gast_k] || p.gast)}</span></span></div>
+      <span class="pr-t h"><span data-kname="${esc(KNAME[p.heim_k] || "")}" title="${esc(p.heim)}">${esc(KNAME[p.heim_k] || p.heim)}</span><span class="kd-l" data-kader="${esc(p.heim_k)}">${logo(p.heim_k, 30)}</span></span>${mitte(p)}<span class="pr-t"><span class="kd-l" data-kader="${esc(p.gast_k)}">${logo(p.gast_k, 30)}</span><span data-kname="${esc(KNAME[p.gast_k] || "")}" title="${esc(p.gast)}">${esc(KNAME[p.gast_k] || p.gast)}</span></span></div>
       ${bs.length ? (klein ? `<div class="belh klein"><span class="kap">ENGLISCHE WOCHE</span></div>` : `<div class="belh"><span class="kap">ENGLISCHE WOCHE</span>${bs.map(([n, b]) => `<span><b>${esc(n)}</b> ${esc(b.text)}</span>`).join("")}</div>`) : ""}</button>`;
   }
   const alleSpiele = () => { const g = new Set(); return (SP.spieltage || []).flatMap(t => t.partien.concat(t.nachholspiele || [])).filter(p => !g.has(p.id) && g.add(p.id)); };
@@ -1158,7 +1159,7 @@ button.chip.pfc{cursor:pointer}
     $("#main").innerHTML = `<div class="det">
       <button class="back" data-back="1">‹ ${p.md ? `${p.md}. Spieltag` : "Spielplan"}</button>
       <div class="kopf"><div class="info">${esc(info)}</div>
-        <div class="tz2"><div class="tk">${logo(p.heim_k, 40)}<span>${esc(p.heim)}</span></div>${mitte(p)}<div class="tk">${logo(p.gast_k, 40)}<span>${esc(p.gast)}</span></div></div>
+        <div class="tz2"><button class="tk kd-btn" data-kader="${esc(p.heim_k)}">${logo(p.heim_k, 40)}<span>${esc(p.heim)}</span></button>${mitte(p)}<button class="tk kd-btn" data-kader="${esc(p.gast_k)}">${logo(p.gast_k, 40)}<span>${esc(p.gast)}</span></button></div>
         ${tore.length ? `<div class="tore"><div class="h">${schuetzinnen(tore, "heim")}</div>${BALL}<div>${schuetzinnen(tore, "gast")}</div></div>
           <button class="tbtn" data-tore="1" aria-expanded="${TOREOFFEN}">${TOREOFFEN ? "Tore im Detail ausblenden" : "Tore im Detail mit Vorlage"}</button>${TOREOFFEN ? `<div class="tdet">${det}</div>` : ""}` : ""}
       </div>
@@ -1203,7 +1204,7 @@ button.chip.pfc{cursor:pointer}
     if (offen.length) h += `<div class="opbox"><div class="kh">${stufeSym("unsicher", 14)}${kap(offen.length > 1 ? "Offene Positionen" : "Offene Position")}</div>
       ${offen.map(o => `<div class="opg"><i>${esc(o.pos)}</i><span><b>${esc(o.n)}</b> <span class="mu">${esc(o.warum)}</span></span>${o.alt ? `<i>ALT.</i><span><b>${esc(o.alt)}</b> <span class="mu">${esc(o.altWarum)}</span></span>` : ""}</div>`).join("")}</div>`;
     const g = sel && alle.find(x => x.n === sel);
-    h += `<div class="begr">${kap("Begründung")}${g ? `<span>${esc(g.voll || g.n)}${STUFE[g.st] ? ` (${STUFE[g.st][2]})` : ""}: ${esc(g.warum)}</span>` : '<span class="mu">Name antippen, dann steht hier, warum wir sie so einschätzen.</span>'}</div>`;
+    h += `<div class="begr">${kap("Begründung")}${g ? `<span class="begr1"><b>${esc(nachN(g.voll || g.n))}</b> · ${esc(kurzWarum(g.warum))}</span>` : '<span class="mu">Name antippen, dann steht hier, warum wir sie so einschätzen.</span>'}</div>`;
     if (a.datenluecke) h += `<p class="dat" style="font-size:11px">Datenlücke: ${esc(a.datenluecke)}, deshalb ohne Einstufung.</p>`;
     // Bank höchstens Unsicher: wer nicht in der Startelf steht, kann nicht Erwartet oder Sicher sein
     const bankCh = s => ch(s.st === "sicher" || s.st === "erwartet" ? {...s, st: "unsicher"} : s);
@@ -1241,7 +1242,11 @@ button.chip.pfc{cursor:pointer}
     return `<div class="hero"><div class="kick">${esc(a.kicker)}</div><h1 class="disp">${esc(a.titel)}</h1>
       <div>${(a.punkte || []).map(p => `<div class="hp" style="--pc:${f(p.art)}"><div class="kh"><i></i>${kap(p.label)}</div><span>${esc(p.text)}</span></div>`).join("")}</div></div>`;
   }
-  function minutenBalken(s){
+  function minutenBalken(s, toreModus){
+    if (toreModus && s.some(x => (x[2] || 0) > 0)) { const mx = Math.max(...s.map(x => x[2] || 0), 1);
+      return `<div class="mb" role="img" aria-label="Tore je Spieltag: ${s.map(x => x[2] || 0).join(", ")}"><div class="bars tb">${s.map(x => { const mi = x[0] || 0, to = x[2] || 0;
+        return `<div><span class="tz">${to ? to : ""}</span><span class="b" style="height:${to ? 10 + to / mx * 30 : 3}px;background:${to ? "#F5B041" : mi ? "rgba(47,91,255,.45)" : "var(--line)"}"></span><span class="mm">${mi ? mi + "'" : "–".replace("–", "·")}</span></div>`; }).join("")}</div>
+        <div class="ax"><span>Sp. 1</span><span>Tore je Spieltag, darunter Minuten</span><span>Sp. ${s.length}</span></div></div>`; }
     return `<div class="mb" role="img" aria-label="Minuten je Spieltag: ${s.map(x => x[0]).join(", ")}"><div class="bars">${s.map(x => { const mi = x[0] || 0, st = x[1] || 0, to = x[2] || 0;
       return `<div><span class="d${to > 0 ? " t" : ""}"></span><span class="b" style="height:${Math.max(mi, 3) / 90 * 40}px;background:${mi === 0 ? "var(--line)" : st === 1 ? "var(--accent)" : "rgba(47,91,255,.45)"}"></span></div>`; }).join("")}</div>
       <div class="ax"><span>Sp. 1</span><span>Minuten</span><span>Sp. ${s.length}</span></div></div>`;
@@ -1265,7 +1270,7 @@ button.chip.pfc{cursor:pointer}
       const s = w == null ? null : w >= 2 ? ["leicht", "#4ADE80"] : w >= 1.3 ? ["mittel", "#F5B041"] : ["schwer", "#FF8A8A"];
       return `<div class="geg">${logo(x.k, 22)}<div><span class="a"><b>${esc(kname(x.k))}</b> <span class="mu">${x.heim ? "zu Hause" : "auswärts"}</span></span>
         <small>${esc(x.term ? tagDatum(x.z) : "Wochenende " + wochenende(x.z))}${w != null ? ` · ${Number(w).toFixed(1).replace(".", ",")} Gegentore pro Spiel` : ""}</small></div>${s ? `<span class="cap" style="background:${s[1]}">${s[0]}</span>` : ""}</div>`; }).join("");
-    return `<article class="fk">${kopf}<div class="finh">${minutenBalken(f.s || [])}<p>${esc(f.text)}</p>
+    return `<article class="fk">${kopf}<div class="finh">${minutenBalken(f.s || [], /Tor/.test(f.big_txt || "") && !/Gegentor/.test(f.big_txt || ""))}<p>${esc(f.text)}</p>
       ${geg ? `<div style="display:grid;gap:8px">${kap("Nächste Gegner")}${geg}</div>` : ""}${kbBox(f.kb)}
       ${fo && fo.datei && nachweis(fo) ? `<div class="credit" style="font-size:9.5px">${nachweis(fo)}</div>` : ""}</div></article>`;
   }
@@ -1321,7 +1326,7 @@ button.chip.pfc{cursor:pointer}
     return `<section class="sek">${sektion("04", "Spieltag", "Spiele mit Ansage", "Die Fakten, die für deine Aufstellung zählen.")}
       <div class="seg" role="group" aria-label="Spieltag">${tage.map(t => `<button data-imd="${t.md}" aria-pressed="${t.md === IMD}">Sp. ${t.md}</button>`).join("")}</div>
       ${!ps.length ? '<p class="dat">Deine Vereine sind an diesem Spieltag nicht unter den Spielen mit Ansage.</p>' : ""}
-      ${ps.map(g => `<div class="ig"><div class="vs"><span class="h">${esc(kname(g.heim))}</span>${logo(g.heim, 24)}<span class="d"><b>${esc(g.datum)}</b><small>${esc(g.zeit)} Uhr</small></span>${logo(g.gast, 24)}<span>${esc(kname(g.gast))}</span></div>
+      ${ps.map(g => `<div class="ig"><div class="vs"><span class="h">${esc(kname(g.heim))}</span><span class="kd-l" data-kader="${esc(g.heim)}">${logo(g.heim, 24)}</span><span class="d"><b>${esc(g.datum)}</b><small>${esc(g.zeit)} Uhr</small></span><span class="kd-l" data-kader="${esc(g.gast)}">${logo(g.gast, 24)}</span><span>${esc(kname(g.gast))}</span></div>
         ${(g.fakten || []).map(x => `<div class="fakt"><i></i><span>${fett(x)}</span></div>`).join("")}${kbBox(g.kb)}</div>`).join("")}</section>`;
   }
   function kalenderSektion(K){
@@ -1655,7 +1660,7 @@ button.chip.pfc{cursor:pointer}
 
   // ---------------- Tabelle und Statistik (nur Liga, berechnet aus spielplan.json und spielerinnen.json)
   let STAUF = {};
-  const STKAT = [["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["sch","Torschüsse","Sportschau-Spielstatistik"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["zkw","Zweikämpfe gewonnen","Sportschau-Spielstatistik"],["gef","Gefoult worden","Sportschau-Spielstatistik"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["karten","Karten","Gelb 1, Gelb-Rot 3, Rot 5 Punkte"],["fouls","Fouls","Sportschau-Spielstatistik"],["fair","Fairnesstabelle","Kartenpunkte der Spielerinnen je Verein, wenigste oben"]];
+  const STKAT = [["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["sch","Torschüsse","laut Spielstatistik"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["zkw","Zweikämpfe gewonnen","laut Spielstatistik"],["gef","Gefoult worden","laut Spielstatistik"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["karten","Karten","Gelb 1, Gelb-Rot 3, Rot 5 Punkte"],["fouls","Fouls","laut Spielstatistik"],["fair","Fairnesstabelle","Kartenpunkte der Spielerinnen je Verein, wenigste oben"]];
   function ligaStand(){
     const T = {}, fertig = [];
     ALLE.forEach(k => T[k] = {k, sp: 0, s: 0, u: 0, n: 0, tp: 0, tm: 0, pkt: 0});
@@ -1686,7 +1691,7 @@ button.chip.pfc{cursor:pointer}
   function stListe(k, l, n){
     const max = l.length ? l[0][k] : 1; let rang = 0, vor = null;
     return l.slice(0, n).map((v, i) => { if (v[k] !== vor) rang = i + 1; vor = v[k]; const kl = n > 3 ? 30 : 44;
-      return `<button class="sr${rang === 1 ? " r1" : ""}" data-profil="${esc(v.s.id)}"><span class="sr-rk${rang <= 3 ? " g" + rang : ""}">${rang <= 3 ? rang : rang + "."}</span>${pfFoto(v.s, kl, kl, n > 3 ? 7 : 9)}${logo(v.s.k, 18)}${k === "karten" ? `<span class="sr-nm sr-kn"><b>${stNach(v.s)}</b>${stKarten(v)}</span><span class="sr-w sr-fp">${v[k]}<small>Fairness-<br>Punkte</small></span>` : `<span class="sr-nm"><b>${esc(v.s.n)}</b><span class="sr-bal"><i style="width:${Math.max(4, v[k] / max * 100)}%"></i></span></span><span class="sr-w">${stFmt(k, v[k])}</span>`}</button>`; }).join("");
+      return `<button class="sr${rang === 1 ? " r1" : ""}" data-profil="${esc(v.s.id)}"><span class="sr-rk${rang <= 3 ? " g" + rang : ""}">${rang <= 3 ? rang : rang + "."}</span>${pfFoto(v.s, kl, kl, n > 3 ? 7 : 9)}<span class="kd-l" data-kader="${esc(v.s.k)}">${logo(v.s.k, 18)}</span>${k === "karten" ? `<span class="sr-nm sr-kn"><b>${stNach(v.s)}</b>${stKarten(v)}</span><span class="sr-w sr-fp">${v[k]}<small>Fairness-<br>Punkte</small></span>` : `<span class="sr-nm"><b>${esc(v.s.n)}</b><span class="sr-bal"><i style="width:${Math.max(4, v[k] / max * 100)}%"></i></span></span><span class="sr-w">${stFmt(k, v[k])}</span>`}</button>`; }).join("");
   }
   function statView(art, sanft){
     BACK = "stat"; PR_STAPEL = []; setHash(art); VIEW_STAT = art;
@@ -1780,6 +1785,11 @@ button.chip.pfc{cursor:pointer}
       ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}</div>`;
     window.scrollTo(0, 0);
   }
+  function kurzWarum(w){
+    const t = String(w || "").split(";").map(x => x.trim()), a = (t[0] || "").replace(/ im Kader/g, " Kader").replace(/Einsatzwert /g, "").replace(/, /g, " · ");
+    const aus = t.slice(1).map(x => (x.match(/Ausfall: ([^(]+)/) || x.match(/^(Sperre|fraglich)/) || [])[1]).filter(Boolean).map(x => x.trim());
+    return [a, ...new Set(aus)].filter(Boolean).join(" · ");
+  }
   function warumSatz(s, pr){
     const m = String(pr.warum || "").match(/(\d+)\/(\d+) Startelf/);
     if (pr.st === "ausgeschlossen") return `Fällt aus (${pr.grund || "verletzt"}).${m ? ` Vorher ${m[1]} der letzten ${m[2]} Spiele in der Startelf.` : ""}`;
@@ -1794,7 +1804,7 @@ button.chip.pfc{cursor:pointer}
     // Kopf
     const stTag = st === "raus" ? '<span class="pf-tag raus">VERLETZT</span>' : st === "gesperrt" ? '<span class="pf-tag sperre">GESPERRT</span>' : st === "fraglich" ? '<span class="pf-tag frag">FRAGLICH</span>' : "";
     let h = `<div class="pf-kopf">${pfFoto(s, 132, 165, 12, true)}<div class="pf-kt">${haupt ? `<span class="pf-mk" title="Position im Spiel">${rasen(true)}<i style="left:${Math.min(86, Math.max(14, fx(haupt[0])))}%;top:${fy(haupt[1])}%"></i></span>` : ""}
-      <h1>${vorn ? esc(vorn) + "<br>" : ""}${esc(nach)}</h1><div class="pf-ver">${logo(s.k, 20)}${esc(s.verein)}${s.nr ? " · Nr. " + esc(s.nr) : ""}</div>
+      <h1>${vorn ? esc(vorn) + "<br>" : ""}${esc(nach)}</h1><div class="pf-ver"><button class="kd-btn" data-kader="${esc(s.k)}">${logo(s.k, 20)}${esc(s.verein)}</button>${s.nr ? " · Nr. " + esc(s.nr) : ""}</div>
       <div class="pf-tags">${stTag}<span class="pf-tag">${esc(KBNAME[s.pos] || s.pos || "")}</span></div></div></div>`;
     // Auf einen Blick
     const eins = sp.filter(e => e.art === "S" || e.art === "E").slice(-3), avg = eins.length ? Math.round(eins.reduce((a, e) => a + e.min, 0) / eins.length) : 0;
@@ -1824,18 +1834,27 @@ button.chip.pfc{cursor:pointer}
       const starts = s.slots.reduce((a, t) => a + t[3], 0), kader = sp.filter(e => e.art !== "X").length;
       const q = kader ? starts / kader : 0, rolleS = q >= .75 ? ["STAMMPLATZ", "#2EB872"] : q >= .4 ? ["ROTATION", "#E0962B"] : ["HERAUSFORDERIN", "#A9B4C6"];
       const stS = sp.filter(e => e.art === "S"), avgS = stS.length ? Math.round(stS.reduce((a, e) => a + e.min, 0) / stS.length) : 0;
-      const key = t => t[0] + "|" + t[2], meine = {}; s.slots.forEach(t => meine[key(t)] = (meine[key(t)] || 0) + t[3]);
+      const key = t => t[0] + "|" + t[2], meine = {};
+      // Plätze aus anderen Systemen dem nächsten Platz des Hauptsystems zuordnen (waagerecht doppelt gewichtet)
+      const naechster = t => sys.slots.find(u => key(u) === key(t)) || sys.slots.slice().sort((a, b) => (Math.abs(a[1] - t[1]) * 2 + Math.abs((LY[a[0]] ?? .5) - (LY[t[0]] ?? .5))) - (Math.abs(b[1] - t[1]) * 2 + Math.abs((LY[b[0]] ?? .5) - (LY[t[0]] ?? .5))))[0];
+      s.slots.forEach(t => { const u = naechster(t); meine[key(u)] = (meine[key(u)] || 0) + t[3]; });
       const punkte = sys.slots.map(t => ({lp: t[0], x: t[1], c: meine[key(t)] || 0}));
-      s.slots.forEach(t => { if (!sys.slots.some(u => key(u) === key(t))) punkte.push({lp: t[0], x: t[1], c: t[3]}); });
+      const hauptSlot = sys.slots.slice().sort((a, b) => (meine[key(b)] || 0) - (meine[key(a)] || 0))[0];
+      const imSys = t => sys.slots.some(u => key(u) === key(t));
+      const weitere = sys.slots.filter(u => u !== hauptSlot && meine[key(u)]).sort((x, y) => meine[key(y)] - meine[key(x)]);
+      const fremd = s.slots.filter(t => !imSys(t));
+      const anders = (sys.andere || []).map(a => `${esc(a.name)} gegen ${a.gegen.map(g => esc(kname(g.gk))).join(", ")}`).join(" und ");
       const mx = Math.max(...punkte.map(p => p.c), 1);
       const KBP = {TW: "Torhüterin", ABW: "Abwehr", MF: "Mittelfeld", ST: "Sturm"}, grob = r => r === "Tor" ? "TW" : /verteidig|Schiene/.test(r) ? "ABW" : /Sturm|stürm/.test(r) ? "ST" : "MF";
       const ers = (s.ersatz || []).map(r => `<div class="pf-er"><b>${esc(r.n)}</b><span>${[r.s ? r.s + "x für sie in der Startelf" : "", r.w ? r.w + "x für sie eingewechselt" : ""].filter(Boolean).join(" · ")}</span></div>`).join("");
-      h += `<section class="pf-box">${kap("Ihre Position")}<div class="pf-prow"><div class="pf-pfeld pf-pfeld2">${rasen(false)}<span class="pf-sys">${esc(sys.name)}</span>${punkte.map(p => `<span class="pf-slot${p.c ? " an" : ""}" style="left:${Math.min(88, Math.max(12, fx(p.x)))}%;top:${fy(LY[p.lp] ?? .5)}%;${p.c ? `opacity:${.55 + .45 * p.c / mx}` : ""}">${p.c && s.slots.length > 1 ? p.c : ""}</span>`).join("")}</div>
-        <div class="pf-pinfo"><b class="pf-pn">${esc(s.slots[0][2])}</b><span class="pf-rolle" style="color:${rolleS[1]};border-color:${rolleS[1]}">${rolleS[0]}</span>
+      h += `<section class="pf-box">${kap("Ihre Position")}<div class="pf-prow"><div class="pf-pfeld pf-pfeld2">${rasen(false)}<span class="pf-sys">${esc(sys.name)}</span>${punkte.map(p => `<span class="pf-slot${p.c ? " an" : ""}" style="left:${Math.min(88, Math.max(12, fx(p.x)))}%;top:${fy(LY[p.lp] ?? .5)}%;${p.c ? `opacity:${.55 + .45 * p.c / mx}` : ""}">${p.c && punkte.filter(q => q.c).length > 1 ? p.c : ""}</span>`).join("")}</div>
+        <div class="pf-pinfo"><b class="pf-pn">${esc(hauptSlot[2])}</b><span class="pf-rolle" style="color:${rolleS[1]};border-color:${rolleS[1]}">${rolleS[0]}</span>
         <div class="pf-pz"><b>${starts}</b> von ${kader} Spielen in der Startelf</div>
         <div class="pf-pz"><b><span class="oe">Ø</span>${avgS}'</b> wenn sie beginnt</div>
-        ${s.slots.length > 1 ? `<div class="pf-pz mu">auch: ${s.slots.slice(1).map(t => esc(t[2]) + " " + t[3] + "x").join(", ")}</div>` : ""}
-        ${s.pos && KBP[s.pos] && grob(s.slots[0][2]) !== s.pos && !(s.pos === "ST" && grob(s.slots[0][2]) === "MF") ? `<div class="pf-pz kbp">Kickbase führt sie als ${KBP[s.pos]}</div>` : ""}</div></div>
+        ${weitere.length ? `<div class="pf-pz mu">auch als ${weitere.map(u => esc(u[2]) + " " + meine[key(u)] + "x").join(", ")}</div>` : ""}
+        ${fremd.length ? `<div class="pf-pz mu">in anderen Systemen ${fremd.map(t => esc(t[2]) + " " + t[3] + "x").join(", ")}</div>` : ""}
+        <div class="pf-pz mu">${esc(kname(s.k))} meist ${esc(sys.name)} (${sys.spiele}x)${anders ? `, sonst ${anders}` : ""}</div>
+        ${s.pos && KBP[s.pos] && grob(hauptSlot[2]) !== s.pos && !(s.pos === "ST" && grob(hauptSlot[2]) === "MF") ? `<div class="pf-pz kbp">Kickbase führt sie als ${KBP[s.pos]}</div>` : ""}</div></div>
         ${kap("Wer sie ersetzt")}${ers || '<div class="pf-er"><span>Bisher keine, sie hat immer selbst gespielt.</span></div>'}</section>`;
     } else
     if (haupt) {
@@ -1908,8 +1927,8 @@ button.chip.pfc{cursor:pointer}
     if (q("[data-statzu]")) { statZu(); return; }
     if ((x = q("[data-stsprung]"))) { const z = document.getElementById("st-" + x.dataset.stsprung); if (z) z.scrollIntoView({behavior: "smooth", block: "start"}); return; }
     if ((x = q("[data-stauf]"))) { STAUF[x.dataset.stauf] = !STAUF[x.dataset.stauf]; const y = window.scrollY; statView("statistik", true); window.scrollTo(0, y); return; }
-    if ((x = q("[data-kader]"))) { KADER_HER = {artikel: document.querySelector("article.det") && ARTIKEL, game: VIEW === "spielplan" && GAME, scroll: window.scrollY}; ladeSPN().then(() => { vereinsKader(x.dataset.kader, "zurueck"); window.scrollTo(0, 0); }).catch(() => {}); return; }
-    if (q("[data-kaderzu]")) { const h = KADER_HER || {}; KADER_HER = null; BACK = null; if (h.artikel) { setHash(h.artikel); article(h.artikel); } else if (h.game) { VIEW = "spielplan"; spiel(h.game); } else show(VIEW); window.scrollTo(0, h.scroll || 0); return; }
+    if ((x = q("[data-kader]"))) { KADER_HER = {artikel: document.querySelector("article.det") && ARTIKEL, game: VIEW === "spielplan" && GAME, stat: BACK === "stat" && VIEW_STAT, profil: BACK === "profil" && PR_STAPEL[PR_STAPEL.length - 1], scroll: window.scrollY}; ladeSPN().then(() => { vereinsKader(x.dataset.kader, "zurueck"); window.scrollTo(0, 0); }).catch(() => {}); return; }
+    if (q("[data-kaderzu]")) { const h = KADER_HER || {}; KADER_HER = null; BACK = null; if (h.stat) { statView(h.stat, true); } else if (h.profil) { oeffneProfil(h.profil); } else if (h.artikel) { setHash(h.artikel); article(h.artikel); } else if (h.game) { VIEW = "spielplan"; spiel(h.game); } else show(VIEW); window.scrollTo(0, h.scroll || 0); return; }
     if ((x = q("[data-statverein]"))) { vereinsKader(x.dataset.statverein, VIEW_STAT || "tabelle"); window.scrollTo(0, 0); return; }
     if (q("[data-suche]")) { STAT_HER = null; VIEW_STAT = null; document.querySelectorAll("[data-statview]").forEach(b => b.setAttribute("aria-pressed", false)); PR_HER = null; SUCHE_HER = {typ: document.querySelector("article.det") && ARTIKEL ? "artikel" : VIEW === "spielplan" && GAME ? "spiel" : VIEW, id: ARTIKEL || GAME, scroll: window.scrollY}; suche(); return; }
     if ((x = q("[data-suchezu]"))) { if (x.dataset.suchezu === "2") { suche(); return; } const h = SUCHE_HER || {typ: "meldungen"}; SUCHE_HER = null; PR_HER = null; BACK = null;
