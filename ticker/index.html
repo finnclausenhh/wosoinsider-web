@@ -747,7 +747,7 @@ button.chip.pfc{cursor:pointer}
 .af .hint .lk{color:var(--accent)}
 .btn-prog{justify-self:start;background:var(--accent);color:#fff;border-radius:10px;padding:10px 14px;font-weight:600;font-size:14px}
 .pf-tag.baby{background:rgba(229,143,181,.2);color:#F4B6D2}.pf-tag.abg{background:rgba(110,155,255,.2);color:#B5CBFF}
-.pf-trainer{display:grid;gap:6px}.pf-trainer .pf-tr{cursor:default;box-sizing:border-box}
+.pf-trainer{display:grid;gap:6px}.pf-zahl{font:800 15px var(--f-display);font-style:normal;color:var(--text,#fff);white-space:nowrap}.pf-trainer .pf-tr{cursor:default;box-sizing:border-box}
 </style>
 
 
@@ -1926,9 +1926,47 @@ button.chip.pfc{cursor:pointer}
     L.sort((a, b) => (ord[a.pos] ?? 9) - (ord[b.pos] ?? 9) || (parseInt(a.nr, 10) || 99) - (parseInt(b.nr, 10) || 99));
     const zeile = s => { const st = stArt(s.status); return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small></span>${st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : ""}</button>`; };
     $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>
-      ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}<div id="kd-trainer"></div></div>`;
+      ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}<div id="kd-trainer"></div>${kaderExtras(k, L)}</div>`;
     trainerteam(k);
     window.scrollTo(0, 0);
+  }
+
+  // Stammelf und Saison in Zahlen unter dem Kader (Finn 01.11.2026)
+  function kaderExtras(k, L){
+    const mds = [...new Set(L.flatMap(s => (s.spiele || []).filter(e => e.erg).map(e => e.md)))].sort((a, b) => a - b), letzte = mds.slice(-5), n5 = letzte.length;
+    if (!n5) return "";
+    // Plätze aus den Spielpositionen (orte: [x, y, Anzahl]); wer am häufigsten begonnen hat, bekommt zuerst ihren Stammplatz
+    const kand = L.map(s => { const sp = (s.spiele || []).filter(e => letzte.includes(e.md));
+      return {s, st: sp.filter(e => e.art === "S").length, min: sp.reduce((a, e) => a + (e.min || 0), 0)}; }).filter(x => x.st > 0 && (x.s.orte || []).length)
+      .sort((a, b) => b.st - a.st || b.min - a.min);
+    const elf = [];
+    kand.forEach(x => { if (elf.length >= 11) return; const tw = x.s.pos === "TW";
+      if (tw && elf.some(e => e.y <= .15)) return;
+      const o = x.s.orte.slice().sort((a, b) => b[2] - a[2]).find(([ox, oy]) => !elf.some(e => Math.abs(e.x - ox) < .15 && Math.abs(e.y - oy) < .15) && (tw ? oy <= .15 : oy > .15));
+      if (!o) return; elf.push({...x, x: o[0], y: o[1]}); });
+    let h = "";
+    if (elf.length >= 10) {
+      const reihen = {}; elf.filter(e => e.y > .15).forEach(e => { const r = e.y === .6 ? .7 : e.y; reihen[r] = (reihen[r] || 0) + 1; });
+      const form = Object.keys(reihen).sort((a, b) => a - b).map(y => reihen[y]).join("-");
+      let f = `<div class="feld" style="height:520px">${feldSVG()}`;
+      elf.forEach(e => { const pl = {n: nachN(e.s.n), voll: e.s.n}, src = fotoSp(k, pl), top = 11 + (.9 - e.y) / .8 * 78;
+        const inner = src ? `<img src="${esc(src)}" alt="" loading="lazy">` : `<b>${initialen(e.s.n)}</b>`;
+        f += `<button class="spl" style="left:${(e.x * 100).toFixed(1)}%;top:${top.toFixed(1)}%" data-profil="${esc(e.s.id)}"><span class="fo" style="width:52px;height:52px"><span class="cl"${src ? "" : ` style="background:${KFARBE[k] || "var(--soft)"}"`}>${inner}</span><span class="ex">${e.st}/${n5}</span></span><span class="nm">${esc(pl.n)}</span></button>`; });
+      f += `<span class="fm">${esc(form)}</span></div>`;
+      const weg = elf.filter(x => ["raus", "gesperrt", "fraglich"].includes((x.s.status || {}).s)).map(x => { const a = stArt(x.s.status); return `<b class="dim">${esc(x.s.n)}<span class="em">(${esc(STWORT[a] || a)})</span></b>`; });
+      h += kap("Stammelf") + `<div class="af">${f}<p class="ki">Die Spielerinnen mit den meisten Startelfeinsätzen in den letzten ${n5} Ligaspielen, jeweils auf ihrer häufigsten Position. Die Zahl zeigt, wie oft sie begonnen haben.</p>
+        ${weg.length ? `<div class="wb"><h4>Aus der Stammelf fehlt aktuell</h4><div class="bk" style="grid-template-columns:1fr"><span class="ns">${weg.join("")}</span></div></div>` : ""}</div>`;
+    }
+    const sum = (s, f) => (s.spiele || []).reduce((a, e) => a + f(e), 0);
+    const gegen = e => { const [a, b] = String(e.erg || "").split(":").map(Number); return isNaN(a) ? null : (e.ha === "H" ? b : a); };
+    const best = (f, filt) => { const r = L.filter(filt || (() => true)).map(s => [s, f(s)]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]); if (!r.length) return null; return [r.filter(x => x[1] === r[0][1]).map(x => x[0]), r[0][1]]; };
+    const reihen = [["Tore", best(s => sum(s, e => (e.tore || []).length)), v => v + (v === 1 ? " Tor" : " Tore")],
+      ["Vorlagen", best(s => sum(s, e => e.vorl || 0)), v => v + (v === 1 ? " Vorlage" : " Vorlagen")],
+      ["Minuten", best(s => sum(s, e => e.min || 0)), v => v.toLocaleString("de-DE") + " Min."],
+      ["Zu Null", best(s => sum(s, e => e.art === "S" && gegen(e) === 0 ? 1 : 0), s => s.pos === "TW"), v => v + (v === 1 ? " Spiel" : " Spiele")]].filter(r => r[1]);
+    if (reihen.length) h += kap("Saison in Zahlen") + `<div class="pf-liste">${reihen.map(([t, [ls, v], fmt]) => { const s0 = ls[0];
+      return `<button class="pf-tr" data-profil="${esc(s0.id)}">${pfFoto(s0, 44, 44, 8)}<span class="pf-tx"><b>${esc(ls.map(x => x.n).slice(0, 2).join(", "))}${ls.length > 2 ? ` +${ls.length - 2}` : ""}</b><small>${esc(t)}</small></span><i class="pf-zahl">${esc(fmt(v))}</i></button>`; }).join("")}</div>`;
+    return h;
   }
   // Trainerteam unter dem Kader (Finn 01.11.2026): Cheftrainer/in aus trainer.json, Co- und Torwarttrainer/innen aus fotos.json
   let TRAINER = null;
