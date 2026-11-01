@@ -1731,7 +1731,7 @@ button.chip.pfc{cursor:pointer}
         h += `<section class="stk${auf ? " stk-klein" : ""}" id="st-${k}"><div class="stk-k"><h2>${t}</h2>${e ? `<small>${e}</small>` : ""}</div>${l.length ? stListe(k, l, n) : '<p class="st-erkl">Noch niemand.</p>'}
           ${mehr.length ? `<div class="st-erkl">Ebenfalls ${stFmt(k, l[n - 1][k])}: ${stNamen(mehr)}</div>` : ""}${l.length > 3 ? `<button class="st-mehr" data-stauf="${k}">${auf ? "Weniger" : "Top 10 ›"}</button>` : ""}</section>`;
       }
-      h += `<p class="st-notiz">Tore, Vorlagen, Karten und Minuten aus den offiziellen Aufstellungen und dem Liveticker der Sportschau. Torschüsse, Zweikämpfe und Fouls aus der Sportschau-Spielstatistik${SPN.stat_md ? `, Stand nach dem ${SPN.stat_md}. Spieltag (wird dienstags aktualisiert)` : ""}. Bei Gleichstand teilen sich Spielerinnen den Platz, weiter oben steht, wer weniger Minuten gebraucht hat. Namen antippen öffnet das Profil.</p></div>`;
+      h += `<p class="st-notiz">Tore, Vorlagen, Karten und Minuten aus den offiziellen Aufstellungen und dem Liveticker der Sportschau. Torschüsse, Zweikämpfe und Fouls aus der Spielstatistik${SPN.stat_md ? `, Stand nach dem ${SPN.stat_md}. Spieltag (wird dienstags aktualisiert)` : ""}. Bei Gleichstand teilen sich Spielerinnen den Platz, weiter oben steht, wer weniger Minuten gebraucht hat. Namen antippen öffnet das Profil.</p></div>`;
       $("#main").innerHTML = h;
     }
     if (!sanft) window.scrollTo(0, 0);
