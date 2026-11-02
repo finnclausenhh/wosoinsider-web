@@ -29,7 +29,6 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .tile{width:38px;height:38px;border-radius:9px;background:var(--brand);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
 .tile b{font-weight:800;font-size:15px;letter-spacing:.5px}.tile i{font-style:normal;font-weight:500;font-size:9px;letter-spacing:.5px}
 .word{font-size:28px;letter-spacing:1.5px}.word b{font-weight:800}.word i{font-style:normal;font-weight:500;color:var(--accent)}
-nav.top{display:flex;gap:16px;font-size:14px}nav.top a{color:var(--muted);text-decoration:none}nav.top a:hover,nav.top a[aria-current]{color:var(--ink)}
 main.wrap{padding-block:28px 40px}
 .hero{display:grid;gap:14px;padding:8px 0 20px}
 .kicker{font:600 12px var(--b);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -39,8 +38,17 @@ main.wrap{padding-block:28px 40px}
 .store{display:inline-flex;align-items:center;gap:10px;justify-self:start;background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 16px;text-decoration:none;font-weight:600}
 .store small{display:block;font-weight:400;font-size:12px;opacity:.75}
 .store.soon{background:transparent;color:var(--ink);border:1.5px dashed var(--line)}
+.cta{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+.live{display:inline-grid;gap:2px;justify-self:start;background:var(--brand);color:#fff;text-decoration:none;font-weight:700;font-size:17px;padding:12px 18px;border-radius:14px}
+.live small{font-weight:500;font-size:12.5px;opacity:.85}.live:hover{filter:brightness(1.08)}
 .feat{display:grid;gap:12px;margin:8px 0 24px}
 @media (min-width:640px){.feat{grid-template-columns:repeat(3,1fr)}}
+a.card{text-decoration:none;color:inherit;grid-template-columns:110px 1fr;column-gap:14px;align-items:center;transition:border-color .15s,transform .15s}
+a.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.shot{grid-row:span 3;width:110px;aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:#0E1726;border:1px solid var(--line)}
+.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.more{font-size:14px;font-weight:600;color:var(--accent)}
+@media (min-width:640px){a.card{grid-template-columns:1fr;align-items:start}.shot{grid-row:auto;width:100%;margin-bottom:6px}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start}
 .card h2{font-family:var(--d);font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;margin:0}
 .card p{margin:0;font-size:15px;color:var(--muted)}
@@ -87,7 +95,7 @@ footer nav{display:flex;flex-wrap:wrap;gap:4px 18px}footer nav a{color:var(--mut
 </script>
 </head>
 <body>
-<header><div class="wrap"><a class="brand" href="/" aria-label="WOSOINSIDER Startseite"><span class="tile" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span><span class="word" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span></a><nav class="top" aria-label="Hauptmenü"><a href="/support/">Support</a><a href="/impressum/" aria-current="page">Impressum</a><a href="/datenschutz/">Datenschutz</a></nav></div></header>
+<header><div class="wrap"><a class="brand" href="/" aria-label="WOSOINSIDER Startseite"><span class="tile" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span><span class="word" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span></a></div></header>
 <main class="wrap">
 <article class="doc">
       <h1>Impressum</h1>
@@ -117,7 +125,7 @@ footer nav{display:flex;flex-wrap:wrap;gap:4px 18px}footer nav a{color:var(--mut
       <p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
 </article>
 </main>
-<footer><div class="wrap"><nav aria-label="Rechtliches"><a href="/">Start</a><a href="/support/">Support</a><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a><a href="/ki-hinweis/">KI-Hinweis &amp; Regeln</a></nav>
+<footer><div class="wrap"><nav aria-label="Rechtliches"><a href="/">Start</a><a href="/ticker/">Ticker</a><a href="/support/">Support</a><a href="/impressum/">Impressum</a><a href="/datenschutz/">Datenschutz</a><a href="/ki-hinweis/">KI-Hinweis &amp; Regeln</a></nav>
 <span>WOSOINSIDER ist ein unabhängiges Angebot und nicht mit Kickbase, dem DFB oder den Vereinen verbunden. Inhalte werden mit KI erstellt.</span></div></footer>
 </body>
 </html>

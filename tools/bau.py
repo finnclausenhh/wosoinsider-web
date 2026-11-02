@@ -35,7 +35,6 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 .tile{width:38px;height:38px;border-radius:9px;background:var(--brand);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
 .tile b{font-weight:800;font-size:15px;letter-spacing:.5px}.tile i{font-style:normal;font-weight:500;font-size:9px;letter-spacing:.5px}
 .word{font-size:28px;letter-spacing:1.5px}.word b{font-weight:800}.word i{font-style:normal;font-weight:500;color:var(--accent)}
-nav.top{display:flex;gap:16px;font-size:14px}nav.top a{color:var(--muted);text-decoration:none}nav.top a:hover,nav.top a[aria-current]{color:var(--ink)}
 main.wrap{padding-block:28px 40px}
 .hero{display:grid;gap:14px;padding:8px 0 20px}
 .kicker{font:600 12px var(--b);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -45,8 +44,17 @@ main.wrap{padding-block:28px 40px}
 .store{display:inline-flex;align-items:center;gap:10px;justify-self:start;background:var(--ink);color:var(--bg);border-radius:12px;padding:10px 16px;text-decoration:none;font-weight:600}
 .store small{display:block;font-weight:400;font-size:12px;opacity:.75}
 .store.soon{background:transparent;color:var(--ink);border:1.5px dashed var(--line)}
+.cta{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+.live{display:inline-grid;gap:2px;justify-self:start;background:var(--brand);color:#fff;text-decoration:none;font-weight:700;font-size:17px;padding:12px 18px;border-radius:14px}
+.live small{font-weight:500;font-size:12.5px;opacity:.85}.live:hover{filter:brightness(1.08)}
 .feat{display:grid;gap:12px;margin:8px 0 24px}
 @media (min-width:640px){.feat{grid-template-columns:repeat(3,1fr)}}
+a.card{text-decoration:none;color:inherit;grid-template-columns:110px 1fr;column-gap:14px;align-items:center;transition:border-color .15s,transform .15s}
+a.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.shot{grid-row:span 3;width:110px;aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:#0E1726;border:1px solid var(--line)}
+.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.more{font-size:14px;font-weight:600;color:var(--accent)}
+@media (min-width:640px){a.card{grid-template-columns:1fr;align-items:start}.shot{grid-row:auto;width:100%;margin-bottom:6px}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start}
 .card h2{font-family:var(--d);font-weight:700;font-size:22px;text-transform:uppercase;letter-spacing:.02em;margin:0}
 .card p{margin:0;font-size:15px;color:var(--muted)}
@@ -65,10 +73,23 @@ footer .wrap{display:grid;gap:8px;padding-block:18px 32px}
 footer nav{display:flex;flex-wrap:wrap;gap:4px 18px}footer nav a{color:var(--muted)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}"""
 
-NAV = [("/", "Start"), ("/support/", "Support"), ("/impressum/", "Impressum"), ("/datenschutz/", "Datenschutz")]
+NAV = [("/", "Start"), ("/ticker/", "Ticker"), ("/support/", "Support"), ("/impressum/", "Impressum"), ("/datenschutz/", "Datenschutz")]
+
+OG = """
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="WOSOINSIDER">
+<meta property="og:title" content="WOSOINSIDER">
+<meta property="og:description" content="{desc}">
+<meta property="og:url" content="https://wosoinsider.de/">
+<meta property="og:image" content="https://wosoinsider.de/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="WOSOINSIDER: Alles, was deine Aufstellung wissen muss.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://wosoinsider.de/og.png">"""
 
 def page(path, title, desc, body):
-    nav = "".join(f'<a href="{h}"{" aria-current=\"page\"" if h == path else ""}>{t}</a>' for h, t in NAV[1:])
+    og = OG.format(desc=desc) if path == "/" else ""
     foot = "".join(f'<a href="{h}">{t}</a>' for h, t in NAV + [("/ki-hinweis/", "KI-Hinweis &amp; Regeln")])
     full = "WOSOINSIDER" if path == "/" else f"{title} · WOSOINSIDER"
     return f"""<!doctype html>
@@ -77,7 +98,7 @@ def page(path, title, desc, body):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{full}</title>
-<meta name="description" content="{desc}">
+<meta name="description" content="{desc}">{og}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <style>
@@ -87,7 +108,7 @@ def page(path, title, desc, body):
 {ZAEHLER}
 </head>
 <body>
-<header><div class="wrap"><a class="brand" href="/" aria-label="WOSOINSIDER Startseite"><span class="tile" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span><span class="word" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span></a><nav class="top" aria-label="Hauptmenü">{nav}</nav></div></header>
+<header><div class="wrap"><a class="brand" href="/" aria-label="WOSOINSIDER Startseite"><span class="tile" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span><span class="word" aria-hidden="true"><b>WOSO</b><i>INSIDER</i></span></a></div></header>
 <main class="wrap">
 {body}
 </main>
@@ -98,15 +119,16 @@ def page(path, title, desc, body):
 """
 
 START = f"""<section class="hero">
-  <span class="kicker">Frauen-Bundesliga · Kickbase</span>
+  <span class="kicker">Frauen-Bundesliga</span>
   <h1>Alles, was deine <span>Aufstellung</span> wissen muss.</h1>
   <p class="lead">WOSOINSIDER sammelt jeden Tag die Meldungen zur Google Pixel Frauen-Bundesliga: Verletzungen, Sperren, Rückkehrerinnen und mögliche Aufstellungen. Kurz zusammengefasst, mit Quelle und mit einer Einordnung für Kickbase.</p>
-  <span class="store soon" aria-label="Die iOS-App erscheint bald im App Store">Bald im App Store<small>für iPhone, kostenlos</small></span>
+  <div class="cta"><a class="live" href="/ticker/">Jetzt im Browser ansehen<small>der Ticker, ohne App und ohne Anmeldung</small></a>
+  <span class="store soon" aria-label="Die iOS-App erscheint bald im App Store">Bald im App Store<small>für iPhone, kostenlos</small></span></div>
 </section>
 <section class="feat" aria-label="Was die App bietet">
-  <div class="card"><h2>News</h2><p>Mehrmals täglich, an Spieltagen stündlich. Jede Meldung nennt und verlinkt ihre Quelle.</p></div>
-  <div class="card"><h2>Spielplan</h2><p>Ergebnisse, Tore und mögliche Aufstellungen mit Einstufung von Sicher bis Unsicher. Die offizielle Elf ersetzt die Prognose.</p></div>
-  <div class="card"><h2>Inside</h2><p>Einmal pro Woche: Formkurven, Standardschützinnen, Belastung und die Spiele mit Ansage.</p></div>
+  <a class="card" href="/ticker/"><span class="shot"><img src="/bilder/news.webp" width="390" height="585" loading="lazy" alt="Ansicht News im Ticker: Meldungen mit Spielerinnenfoto, Vereinswappen und Kategorien"></span><h2>News</h2><p>Mehrmals täglich, an Spieltagen stündlich. Jede Meldung nennt und verlinkt ihre Quelle.</p><span class="more">News öffnen ›</span></a>
+  <a class="card" href="/ticker/#spielplan"><span class="shot"><img src="/bilder/spielplan.webp" width="390" height="585" loading="lazy" alt="Ansicht Spielplan im Ticker: Partien des Spieltags mit Anstoßzeiten"></span><h2>Spielplan</h2><p>Ergebnisse, Tore und mögliche Aufstellungen mit Einstufung von Sicher bis Unsicher. Die offizielle Elf ersetzt die Prognose.</p><span class="more">Spielplan öffnen ›</span></a>
+  <a class="card" href="/ticker/#inside"><span class="shot"><img src="/bilder/inside.webp" width="390" height="585" loading="lazy" alt="Ansicht Inside im Ticker: wöchentliche Ausgabe mit Risiko, Chance und Beobachten"></span><h2>Inside</h2><p>Einmal pro Woche: Formkurven, Standardschützinnen, Belastung und die Spiele mit Ansage.</p><span class="more">Inside öffnen ›</span></a>
 </section>
 <p class="note">Kein Konto, keine Cookies, kein Tracking, keine Werbung. Fragen, Hinweise oder Korrekturen an <a href="mailto:{MAIL}">{MAIL}</a>.</p>"""
 
@@ -119,19 +141,22 @@ FAQ = [
     ("Die App zeigt keine neuen Inhalte. Was tun?", "Prüfen Sie die Internetverbindung und öffnen Sie die App neu. Hilft das nicht, schreiben Sie uns mit Gerät und iOS-Version."),
 ]
 
-def support():
+def support(kontakt=False):
+    # /kontakt/ hat seit 31.10.2026 zusätzlich Kooperationsanfragen und Instagram
+    vorschlaege = "Fragen zu WOSOINSIDER, Verbesserungsvorschläge und Wünsche für neue Funktionen</li>\n    <li>Kooperationsanfragen von Vereinen, Medien und Partnern" if kontakt else "Fragen zu WOSOINSIDER und Wünsche für neue Funktionen"
+    insta = '\n  <p>Direkt an Finn Clausen auf Instagram: <a href="https://www.instagram.com/finn.baut/" rel="noopener">@finn.baut</a></p>' if kontakt else ""
     faq = "".join(f"<details><summary>{q}</summary><p>{a}</p></details>" for q, a in FAQ)
     return f"""<article class="doc">
   <h1>Support</h1>
   <p>Fragen zur App, ein Fehler in einer Meldung oder ein Wunsch für eine neue Funktion? Eine Adresse für alles:</p>
   <div class="mailbox"><a href="mailto:{MAIL}">{MAIL}</a></div>
   <ul>
-    <li>Fragen zu WOSOINSIDER und Wünsche für neue Funktionen</li>
+    <li>{vorschlaege}</li>
     <li>Fehler in einer Meldung oder Aufstellung, neue Informationen zu Verletzungen, Sperren oder Rückkehr, bitte mit Link zur Quelle</li>
     <li>Auskunft, Berichtigung oder Löschung personenbezogener Daten sowie Fragen zu Bild- und Markenrechten</li>
   </ul>
   <h2>Häufige Fragen</h2>
-  <div>{faq}</div>
+  <div>{faq}</div>{insta}
   <p class="note">Die Postanschrift steht im <a href="/impressum/">Impressum</a>.</p>
 </article>"""
 
@@ -149,8 +174,8 @@ def main(legal_path, out):
         "support/index.html": page("/support/", "Support", "Kontakt und Hilfe zur App WOSOINSIDER.", support()),
         "impressum/index.html": page("/impressum/", "Impressum", "Impressum von WOSOINSIDER.", imp),
         "datenschutz/index.html": page("/datenschutz/", "Datenschutz", "Datenschutzerklärung für App und Webseite WOSOINSIDER.", doc("datenschutz")),
-        "ki-hinweis/index.html": page("/ki-hinweis/", "KI-Hinweis & Regeln", "Wie WOSOINSIDER mit KI entsteht.", ki),
-        "kontakt/index.html": page("/support/", "Kontakt", "Kontakt zu WOSOINSIDER.", support()),
+        "ki-hinweis/index.html": page("/ki-hinweis/", "KI-Hinweis, Methodik & Regeln", "Wie WOSOINSIDER mit KI entsteht.", ki),
+        "kontakt/index.html": page("/support/", "Kontakt", "Kontakt zu WOSOINSIDER.", support(kontakt=True)),
         "404.html": page("", "Nicht gefunden", "Seite nicht gefunden.", NOTFOUND),
     }
     for rel, html in pages.items():
