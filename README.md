@@ -3,7 +3,7 @@
 Webseite zur App WOSOINSIDER (GitHub Pages, eigene Domain wosoinsider.de).
 
 - Start, Support, Impressum, Datenschutz, KI-Hinweis. Kopfzeile nur mit Logo, alle Links stehen im Fuß.
-- Startseite: Karten News, Spielplan, Inside verlinken in den Ticker (/ticker/, #spielplan, #inside) und zeigen Screenshots aus bilder/. Erneuern mit `python3 tools/screens.py bilder`.
+- Startseite: sechs Karten verlinken in den Ticker (News, #spielplan, #inside, Spielbericht #bayern-pokal-0111, #analyse, #statistik) und zeigen Screenshots aus bilder/. Neue Beispiel-Partie oder Analyse: Hash in tools/screens.py und tools/bau.py anpassen. Erneuern mit `python3 tools/screens.py bilder`.
 - Rechtstexte kommen aus derselben Quelle wie `legal.json` der App (`tools/legal_bau.py`).
 - Neu bauen: `python3 tools/legal_bau.py <altes legal.json> <neues legal.json> <legal_html.json>`, dann `python3 tools/bau.py <legal.json> .`
 - /ticker/: Webversion des Newstickers. Gebaut mit `python3 tools/ticker_bau.py <index.html aus dem Artifact> ticker/index.html`; Daten kommen live aus fbl-daten. Nach jeder Änderung an der index.html im Artifact neu bauen. Bis zum Launch noindex und nicht verlinkt.
