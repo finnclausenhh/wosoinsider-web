@@ -1428,7 +1428,7 @@ details.dzb[open]{padding-bottom:10px}
     return `<button class="pr${mk ? " mein" : ""}" ${mk ? `style="--vc:${ring(mk)}" ` : ""}data-game="${esc(p.id)}">${mitTag ? `<div class="dat" style="font-size:11px">${esc(terminiert(p) ? wtLang(p.anstoss) : "Termin offen")}</div>` : ""}<div class="pr-z">
       <span class="pr-t h"><span data-kname="${esc(KNAME[p.heim_k] || "")}" title="${esc(p.heim)}">${esc(KNAME[p.heim_k] || p.heim)}</span><span class="kd-l" data-kader="${esc(p.heim_k)}">${logo(p.heim_k, 30)}</span></span>${mitte(p)}<span class="pr-t"><span class="kd-l" data-kader="${esc(p.gast_k)}">${logo(p.gast_k, 30)}</span><span data-kname="${esc(KNAME[p.gast_k] || "")}" title="${esc(p.gast)}">${esc(KNAME[p.gast_k] || p.gast)}</span></span></div>
       ${p.status !== "beendet" ? (() => { const v = AF && (AF.vorschau || []).some(x => x.id === p.id), a = [p.heim_aufstellung, p.gast_aufstellung].filter(Boolean), off = a.some(x => x.typ === "offiziell");
-        return v || a.length ? `<div class="af-hin">${v ? '<span class="v">VORSCHAU</span>' : ""}${a.length ? `<span class="${off ? "o" : "a"}">${off ? "OFFIZIELLE AUFSTELLUNG" : "MÖGLICHE AUFSTELLUNG"}</span>` : ""}</div>` : ""; })() : ""}
+        return v || a.length ? `<div class="af-hin"><span class="${off ? "o" : "v"}">${off ? "OFFIZIELLE AUFSTELLUNG" : "VORSCHAU"}</span></div>` : ""; })() : ""}
       ${bs.length ? (klein ? `<div class="belh klein"><span class="kap">ENGLISCHE WOCHE</span></div>` : `<div class="belh"><span class="kap">ENGLISCHE WOCHE</span>${bs.map(([n, b]) => `<span><b>${esc(n)}</b> ${esc(b.text)}</span>`).join("")}</div>`) : ""}</button>`;
   }
   const alleSpiele = () => { const g = new Set(); return (SP.spieltage || []).flatMap(t => t.partien.concat(t.nachholspiele || [])).filter(p => !g.has(p.id) && g.add(p.id)); };
@@ -1493,8 +1493,8 @@ details.dzb[open]{padding-bottom:10px}
     AFNOTEN = AS ? AS.no : null; AFBEST = null;
     if (AS && SPN) { AFBEST = new Set(); [p.heim_k, p.gast_k].forEach(k => { const l = Object.entries(AS.no).filter(([id]) => (spById(id) || {}).k === k).sort((a, b) => b[1] - a[1]); if (l[0]) AFBEST.add(l[0][0]); }); }
     const hatV = p.status !== "beendet" && AF && (AF.vorschau || []).some(v => v.id === p.id), hatA = p.status !== "beendet" && [p.heim_aufstellung, p.gast_aufstellung].some(Boolean), offA = [p.heim_aufstellung, p.gast_aufstellung].some(a => a && a.typ === "offiziell");
-    const sprung = hatV || hatA ? `<div class="af-sprung"><span class="mu">In diesem Spiel:</span>${hatV ? '<button data-afsprung="af-dz">Vorschau ↓</button>' : ""}${hatA ? `<button data-afsprung="af-auf">${offA ? "Aufstellung" : "Aufstellungen"} ↓</button>` : ""}</div>` : "";
-    const afBox = AS ? afStatBox(p, AS) : hatV ? `<div class="kartebox" id="af-dz">${kap("Vorschau: Daten zum Spiel")}${datenZumSpiel(AF.vorschau.find(v => v.id === p.id))}</div>` : "";
+    const sprung = hatV && hatA ? '<div class="af-sprung"><button data-afsprung="af-dz">Daten zum Spiel ↓</button></div>' : "";
+    const afBox = AS ? afStatBox(p, AS) : hatV ? `<div class="kartebox" id="af-dz">${kap("Daten zum Spiel")}${datenZumSpiel(AF.vorschau.find(v => v.id === p.id))}</div>` : "";
     $("#main").innerHTML = `<div class="det">
       <button class="back" data-back="1">‹ ${p.md ? `${p.md}. Spieltag` : "Spielplan"}</button>
       <div class="kopf"><div class="info">${esc(info)}</div>
@@ -1503,11 +1503,12 @@ details.dzb[open]{padding-bottom:10px}
           <button class="tbtn" data-tore="1" aria-expanded="${TOREOFFEN}">${TOREOFFEN ? "Tore im Detail ausblenden" : "Tore im Detail mit Vorlage"}</button>${TOREOFFEN ? `<div class="tdet">${det}</div>` : ""}` : ""}
       </div>
       
-      ${sprung}${afBox}${pv.length ? `<div class="kartebox">${kap("Platzverweise")}${pv.map(x => `<div style="display:flex;gap:8px;align-items:center;font-size:14px">${karte(true)}<span style="flex:1">${x.n ? esc(x.n) : '<span class="mu">ohne Namen im Spielbericht</span>'} (${esc(x.min)}')</span>${logo(x.seite === "heim" ? p.heim_k : p.gast_k, 20)}</div>`).join("")}</div>` : ""}
+      ${sprung}${AS ? afBox : ""}${pv.length ? `<div class="kartebox">${kap("Platzverweise")}${pv.map(x => `<div style="display:flex;gap:8px;align-items:center;font-size:14px">${karte(true)}<span style="flex:1">${x.n ? esc(x.n) : '<span class="mu">ohne Namen im Spielbericht</span>'} (${esc(x.min)}')</span>${logo(x.seite === "heim" ? p.heim_k : p.gast_k, 20)}</div>`).join("")}</div>` : ""}
       ${bs.length ? `<div class="kartebox" style="gap:8px">${kap("Englische Woche")}${bs.map(([n, b]) => `<div style="display:grid;gap:2px"><b style="font-size:14px;font-weight:600">${esc(n)}: ${esc(b.text)}</b><span class="dat">${(b.spiele || []).map(esc).join(" · ")}</span></div>`).join("")}${prog ? '<span style="font-size:12px;color:var(--frag)">Deshalb stufen wir Feldspielerinnen höchstens als Erwartet ein.</span>' : ""}</div>` : ""}
       ${!p.heim_aufstellung && !p.gast_aufstellung && p.status === "beendet" ? '<p class="dat">Zu diesem Spiel hat der Spielbericht keine offizielle Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : !p.heim_aufstellung && !p.gast_aufstellung ? '<p class="dat">Die mögliche Aufstellung erscheint, sobald dieser Spieltag als nächster ansteht. Die offizielle kommt ca. 60 Minuten vor Anpfiff.</p>'
         : `<span id="af-auf"></span>` + teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", p.status === "beendet", p.anstoss) + teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", p.status === "beendet", p.anstoss)}
       ${prog ? `<div class="leg" style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)">${Object.keys(STUFE).filter(k => ["sicher","erwartet","unsicher"].includes(k)).map(k => `<span>${stufeSym(k, 14)}${STUFE[k][2]}</span>`).join("")}</div><button class="hk" data-legal="so-entsteht" style="background:none;padding:6px 0"><span class="mu" style="font-size:12px">Prognose von WOSOINSIDER, die offizielle Aufstellung kommt ca. 60 Minuten vor Anpfiff und ersetzt sie hier. <span class="lk">So entsteht sie</span></span></button>` : ""}
+      ${!AS ? afBox : ""}
     </div>`;
     AFNOTEN = null; AFBEST = null;
     window.scrollTo(0, halten ? y : 0);
