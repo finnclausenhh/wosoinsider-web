@@ -192,6 +192,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .pk.fest .pk-b .z{font-weight:700;color:var(--accent)}
 
 /* Top-Analyse im Ticker */
+.kzl{display:grid;gap:12px;text-align:left} .kz2{display:grid;grid-template-columns:44px 1fr;column-gap:12px;align-items:center} .kz2 b{font-family:var(--f-display);font-weight:800;color:var(--hell);font-size:30px;line-height:1;text-align:center} .kz2 span{font-size:13.5px;line-height:1.35;color:var(--muted)} .ana-b{text-align:left} .kz2a{display:block} .kz2a span b{font-family:var(--f-body);font-size:13.5px;font-weight:700;color:var(--hell)}
 .ana{width:100%;background:var(--card);border-radius:14px;overflow:hidden;display:block}
 .ana-k{padding:12px 14px;display:grid;gap:8px;color:#fff}
 .ana-k .z1{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:rgba(255,255,255,.85)}
@@ -908,13 +909,13 @@ button.chip.pfc{cursor:pointer}
   function anteil(s){ const t = String(s).split(" von "); if (t.length !== 2) return null; const a = parseInt(t[0], 10), b = parseInt(t[1], 10);
     return (Number.isInteger(a) && Number.isInteger(b) && b > 0 && b <= 40 && a <= b) ? [a, b] : null; }
   function anaTeaser(A){
-    const farbe = KFARBE[A.verein] || "#2F5BFF", st = A.stats || [];
-    let unten = "";
-    if (st[0]) unten += `<div class="kz"><b style="font-size:28px">${esc(st[0][0])}</b><span>${esc(st[0][1] || "")}</span></div>`;
-    if (st[1]) { const t = anteil(st[1][0]);
-      unten += t ? `<div style="display:grid;gap:6px"><div class="dots" aria-hidden="true">${Array.from({length: t[1]}, (_, i) => `<i class="${i < t[0] ? "t" : ""}"></i>`).join("")}</div>
-        <div class="kz" style="display:block"><b style="font-family:var(--f-body);font-size:13px">${esc(st[1][0])}</b> <span>${esc(st[1][1] || "")}</span></div></div>`
-        : `<div class="kz"><b style="font-size:26px;min-width:84px">${esc(st[1][0])}</b><span>${esc(st[1][1] || "")}</span></div>`; }
+    const farbe = KFARBE[A.verein] || "#2F5BFF", st = (A.stats || []).slice(0, 2);
+    // Kennzahlen: feste Zahlenspalte, Text linksbündig und mittig zur Zahl
+    // Anteile wie "10 von 11" als Punktereihe, sonst Zahl in fester Spalte
+    const zeile = s => { const a = anteil(s[0]);
+      return a ? `<div style="display:grid;gap:6px"><div class="dots" aria-hidden="true">${Array.from({length: a[1]}, (_, i) => `<i class="${i < a[0] ? "t" : ""}"></i>`).join("")}</div><div class="kz2 kz2a"><span><b>${esc(s[0])}</b> ${esc(s[1] || "")}</span></div></div>`
+        : `<div class="kz2"><b>${esc(s[0])}</b><span>${esc(s[1] || "")}</span></div>`; };
+    let unten = st.length ? `<div class="kzl">${st.map(zeile).join("")}</div>` : "";
     return `<button class="ana" data-ana="1"><div class="ana-k" style="background:linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.18)),${farbe}">
       <div class="z1"><span class="tg" style="color:${farbe}">TOP-ANALYSE</span><span>${esc(relativ(A.news_zeit))}</span></div>
       <div class="z2"><h3>${esc(A.titel)}</h3>${A.verein ? logo(A.verein, 44) : ""}</div></div>
