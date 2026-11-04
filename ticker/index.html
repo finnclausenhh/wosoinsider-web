@@ -1428,7 +1428,7 @@ details.dzb[open]{padding-bottom:10px}
   const POKAL = '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>';
   const einsTag = nur => `<span class="eins" title="Offizielle Startelf steht fest, bevor Kickbase die Aufstellung sperrt">${svg(AUGE)}EINSEHBAR</span>`;
   const BILANZ_AB = 14, STUFEN_AB = 42, SCHLUSS_MIN = 90;
-  let G_LADEN = null, TQ = null, KZ = null;
+  let G_LADEN = null, TQ = null, KZ = null, SS = null;
   let TIPPS = {}; try { TIPPS = JSON.parse(localStorage.getItem("woso-tipps") || "{}") || {}; } catch (e) {}
   const tippsSpeichern = () => { try { localStorage.setItem("woso-tipps", JSON.stringify(TIPPS)); } catch (e) {} };
   // Tipps in Supabase (supabase/tippspiel.sql, 04.11.2026): gleiche anonyme Sitzung wie die Kommentare.
@@ -1469,7 +1469,8 @@ details.dzb[open]{padding-bottom:10px}
       SP ? Promise.resolve(SP) : json("spielplan.json").then(d => { SP = d; if (MD == null) MD = d.aktuell; }).catch(() => {}),
       ladeSPN().catch(() => {}),
       json("tracking/trefferquote.json").then(d => { TQ = d; }).catch(() => { TQ = {}; }),
-      json("klickzahlen.json").then(d => { KZ = d; }).catch(() => { KZ = {}; })
+      json("klickzahlen.json").then(d => { KZ = d; }).catch(() => { KZ = {}; }),
+      json("spielt_sie.json").then(d => { SS = d; }).catch(() => { SS = null; })
     ]).then(() => {
       if (BACK || ARTIKEL || GAME) return;
       const y = window.scrollY;
@@ -1499,60 +1500,14 @@ details.dzb[open]{padding-bottom:10px}
 
   function tippTag(){ return SP && (SP.spieltage || []).find(t => t.nr === SP.aktuell) || null; }
   function tippRunde(){
-    const t = tippTag(); if (!t || !SPN) return null;
-    const ps = t.partien.filter(terminiert); if (!ps.length) return null;
-    const erst = ps.map(p => p.anstoss).sort()[0], schluss = new Date(dt(erst).getTime() - SCHLUSS_MIN * 60000);
-    const proV = {}, frei = k => (proV[k] || 0) < 2, nimm = k => { proV[k] = (proV[k] || 0) + 1; };
-    const fragen = [], belegt = new Set();
-    // 1. Bestehende Startelf-Umfragen des Spieltags (mit Infos und Einschätzung), höchstens 2
-    (UM || []).filter(u => (u.art || "startelf") === "startelf" && u.partie && t.partien.some(p => p.id === u.partie)).slice(0, 2).forEach(u => {
-      const p = t.partien.find(x => x.id === u.partie), e = u.einschaetzung, eo = e && (u.optionen || []).find(o => o.id === e.option);
-      (u.optionen || []).forEach(o => o.nachname && belegt.add(normS(o.nachname)));
-      nimm(u.verein);
-      fragen.push({id: "u-" + u.id, art: u.position === "TW" ? "TOR" : "WER STARTET", p, ein: einsehbar(p), frage: u.frage, umfrage: u,
-        warum: (u.position === "TW" ? "Torhüterinnen punkten bei Kickbase stark. " : "") + (u.optionen || []).filter(o => o.info).map(o => `${o.nachname || o.n}: ${o.info}`).join(" · "),
-        prognose: eo ? `${STUFE[e.stufe] ? STUFE[e.stufe][2] : ""}: ${eo.nachname || eo.n}. ${e.text}` : "",
-        optionen: (u.optionen || []).map(o => ({id: o.id, n: o.nachname || (o.id === "andere" ? "Andere" : o.n)}))});
-    });
-    // 2. Startelf-Fragen aus der Prognose: nur Kickbase-Gewicht, nur echte Unsicherheit, nur mit Anlass
-    const kand = [];
-    t.partien.forEach(p => {
-      [[p.heim_k, p.heim_aufstellung], [p.gast_k, p.gast_aufstellung]].forEach(([k, a]) => {
-        if (!a || a.typ !== "prognose") return;
-        (a.startelf || []).concat(a.bank || []).forEach(x => {
-          if (!["erwartet", "unsicher"].includes(x.st) || belegt.has(normS(x.n))) return;
-          const s = findeSP(k, x.n); if (!s) return;
-          const f = FOTOS[s.n] || {}; if (!f.portrait && !f.datei) return;
-          const w = s.prognose && s.prognose.wert != null ? s.prognose.wert : Number((String(x.warum || "").match(/Einsatzwert (\d+)/) || [])[1] || 0);
-          if (w >= 95 || w < 30) return;
-          const tore = sTore(s), vorl = sVorl(s), tw = x.p === "TW", gewicht = tore * 2 + vorl + (tw ? 6 : 0);
-          if (gewicht < 3) return;
-          const ll = (s.spiele || []).slice(-1)[0], lp = (s.pokal || []).slice(-1)[0];
-          const letzt = [ll && {d: ll.datum, wb: "Liga", g: ll.gegner, art: ll.art}, lp && {d: lp.datum, wb: lp.wb, g: lp.gegner, art: lp.art}].filter(Boolean).sort((a, b) => dt(b.d) - dt(a.d))[0];
-          const einsch = (String(x.warum || "").split("Einschätzung WOSOINSIDER:")[1] || "").trim();
-          const l3 = (s.spiele || []).slice(-3), s3 = l3.filter(e => e.art === "S").length;
-          let anlass = "";
-          if (letzt && letzt.art === "B") anlass = `Zuletzt ${imWb(letzt.wb)} gegen ${letzt.g} nur auf der Bank.`;
-          else if (letzt && letzt.art === "E") anlass = `Zuletzt ${imWb(letzt.wb)} gegen ${letzt.g} nur eingewechselt.`;
-          else if (einsch) anlass = einsch.replace(/\.?$/, ".");
-          else if (l3.length === 3 && s3 < 3) anlass = `In den letzten 3 Ligaspielen ${s3}-mal in der Startelf.`;
-          if (!anlass) return;
-          const stz = (String(x.warum || "").match(/(\d)\/5 Startelf/) || [])[1];
-          kand.push({id: "s-" + s.id, art: "STARTELF", p, k, s, ein: einsehbar(p), gewicht,
-            frage: `Steht ${nachN(s.n)} in der Startelf?`,
-            warum: `${anlass} ${tw ? "Torhüterinnen punkten bei Kickbase stark." : `Diese Saison ${tore} ${tore === 1 ? "Tor" : "Tore"}, ${vorl} ${vorl === 1 ? "Vorlage" : "Vorlagen"}.`}`,
-            prognose: `${STUFE[x.st][2]}. ${stz ? stz + " von 5 zuletzt in der Startelf, " : ""}Einsatzwert ${w} %.`,
-            optionen: [{id: "ja", n: "Ja"}, {id: "nein", n: "Nein"}]});
-        });
-      });
-    });
-    kand.sort((a, b) => b.gewicht - a.gewicht);
-    // mindestens 2 Fragen zu nicht einsehbaren Spielen, höchstens 2 je Verein, insgesamt 5
-    const pick = q => { if (fragen.length >= 5 || !frei(q.k) || fragen.some(f => f.id === q.id)) return; nimm(q.k); fragen.push(q); };
-    kand.filter(q => !q.ein).slice(0, 2).forEach(pick);
-    kand.forEach(pick);
-    fragen.sort((a, b) => dt(a.p.anstoss) - dt(b.p.anstoss));
-    return {md: t.nr, schluss, erst, fragen};
+    // Fragen kommen fest aus spielt_sie.json (tools/spielt_sie.py in fbl-daten, Finn 04.11.2026), nicht mehr aus der Prognose im Browser
+    const r = SS; if (!r || !(r.fragen || []).length || !SP || !SPN || r.md !== SP.aktuell) return null;
+    const t = (SP.spieltage || []).find(x => x.nr === r.md); if (!t) return null;
+    const fragen = r.fragen.map(q => { const p = t.partien.find(x => x.id === q.partie); if (!p) return null;
+      const s = q.sid ? spById(q.sid) : null, u = q.umfrage ? (UM || []).find(x => x.id === q.umfrage) : null;
+      if ((q.umfrage && !u) || (q.sid && !s)) return null;
+      return Object.assign({}, q, {p, s, umfrage: u, ein: einsehbar(p)}); }).filter(Boolean);
+    return {md: r.md, schluss: dt(r.schluss), erst: r.erst, fragen};
   }
 
   // Auflösung: Startelf aus der offiziellen Aufstellung, Umfragen über die bestehende Auflösung
@@ -1627,7 +1582,7 @@ details.dzb[open]{padding-bottom:10px}
       ${!oeff ? `<div class="bil-test">Testansicht: öffentlich erst ab ${BILANZ_AB} geprüften Aufstellungen, aktuell ${n}.</div>` : ""}
       <div class="kap" style="color:#14B8A6">PROGNOSE-BILANZ</div><h2>Wie gut sind unsere Aufstellungen?</h2>
       <p class="mu">${n} Aufstellungen geprüft · Stand ${esc(tagDatum(TQ.stand))} · jeden Dienstag neu</p>
-      <div class="bil-k"><div><span>24 h vor Anpfiff</span><b class="mu">kommt</b><small>wird ab jetzt mitgeschrieben</small></div>
+      <div class="bil-k">${TQ.gesamt_24h && TQ.gesamt_24h.teams ? `<div><span>24 h vor Anpfiff</span><b style="color:#6E9BFF">${pz(TQ.gesamt_24h.elf_quote)}</b><small>im Schnitt ${esc(String(TQ.gesamt_24h.elf_treffer_schnitt).replace(".", ","))} von 11 richtig</small></div>` : `<div><span>24 h vor Anpfiff</span><b class="mu">kommt</b><small>ab dem nächsten Spieltag</small></div>`}
         <div><span>Letzte Prognose</span><b style="color:#6E9BFF">${pz(g.elf_quote)}</b><small>im Schnitt ${esc(String(g.elf_treffer_schnitt).replace(".", ","))} von 11 richtig</small></div></div>
       ${stufen || !oeff ? `<div class="bil-s">${!stufen ? `<div class="bil-test">Testansicht: je Status erst ab ${STUFEN_AB} Aufstellungen.</div>` : ""}<div class="kap">HÄLT DER STATUS, WAS ER VERSPRICHT?</div>${ST.map(([k, l, c]) => { const x = (g.je_stufe || {})[k]; if (!x || !x.n) return "";
         return `<div class="bil-z"><div><span><i style="background:${c}"></i>${l}</span><span><b>${pz(x.quote)}</b> <small>(${x.begonnen} von ${x.n})</small></span></div><div class="bil-b"><div style="width:${Math.round((x.quote || 0) * 100)}%;background:${c}"></div></div></div>`; }).join("")}</div>` : ""}
@@ -2133,7 +2088,9 @@ details.dzb[open]{padding-bottom:10px}
     const wert = f => { const s = SPN && (f.id ? spById(f.id) : findeSP(f.k, nachN(f.n))), a = s && afSp(s.id), v = a && (a.no || []).filter(x => x[2] >= 60);
       if (!v || v.length < 4) return null; const n = v.map(x => x[1]), l = n.slice(-3).reduce((x, y) => x + y, 0) / 3; return key === "hold" ? a.avg : l - n.slice(0, -3).reduce((x, y) => x + y, 0) / (n.length - 3); };
     const sortiert = l.map((f, i) => ({f, i, w: wert(f)})).sort((a, b) => (a.w == null) - (b.w == null) || (key === "down" ? a.w - b.w : b.w - a.w) || a.i - b.i).map(x => x.f);
-    return sortiert.slice(0, 10).filter(f => zeigen(f.k)); };
+    // Inside-Karten der Redaktion behalten feste Plätze (bis 4), der Rest bis 10 kommt aus API-Football (Finn 04.11.2026)
+    const ins = sortiert.filter(f => !f.af).slice(0, 4), rest = sortiert.filter(f => f.af).slice(0, 10 - ins.length);
+    return sortiert.filter(f => ins.includes(f) || rest.includes(f)).filter(f => zeigen(f.k)); };
   function programmVon(k){
     const L = (((SPN && SPN.vereine) || {})[k] || {}).kommend; if (!L) return null;
     const n = L.filter(z => z.wb === "Liga" && z.gk).slice(0, 3); if (!n.length) return null;
