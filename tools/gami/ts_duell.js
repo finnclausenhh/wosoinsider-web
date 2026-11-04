@@ -20,7 +20,7 @@
       return {id: o.id, n: o.n, name: (u && u.nachname) || o.n, info: (u && u.info) || "", src: sp ? tsSrc(u.n) : "", sp, logo: u && u.logo};
     });
   }
-  function tsKarte(q, r, zu, mein, srv){
+  function tsKarte(q, r, zu, mein, srv, imArtikel){
     const erg = tippErgebnis(q), t = mein[q.id];
     const st = srv ? (t || zu ? srv[q.id] || {} : null) : q.umfrage && UST[q.umfrage.id] ? UST[q.umfrage.id].stimmen || {} : null, ges = st ? Object.values(st).reduce((a, b) => a + (Number(b) || 0), 0) : 0;
     const pz = id => ges ? Math.round((Number(st[id]) || 0) / ges * 100) : 0;
@@ -28,7 +28,7 @@
     const zust = o => { const on = t === o.id, ok = erg && erg === o.id; return {on, cls: `${on ? " on" : ""}${ok ? " ok" : ""}`, attr: `data-tv="${esc(r.md)}|${esc(q.id)}|${esc(o.id)}" ${zu ? "disabled" : ""} aria-pressed="${on}"`}; };
     const haken = on => on ? `<span class="tsd-hk" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span>` : "";
     const karte = (o, oben, name, info) => { const z = zust(o);
-      return `<button class="tsd-k${z.cls}" ${z.attr}>${oben}${haken(z.on)}<span class="tsd-t"><b>${esc(name)}</b>${info ? `<small>${esc(info)}</small>` : ""}</span></button>`; };
+      return `<button class="tsd-k${z.cls}" ${z.attr}>${oben}${haken(z.on)}<span class="tsd-t">${name ? `<b>${esc(name)}</b>` : ""}${info ? `<small>${esc(info)}</small>` : ""}</span></button>`; };
     const feld = inner => `<span class="tsd-fd">${inner}</span>`;
     const ohneFoto = o => o.logo ? feld(logo(o.logo, 44)) : /^[0-9]/.test(o.n) ? feld(`<span class="tsd-z">${esc(o.n)}</span>`) : feld(`<svg class="tsd-i" viewBox="0 0 24 24">${TSI[tsSym(o.n)]}</svg>`);
     const kurzSp = s => s ? s.n.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() : "";
@@ -47,7 +47,7 @@
       : st ? (ges && os.length === 2 ? `<div class="tsd-fans"><span><b>${pz(os[0].id)} %</b> ${esc(jn ? "Ja" : os[0].name)}</span><span>${zahlDE(ges)} ${ges === 1 ? "Tipp" : "Tipps"}</span><span>${esc(jn ? "Nein" : os[1].name)} <b>${pz(os[1].id)} %</b></span></div>`
         : `<div class="ts-f">${ges ? `Fans: ${os.map(o => `${esc(o.n)} ${pz(o.id)} %`).join(" · ")} · ${zahlDE(ges)} ${ges === 1 ? "Tipp" : "Tipps"}` : "Noch keine Tipps"}</div>`) : "";
     const html = `<section class="ts-k tsd">
-        <div class="ts-kz"><span class="kap">${esc(q.art)} · ${esc(q.p.heim_k)}-${esc(q.p.gast_k)} · ${esc(WT[dt(q.p.anstoss).getDay()])}</span>${q.ein ? einsTag() : ""}</div>
+        ${imArtikel ? "" : `<div class="ts-kz"><span class="kap">${esc(q.art)} · ${esc(q.p.heim_k)}-${esc(q.p.gast_k)} · ${esc(WT[dt(q.p.anstoss).getDay()])}</span>${q.ein ? einsTag() : ""}</div>`}
         <h3 class="tsd-q">${esc(q.frage)}</h3>
         ${kopf}${felder}${knoepfe}${fans}
         <div class="ts-i"><span class="l">WARUM</span><span>${esc(q.warum)}</span></div>
@@ -66,9 +66,36 @@
   function tsArtikel(m){
     gLaden(); const z = tsFrageZu(m); if (!z) return "";
     const {r, q} = z; tsLaden(r.md);
-    const zu = new Date() >= r.schluss, k = tsKarte(q, r, zu, TIPPS[r.md] || {}, TS.ok && TS.stand[r.md]);
-    return `<div class="tsd-art"><div class="tsd-ak"><span class="kap">SPIELT SIE? · ${r.md}. SPIELTAG</span><span class="tsd-bis">${svg(P.uhr)}${zu ? "Tippen beendet" : "bis " + esc(wtUhr(r.schluss))}</span></div>${k.html}
+    const zu = new Date() >= r.schluss, k = tsKarte(q, r, zu, TIPPS[r.md] || {}, TS.ok && TS.stand[r.md], true);
+    return `<div class="tsd-art"><div class="tsd-ak"><span class="kap">SPIELT SIE?</span><span class="tsd-bis">${svg(P.uhr)}${zu ? "Tippen beendet" : "Tippen bis " + esc(wtUhr(r.schluss))}</span></div>${k.html}
       <button class="tsd-mehr" data-tipp="1">${r.fragen.length > 1 ? `${r.fragen.length - 1} weitere ${r.fragen.length === 2 ? "Frage" : "Fragen"} im Tippschein` : "Zum Tippschein"} ›</button></div>`;
+  }
+
+  // Umfragen im Duell-Stil (Finn 04.11.2026): Spielerinnen als Fotokarten, zwei Spielerinnen mit VS, übrige Antworten als Knöpfe.
+  // Umfrage zu einer Spielerin ohne Fotos an den Antworten (z. B. Tore): Kopfzeile mit Foto, Antworten als Zahlkarten. Sonst bleibt die alte Liste.
+  function umKarten(u, feed, v){
+    const O = u.optionen || [], spO = o => o.nachname && !o.logo && o.bild !== false && tsSrc(o.n);
+    const fo = O.filter(spO), spN = u.spielerin ? Object.keys(FOTOS).find(n => normS(nachN(n)) === normS(u.spielerin) && KURZ[(FOTOS[n] || {}).verein] === u.verein) : null, sp = spN ? {n: spN} : null;
+    const zahl = o => o.von == null ? "" : o.bis == null ? o.von + "+" : o.von === o.bis ? String(o.von) : o.von + "–" + o.bis;
+    const zahlen = !fo.length && O.length <= 3 && O.every(o => zahl(o));
+    if (!fo.length && !zahlen) return "";
+    const zu = o => { const mein = v.meine && v.meine.o === o.id, richtig = v.auf && v.auf.richtig === o.id;
+      return {mein, cls: `${mein ? " on" : ""}${richtig ? " ok" : ""}`, attr: `data-uvote="${esc(u.id)}|${esc(o.id)}" ${v.zeigt ? "disabled" : ""}`}; };
+    const pzT = o => v.zp ? `<span class="tsd-pz">${v.pz(o)} %</span>` : "";
+    const haken = on => on ? `<span class="tsd-hk" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span>` : "";
+    const ks = o => !feed && o.kader ? `<span class="ks" aria-label="Kader der letzten 5 Spieltage">${[...String(o.kader)].map(c => `<i class="${"bse".includes(c) ? c : ""}"></i>`).join("")}</span>` : "";
+    const karte = (o, oben, name, info) => { const z = zu(o);
+      return `<button class="tsd-k${z.cls}" ${z.attr}>${oben}${haken(z.mein)}<span class="tsd-t">${name ? `<b>${esc(name)}</b>` : ""}${info ? `<small>${esc(info)}</small>` : ""}${ks(o)}${pzT(o)}</span></button>`; };
+    const knopf = o => { const z = zu(o); return `<button class="ts-o${z.cls}" ${z.attr}>${esc(o.n)}${v.zp ? ` · ${v.pz(o)} %` : ""}</button>`; };
+    if (zahlen) {
+      const kopf = sp ? `<div class="tsd-kopf">${tsBild(tsSrc(sp.n), u.verein, nachN(sp.n).slice(0, 2).toUpperCase())}<span><b>${esc(nachN(sp.n).toUpperCase())}</b><small>${esc((FOTOS[sp.n] || {}).verein || sp.n)}</small></span></div>` : "";
+      return `<div class="tsd-um${feed ? " feed" : ""}">${kopf}<div class="tsd-g" style="--n:${O.length}">${O.map(o => karte(o, `<span class="tsd-fd"><span class="tsd-z">${esc(zahl(o))}</span></span>`, "", o.n)).join("")}</div></div>`;
+    }
+    const duell = fo.length === 2, haupt = duell ? fo : O, rest = duell ? O.filter(o => !fo.includes(o)) : [];
+    const n = haupt.length <= 3 ? haupt.length : 2, mitInfo = n <= 2;
+    const oben = o => spO(o) ? tsBild(tsSrc(o.n), u.verein, (o.nachname || o.n).slice(0, 2).toUpperCase()) : `<span class="tsd-fd">${o.logo ? logo(o.logo, 44) : `<svg class="tsd-i" viewBox="0 0 24 24">${TSI[tsSym(o.n)]}</svg>`}</span>`;
+    return `<div class="tsd-um${feed ? " feed" : ""}"><div class="tsd-g" style="--n:${n}">${haupt.map(o => karte(o, oben(o), (o.nachname || o.n).toUpperCase(), mitInfo ? o.info : "")).join("")}${duell ? `<span class="tsd-vs" aria-hidden="true">VS</span>` : ""}</div>
+      ${rest.length ? `<div class="ts-os" style="--n:${rest.length}">${rest.map(knopf).join("")}</div>` : ""}</div>`;
   }
 
   function tippschein(){

@@ -40,3 +40,11 @@
 .tsd-bis svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tsd-mehr{display:flex;align-items:center;justify-content:center;min-height:46px;border-top:1px solid var(--line);color:var(--hell);font-size:13px;font-weight:600;width:100%}
 .tsd .ts-o{text-align:center}
+.tsd-um{display:grid;gap:8px;padding:8px 12px}
+.tsd-um.feed .tsd-g{--h:120px}
+.tsd-um.feed .tsd-g[style*="--n:3"]{--h:96px}
+.tsd-um .tsd-g[style*="--n:3"] .tsd-fd{--h:96px}
+.tsd-um .ts-o{text-align:center}
+.tsd-pz{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1;color:var(--ink);margin-top:4px}
+.tsd-t .ks{justify-content:center;margin-top:4px}
+.tsd-ak{padding:14px 14px 0}

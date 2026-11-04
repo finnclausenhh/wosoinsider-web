@@ -16,6 +16,9 @@ CSS = (G / "ts_duell.css").read_text(encoding="utf-8")
 MARK = "function tsKarte("
 
 ERS = [
+    # Umfragen im Duell-Stil, alte Liste nur noch als Rückfall
+    ('<div class="um-o${kurz ? " kurz" : ""}" style="--n:${O.length}">${opts}</div>',
+     '${umKarten(u, feed, {meine, zeigt, zp, pz, auf}) || `<div class="um-o${kurz ? " kurz" : ""}" style="--n:${O.length}">${opts}</div>`}'),
     # Artikel: Tippkarte statt Umfrage, wenn die Frage zur Meldung gehört
     ("ARTIKEL = id; const um = umfrageZu(m.id);", "ARTIKEL = id; const um = umfrageZu(m.id), tsA = tsArtikel(m);"),
     ('${zurueck()}${kopf}${um ? umfrageBlock(um) : ""}', '${zurueck()}${kopf}${tsA ? tsA : um ? umfrageBlock(um) : ""}'),
