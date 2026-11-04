@@ -1582,7 +1582,7 @@ details.dzb[open]{padding-bottom:10px}
       ? `<div class="hinw"><span>Alle Meldungen</span><button data-newsalle="0">Nur meine Vereine</button></div>`
       : !rest.length ? `<div class="leer" style="padding:28px 4px;display:grid;gap:10px;justify-items:center"><span>Keine Meldungen deiner Vereine in den letzten 14 Tagen.</span><button class="lk" data-newsalle="1">Alle zeigen</button></div>`
       : "";
-    let seit = 99; const SONDER = [[tippZeile, 1], [gefragtZeile, 9]], MINAB = 2;
+    let seit = 99; const SONDER = [[gefragtZeile, 15]], MINAB = 2;
     rest.forEach((m, gi) => { if (A && dt(A.news_zeit) >= (dt(m.zeit) || 0) && seit >= MINAB) { h += anaTeaser(A); A = null; seit = 0; } const u = m.typ !== "punkt" && umfrageZu(m.id), uT = u ? u : null; h += m.typ === "punkt" ? punktKarte(m) : uT ? `<div class="nkw">${newsKarte(m)}${umfrageBlock(uT, true)}</div>` : u ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(u.frage)}</span><b>${STIMMEN[u.id] ? "abgestimmt" : "im Artikel"}</b></button></div>` : newsKarte(m); seit++;
       if (SONDER.length && gi + 1 >= SONDER[0][1] && seit >= MINAB) { const x = SONDER.shift()[0](); if (x) { h += x; seit = 0; } } });
     if (A) h += anaTeaser(A);
