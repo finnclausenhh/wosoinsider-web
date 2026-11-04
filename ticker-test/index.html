@@ -1046,6 +1046,31 @@ details.dzb[open]{padding-bottom:10px}
 .tsd-bars i{display:block;width:16px;border-radius:3px;background:#2F5BFF}
 .tsd-bars i.z{background:var(--line);height:3px}
 .tsd-g[style*="--n:3"] .tsd-t b{font-size:17px}
+.fd{display:grid;gap:4px;margin-top:6px}
+.fd-sb{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px;border-radius:14px;background:var(--soft);margin-bottom:6px}
+.fd-sb .s{display:grid;justify-items:center;gap:2px}
+.fd-sb .s b{font-family:var(--f-display);font-weight:800;font-size:44px;line-height:1}
+.fd-sb .s small{font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--muted)}
+.fd-z{display:grid;grid-template-columns:1fr 54px 54px;gap:8px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:13px}
+.fd-z span:first-child{display:grid;gap:2px;min-width:0}.fd-z small{font-size:11.5px;color:var(--muted)}
+.fd-z.fd-k{border-top:0;font-size:11px;font-weight:700;color:var(--muted)}
+.fd-z .c{text-align:center;font-weight:700}.fd-z .ok{color:#4ADE80}.fd-z .no{color:#FF8A8A}
+.fd-h{font-size:11.5px;color:var(--muted);margin:6px 0 0}
+.fd-b{display:grid!important;place-content:center;justify-items:center;gap:2px;background:#24345A;flex:none}
+.fd-b b{font-family:var(--f-display);font-weight:800;font-size:28px;line-height:1;color:var(--ink)}
+.fd-b small{font-size:8.5px;font-weight:700;letter-spacing:.4px;color:var(--muted)}
+.fw{gap:10px}
+.fw-q{display:grid;gap:8px}
+.fw-f{font-size:13px;font-weight:600}
+.fw-r{display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;background:var(--soft)}
+.fw-r .tsd-b{width:48px;flex:none;border-radius:10px}
+.fw-r .tx{flex:1;min-width:0;display:grid;gap:5px}
+.fw-r .tx b{font-size:14px}
+.fw-r .tx small{font-size:11.5px;color:var(--muted)}
+.fw-r .fb{position:relative;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.fw-r .fb i{position:absolute;left:0;top:0;bottom:0;background:#8FB0FF;border-radius:3px}
+.fw-n{font-size:11px;color:var(--muted);text-align:right}
+.fw-s{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--muted)}
 .bil h2{font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1.05;margin:2px 0 4px}
 .bil .mu{color:var(--muted);font-size:12px;margin:0 0 10px}
 .bil-test{font-size:11px;color:#F5B041;background:rgba(245,176,65,.12);border-radius:8px;padding:6px 8px;margin-bottom:8px}
@@ -1284,6 +1309,7 @@ details.dzb[open]{padding-bottom:10px}
   const WMG = {"FCB": [76.4, 76.4], "WOB": [76.4, 76.4], "SGE": [76.4, 76.4], "B04": [84.0, 66.2], "KOE": [70.4, 80.0], "RBL": [84.0, 54.0], "SVW": [59.8, 90.0], "SCF": [62.8, 90.0], "FCU": [94.0, 34.1], "VFB": [71.8, 80.0], "TSG": [66.8, 80.0], "HSV": [80.0, 80.0], "FCN": [76.4, 76.4], "M05": [79.3, 73.6]};
   const wm = k => k && WMG[k] ? `<img class="wm" src="logos/wm/${esc(k)}.png" alt="" style="width:${WMG[k][0]}%;height:${WMG[k][1]}%${k === "FCU" ? ";top:30%" : ""}" onerror="this.remove()">` : "";
   function bild(m, g, hh){
+    if (m.grafik && m.grafik.typ === "fansdaten") return fdBild(m, g);
     const h = hh || g, r = g > 70 ? 11 : 8, k = KURZ[m.verein], f = bildPfad(m);
     const box = (inner, bg) => `<div class="bild" style="width:${g}px;height:${h}px;border-radius:${r}px;${bg ? `background:${bg}` : ""}" aria-hidden="true">${inner}</div>`;
     // Hochformat: Kopfmitte (cx aus fotos.json) waagerecht mittig setzen
@@ -1502,7 +1528,7 @@ details.dzb[open]{padding-bottom:10px}
   }
   const tsSitzung = (anlegen) => { const sb = tsClient(); if (!sb) return Promise.reject(new Error("aus"));
     return sb.auth.getSession().then(r => r.data && r.data.session ? r.data.session : anlegen ? sb.auth.signInAnonymously().then(x => { if (x.error) throw x.error; return x.data.session; }) : null); };
-  const tsNeu = () => { if (VIEW !== "tipp" && ARTIKEL && document.querySelector(".tsd-art")) { const y = window.scrollY; article(ARTIKEL); window.scrollTo(0, y); return; } if (VIEW === "tipp") { const y = window.scrollY; tippschein(); window.scrollTo(0, y); } };
+  const tsNeu = () => { if (VIEW === "spielplan" && GAME && document.querySelector(".det")) { spiel(GAME, true); return; } if (VIEW !== "tipp" && ARTIKEL && document.querySelector(".tsd-art")) { const y = window.scrollY; article(ARTIKEL); window.scrollTo(0, y); return; } if (VIEW === "tipp") { const y = window.scrollY; tippschein(); window.scrollTo(0, y); } };
   function tsLaden(md){
     if (TS.geladen[md]) return; TS.geladen[md] = true;
     tsSitzung(false).then(se => {
@@ -1600,7 +1626,7 @@ details.dzb[open]{padding-bottom:10px}
   };
   const tsSym = n => { const s = normS(n); return /startelf|beginnt/.test(s) ? "start" : /bank|kader/.test(s) && !/nicht/.test(s) ? "bank" : /nicht|fehlt|keine/.test(s) ? "raus" : "leute"; };
   const tsSrc = n => { const f = FOTOS[n] || {}; return f.portrait || f.datei || ""; };
-  let TL = null;   // tipp_loesung.json: Auflösung aller Fragen (spielt_sie.py), mehrere richtige mit Komma
+  let TL = null, TAW = null;   // tipp_loesung.json: Auflösung aller Fragen (spielt_sie.py), mehrere richtige mit Komma
   const tsOk = (erg, id) => !!erg && String(erg).split(",").includes(id);
   const TS_NEU = ["mvp", "weste", "flaute", "serie"];
   const tsErg = q => { const l = TL && TL.md === (SS && SS.md) && TL.loesung ? TL.loesung[q.id] : null;
@@ -1721,6 +1747,31 @@ details.dzb[open]{padding-bottom:10px}
     window.scrollTo(0, 0);
   }
 
+  // Fans gegen Daten (Finn 04.11.2026): Auswertung als normale Meldung, Grafik im Artikel
+  function fdGrafik(g){
+    const z = (g.zeilen || []).map(r => `<div class="fd-z"><span><b>${esc(r.frage)}</b><small>Richtig: ${esc(r.richtig)}${r.fans_n ? ` · Fans: ${esc(r.fans_n)} (${r.fans_p} %)` : " · Fans: kein klarer Tipp"}</small></span>
+      <span class="c ${r.fans ? "ok" : "no"}">${r.fans ? "✓" : "✗"}</span><span class="c ${r.daten ? "ok" : "no"}">${r.daten ? "✓" : "✗"}</span></div>`).join("");
+    return `<div class="fd"><div class="fd-sb"><span class="s"><b>${g.fans}</b><small>FANS</small></span><span class="tsd-vs" style="position:static;transform:none">VS</span><span class="s"><b>${g.daten}</b><small>DATEN</small></span></div>
+      <div class="fd-z fd-k"><span>FRAGE</span><span class="c">FANS</span><span class="c">DATEN</span></div>${z}
+      <p class="fd-h">Fans = Antwort mit den meisten Tipps, Daten = unsere Prognose. Bis zu ${g.tipps} ${g.tipps === 1 ? "Tipp" : "Tipps"} je Frage.</p></div>`;
+  }
+  const fdBild = (m, g) => `<div class="bild fd-b" style="width:${g}px;height:${g}px;border-radius:${g > 70 ? 11 : 8}px" aria-hidden="true"><b>${m.grafik.fans}:${m.grafik.daten}</b><small>FANS : DATEN</small></div>`;
+  // Fan-Wert an der Prognose: Spielansicht, nur Einsatzfragen dieser Partie, ab 10 Tipps, immer mit Anzahl
+  function tsFanBlock(p){
+    gLaden(); const r = tippRunde(); if (!r) return "";
+    const qs = r.fragen.filter(q => q.partie === p.id && (q.typ === "einsatz" || !q.typ)); if (!qs.length) return "";
+    tsLaden(r.md); const srv = TS.ok && TS.stand[r.md]; if (!srv) return "";
+    const rows = qs.map(q => { const st = srv[q.id] || {}, ges = Object.values(st).reduce((a, b) => a + (Number(b) || 0), 0); if (ges < 10) return "";
+      const pz = id => Math.round((Number(st[id]) || 0) / ges * 100);
+      const os = tsOpts(q).filter(o => o.sp || q.s), jn = q.s && q.optionen.length === 2 && q.optionen[0].id === "ja";
+      const stufe = n => { const a = [p.heim_aufstellung, p.gast_aufstellung].find(a => a && a.typ === "prognose" && [...(a.startelf || []), ...(a.bank || [])].some(x => normS(x.n) === normS(n)));
+        const x = a && [...(a.startelf || []), ...(a.bank || [])].find(x => normS(x.n) === normS(n)), S = x && STUFE[x.st];
+        return S ? `<span class="fw-s">${stufeSym(x.st, 12)} ${esc(S[2])}</span>` : ""; };
+      const zeile = (n, src, k, w) => `<div class="fw-r">${tsBild(src, k, n.slice(0, 2).toUpperCase())}<span class="tx"><b>${esc(n)}</b>${stufe(n)}<span class="fb"><i style="width:${w}%"></i></span><small>Fans: ${w} % erwarten sie in der Startelf</small></span></div>`;
+      const inner = jn ? zeile(nachN(q.s.n), tsSrc(q.s.n), q.k, pz("ja")) : os.filter(o => o.sp).map(o => zeile(o.name, o.src, o.k || q.k, Math.min(100, pz(o.id) + (st.beide ? pz("beide") : 0)))).join("");
+      return inner ? `<div class="fw-q"><span class="fw-f">${esc(q.frage)}</span>${inner}<span class="fw-n">${zahlDE(ges)} Tipps</span></div>` : ""; }).join("");
+    return rows ? `<div class="kartebox fw">${kap("Spielt sie? Das tippen die Fans")}${rows}</div>` : "";
+  }
   function gefragtZeile(){
     gLaden();
     const l = ((KZ && KZ.spielerinnen) || []).filter(x => x.oeffnungen_7t > 0 && (FOTOS[x.n] || {}).datei).slice(0, 6);
@@ -1991,7 +2042,7 @@ details.dzb[open]{padding-bottom:10px}
           <div class="wer">${m.pos === "Spielansetzung" ? esc(m.spielerin && m.spielerin !== "Spielansetzung" ? m.spielerin : [m.verein, m.aufstellung && m.aufstellung.gegner].filter(Boolean).join(" gegen ")) : istSpielerin(m) && m.spielerin ? `<button class="wer-btn" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}">${esc(m.spielerin)}</button>` : esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc(m.pos === "Spielansetzung" ? ((m.tags || []).includes("SPIELBERICHT") ? "Spielbericht" : (m.aufstellung ? "Aufstellung" : "Vorbericht")) : [m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
           ${st ? `<div class="mk-st">${plakette(meldungsStatus(m), 28)}<span>${st[2]}</span></div>` : ""}</div>
           <h1 class="disp" style="font-size:30px">${esc(m.headline)}</h1><div class="dat">${esc(lang(m.zeit))}</div></div>
-          <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>${m.grafik && m.grafik.typ === "formvergleich" ? fvGrafik(m.grafik) : ""}${m.platzhalter && m.partie_id ? `<button class="btn-prog" data-game="${esc(m.partie_id)}" data-tabspiel="1">Unsere Prognose ansehen ›</button>` : ""}${spielAufstellung(m.spiel_aufstellung, m.verein)}`;
+          <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>${m.grafik && m.grafik.typ === "formvergleich" ? fvGrafik(m.grafik) : m.grafik && m.grafik.typ === "fansdaten" ? fdGrafik(m.grafik) : ""}${m.platzhalter && m.partie_id ? `<button class="btn-prog" data-game="${esc(m.partie_id)}" data-tabspiel="1">Unsere Prognose ansehen ›</button>` : ""}${spielAufstellung(m.spiel_aufstellung, m.verein)}`;
     // Nachweis zum gezeigten Foto: Eintrag aus fotos.json hat Vorrang, sonst der Nachweis aus der Meldung
     const fi = FOTOS[sc ? scSp(m)[0].n : m.spielerin], fc = m.foto_credit;
     const credit = fi && fi.datei && nachweis(fi)
@@ -2128,6 +2179,7 @@ details.dzb[open]{padding-bottom:10px}
       ${!p.heim_aufstellung && !p.gast_aufstellung && p.status === "beendet" ? '<p class="dat">Zu diesem Spiel hat der Spielbericht keine offizielle Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : !p.heim_aufstellung && !p.gast_aufstellung ? '<p class="dat">Die mögliche Aufstellung erscheint, sobald dieser Spieltag als nächster ansteht. Die offizielle kommt ca. 60 Minuten vor Anpfiff.</p>'
         : `<span id="af-auf"></span>` + (p.status !== "beendet" ? teamSchalter(p) : teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", p.status === "beendet", p.anstoss) + teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", p.status === "beendet", p.anstoss))}
       ${prog ? `<div class="leg" style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)">${Object.keys(STUFE).filter(k => ["sicher","erwartet","unsicher"].includes(k)).map(k => `<span>${stufeSym(k, 14)}${STUFE[k][2]}</span>`).join("")}</div><button class="hk" data-legal="so-entsteht" style="background:none;padding:6px 0"><span class="mu" style="font-size:12px">Prognose von WOSOINSIDER, die offizielle Aufstellung kommt ca. 60 Minuten vor Anpfiff und ersetzt sie hier. <span class="lk">So entsteht sie</span></span></button>` : ""}
+      ${tsFanBlock(p)}
       ${!AS ? afBox : ""}
     </div>`;
     AFNOTEN = null; AFBEST = null;
@@ -3337,9 +3389,9 @@ details.dzb[open]{padding-bottom:10px}
     else if (INFO[h]) { list(); legal(h); }
     else h && N.some(m => m.id === h) ? article(h) : list();
   }).catch(() => { if (VIEW === "meldungen") $("#main").innerHTML = '<p class="leer">Die Meldungen konnten nicht geladen werden. Seite neu laden.</p>'; });
-  Object.assign(TAGF, {FORMTIEF: ["#F59E0B", "#1A1206"], FORMHOCH: ["#22C55E", "#06210f"], ELFMETER: ["#6E9BFF", "#0B1220"], JOKER: ["#4ADE80", "#06210f"], GELBSPERRE: ["#F5C518", "#1A1606"], "xG-CHECK": ["#9B6BE8", "#fff"], INSIDER: ["#2A3B5E", "#C7D7FF"], AUFWIND: ["#22C55E", "#06210f"]});
-  ladeAF().then(afNeu).then(() => { ladeSPN().catch(() => {}); const mische = () => { if (!N.length) return setTimeout(mische, 400);
-    const neu = (AF.news || []).filter(n => !N.some(m => m.id === n.id) && n.zeit && dt(n.zeit) <= new Date()); if (!neu.length) return;
+  Object.assign(TAGF, {"SPIELT SIE?": ["rgba(47,91,255,.18)", "#8FB0FF"], FORMTIEF: ["#F59E0B", "#1A1206"], FORMHOCH: ["#22C55E", "#06210f"], ELFMETER: ["#6E9BFF", "#0B1220"], JOKER: ["#4ADE80", "#06210f"], GELBSPERRE: ["#F5C518", "#1A1606"], "xG-CHECK": ["#9B6BE8", "#fff"], INSIDER: ["#2A3B5E", "#C7D7FF"], AUFWIND: ["#22C55E", "#06210f"]});
+  ladeAF().then(afNeu).then(() => json("tipp_auswertung.json").then(d => { TAW = (d && d.news) || []; }).catch(() => {})).then(() => { ladeSPN().catch(() => {}); const mische = () => { if (!N.length) return setTimeout(mische, 400);
+    const neu = (AF.news || []).concat(TAW || []).filter(n => !N.some(m => m.id === n.id) && n.zeit && dt(n.zeit) <= new Date()); if (!neu.length) return;
     N = N.concat(neu).sort((a, b) => String(b.zeit).localeCompare(String(a.zeit)));
     if (VIEW === "meldungen" && document.querySelector("#main .liste")) { const y = window.scrollY; list(); window.scrollTo(0, y); } }; mische(); });
   fetch("patchnotes.json", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(d => { PATCH = d; if (decodeURIComponent(location.hash.slice(1)) === "patches") legal("patches"); }).catch(() => {});

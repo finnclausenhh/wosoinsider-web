@@ -16,6 +16,15 @@ CSS = (G / "ts_duell.css").read_text(encoding="utf-8")
 MARK = "function tsKarte("
 
 ERS = [
+    # Fans gegen Daten: Meldung aus tipp_auswertung.json in den Feed mischen, Bild und Grafik
+    ('    const neu = (AF.news || []).filter(n => !N.some(m => m.id === n.id) && n.zeit && dt(n.zeit) <= new Date()); if (!neu.length) return;',
+     '    const neu = (AF.news || []).concat(TAW || []).filter(n => !N.some(m => m.id === n.id) && n.zeit && dt(n.zeit) <= new Date()); if (!neu.length) return;'),
+    ('  ladeAF().then(afNeu).then(() => {', '  ladeAF().then(afNeu).then(() => json("tipp_auswertung.json").then(d => { TAW = (d && d.news) || []; }).catch(() => {})).then(() => {'),
+    ('  function bild(m, g, hh){\n', '  function bild(m, g, hh){\n    if (m.grafik && m.grafik.typ === "fansdaten") return fdBild(m, g);\n'),
+    ('${m.grafik && m.grafik.typ === "formvergleich" ? fvGrafik(m.grafik) : ""}', '${m.grafik && m.grafik.typ === "formvergleich" ? fvGrafik(m.grafik) : m.grafik && m.grafik.typ === "fansdaten" ? fdGrafik(m.grafik) : ""}'),
+    ('  Object.assign(TAGF, {FORMTIEF:', '  Object.assign(TAGF, {"SPIELT SIE?": ["rgba(47,91,255,.18)", "#8FB0FF"], FORMTIEF:'),
+    # Fan-Wert in der Spielansicht
+    ('      ${!AS ? afBox : ""}\n    </div>`;\n    AFNOTEN = null; AFBEST = null;', '      ${tsFanBlock(p)}\n      ${!AS ? afBox : ""}\n    </div>`;\n    AFNOTEN = null; AFBEST = null;'),
     # Auflösung aller Tippfragen aus tipp_loesung.json (spielt_sie.py)
     ('json("spielt_sie.json").then(d => { SS = d; }).catch(() => { SS = null; })', 'json("spielt_sie.json").then(d => { SS = d; }).catch(() => { SS = null; }),\n      json("tipp_loesung.json").then(d => { TL = d; }).catch(() => { TL = null; })'),
     # Umfragen im Duell-Stil, alte Liste nur noch als Rückfall
@@ -34,6 +43,7 @@ ERS = [
      'const tsNeu = () => { if (VIEW !== "tipp" && ARTIKEL && document.querySelector(".tsd-art")) { const y = window.scrollY; article(ARTIKEL); window.scrollTo(0, y); return; } if (VIEW === "tipp") {'),
     ("    ]).then(() => {\n      if (BACK || ARTIKEL || GAME) return;",
      "    ]).then(() => {\n      if (ARTIKEL && !BACK && !GAME && VIEW === \"meldungen\" && SS) { const y = window.scrollY; article(ARTIKEL); window.scrollTo(0, y); return; }\n      if (BACK || ARTIKEL || GAME) return;"),
+    ('const tsNeu = () => { if (VIEW !== "tipp" && ARTIKEL', 'const tsNeu = () => { if (VIEW === "spielplan" && GAME && document.querySelector(".det")) { spiel(GAME, true); return; } if (VIEW !== "tipp" && ARTIKEL'),
 ]
 
 

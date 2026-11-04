@@ -9,7 +9,7 @@
   };
   const tsSym = n => { const s = normS(n); return /startelf|beginnt/.test(s) ? "start" : /bank|kader/.test(s) && !/nicht/.test(s) ? "bank" : /nicht|fehlt|keine/.test(s) ? "raus" : "leute"; };
   const tsSrc = n => { const f = FOTOS[n] || {}; return f.portrait || f.datei || ""; };
-  let TL = null;   // tipp_loesung.json: Auflösung aller Fragen (spielt_sie.py), mehrere richtige mit Komma
+  let TL = null, TAW = null;   // tipp_loesung.json: Auflösung aller Fragen (spielt_sie.py), mehrere richtige mit Komma
   const tsOk = (erg, id) => !!erg && String(erg).split(",").includes(id);
   const TS_NEU = ["mvp", "weste", "flaute", "serie"];
   const tsErg = q => { const l = TL && TL.md === (SS && SS.md) && TL.loesung ? TL.loesung[q.id] : null;
@@ -130,3 +130,28 @@
     window.scrollTo(0, 0);
   }
 
+  // Fans gegen Daten (Finn 04.11.2026): Auswertung als normale Meldung, Grafik im Artikel
+  function fdGrafik(g){
+    const z = (g.zeilen || []).map(r => `<div class="fd-z"><span><b>${esc(r.frage)}</b><small>Richtig: ${esc(r.richtig)}${r.fans_n ? ` · Fans: ${esc(r.fans_n)} (${r.fans_p} %)` : " · Fans: kein klarer Tipp"}</small></span>
+      <span class="c ${r.fans ? "ok" : "no"}">${r.fans ? "✓" : "✗"}</span><span class="c ${r.daten ? "ok" : "no"}">${r.daten ? "✓" : "✗"}</span></div>`).join("");
+    return `<div class="fd"><div class="fd-sb"><span class="s"><b>${g.fans}</b><small>FANS</small></span><span class="tsd-vs" style="position:static;transform:none">VS</span><span class="s"><b>${g.daten}</b><small>DATEN</small></span></div>
+      <div class="fd-z fd-k"><span>FRAGE</span><span class="c">FANS</span><span class="c">DATEN</span></div>${z}
+      <p class="fd-h">Fans = Antwort mit den meisten Tipps, Daten = unsere Prognose. Bis zu ${g.tipps} ${g.tipps === 1 ? "Tipp" : "Tipps"} je Frage.</p></div>`;
+  }
+  const fdBild = (m, g) => `<div class="bild fd-b" style="width:${g}px;height:${g}px;border-radius:${g > 70 ? 11 : 8}px" aria-hidden="true"><b>${m.grafik.fans}:${m.grafik.daten}</b><small>FANS : DATEN</small></div>`;
+  // Fan-Wert an der Prognose: Spielansicht, nur Einsatzfragen dieser Partie, ab 10 Tipps, immer mit Anzahl
+  function tsFanBlock(p){
+    gLaden(); const r = tippRunde(); if (!r) return "";
+    const qs = r.fragen.filter(q => q.partie === p.id && (q.typ === "einsatz" || !q.typ)); if (!qs.length) return "";
+    tsLaden(r.md); const srv = TS.ok && TS.stand[r.md]; if (!srv) return "";
+    const rows = qs.map(q => { const st = srv[q.id] || {}, ges = Object.values(st).reduce((a, b) => a + (Number(b) || 0), 0); if (ges < 10) return "";
+      const pz = id => Math.round((Number(st[id]) || 0) / ges * 100);
+      const os = tsOpts(q).filter(o => o.sp || q.s), jn = q.s && q.optionen.length === 2 && q.optionen[0].id === "ja";
+      const stufe = n => { const a = [p.heim_aufstellung, p.gast_aufstellung].find(a => a && a.typ === "prognose" && [...(a.startelf || []), ...(a.bank || [])].some(x => normS(x.n) === normS(n)));
+        const x = a && [...(a.startelf || []), ...(a.bank || [])].find(x => normS(x.n) === normS(n)), S = x && STUFE[x.st];
+        return S ? `<span class="fw-s">${stufeSym(x.st, 12)} ${esc(S[2])}</span>` : ""; };
+      const zeile = (n, src, k, w) => `<div class="fw-r">${tsBild(src, k, n.slice(0, 2).toUpperCase())}<span class="tx"><b>${esc(n)}</b>${stufe(n)}<span class="fb"><i style="width:${w}%"></i></span><small>Fans: ${w} % erwarten sie in der Startelf</small></span></div>`;
+      const inner = jn ? zeile(nachN(q.s.n), tsSrc(q.s.n), q.k, pz("ja")) : os.filter(o => o.sp).map(o => zeile(o.name, o.src, o.k || q.k, Math.min(100, pz(o.id) + (st.beide ? pz("beide") : 0)))).join("");
+      return inner ? `<div class="fw-q"><span class="fw-f">${esc(q.frage)}</span>${inner}<span class="fw-n">${zahlDE(ges)} Tipps</span></div>` : ""; }).join("");
+    return rows ? `<div class="kartebox fw">${kap("Spielt sie? Das tippen die Fans")}${rows}</div>` : "";
+  }
