@@ -1075,6 +1075,15 @@ details.dzb[open]{padding-bottom:10px}
 .sc-zb i{width:10px;height:10px}
 .sc-zr small{font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap}
 .sc-zr small.t{color:#F5B041}
+
+.sb2 .ic.si{align-items:flex-end;gap:8px}
+.sb2 > div.gr{grid-column:1/-1}
+.af-ww .pz{display:grid !important;grid-template-columns:1fr !important}
+.af-ww .pz .bb{display:block !important;width:100% !important}
+.sb2 .ic.si span{display:grid;justify-items:center;gap:1px;font:600 9px var(--f-mono);color:var(--muted)}
+.sb2 .ic.fu{gap:2px}
+.sb2 .ic.fu span{display:grid;justify-items:center;gap:1px;font:700 9px var(--f-mono);color:var(--muted)}
+.sb2 .ic.fu span.an{color:#8FB0FF}
 </style>
 
 
@@ -1573,7 +1582,9 @@ details.dzb[open]{padding-bottom:10px}
       ? `<div class="hinw"><span>Alle Meldungen</span><button data-newsalle="0">Nur meine Vereine</button></div>`
       : !rest.length ? `<div class="leer" style="padding:28px 4px;display:grid;gap:10px;justify-items:center"><span>Keine Meldungen deiner Vereine in den letzten 14 Tagen.</span><button class="lk" data-newsalle="1">Alle zeigen</button></div>`
       : "";
-    rest.forEach((m, gi) => { if (A && dt(A.news_zeit) >= (dt(m.zeit) || 0)) { h += anaTeaser(A); A = null; } const u = m.typ !== "punkt" && umfrageZu(m.id), uT = u ? u : null; h += m.typ === "punkt" ? punktKarte(m) : uT ? `<div class="nkw">${newsKarte(m)}${umfrageBlock(uT, true)}</div>` : u ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(u.frage)}</span><b>${STIMMEN[u.id] ? "abgestimmt" : "im Artikel"}</b></button></div>` : newsKarte(m); if (gi === 0) h += tippZeile(); if (gi === 2) h += gefragtZeile(); });
+    let seit = 99; const SONDER = [[tippZeile, 1], [gefragtZeile, 9]], MINAB = 2;
+    rest.forEach((m, gi) => { if (A && dt(A.news_zeit) >= (dt(m.zeit) || 0) && seit >= MINAB) { h += anaTeaser(A); A = null; seit = 0; } const u = m.typ !== "punkt" && umfrageZu(m.id), uT = u ? u : null; h += m.typ === "punkt" ? punktKarte(m) : uT ? `<div class="nkw">${newsKarte(m)}${umfrageBlock(uT, true)}</div>` : u ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(u.frage)}</span><b>${STIMMEN[u.id] ? "abgestimmt" : "im Artikel"}</b></button></div>` : newsKarte(m); seit++;
+      if (SONDER.length && gi + 1 >= SONDER[0][1] && seit >= MINAB) { const x = SONDER.shift()[0](); if (x) { h += x; seit = 0; } } });
     if (A) h += anaTeaser(A);
     if (filter && rest.length) h += `<div class="hinw"><span>${alle.length - rest.length} weitere Meldungen anderer Vereine</span><button data-newsalle="1">Alle zeigen</button></div>`;
     $("#main").innerHTML = vereinsZeile() + `<div class="liste">${h}</div>`;
@@ -2519,8 +2530,9 @@ details.dzb[open]{padding-bottom:10px}
   const FLAGGE = {Deutschland:"DE",Österreich:"AT",Schweiz:"CH",Niederlande:"NL",Belgien:"BE",Polen:"PL",Japan:"JP",Frankreich:"FR",Norwegen:"NO",Ungarn:"HU",Dänemark:"DK",Schweden:"SE",Island:"IS",Spanien:"ES",Kanada:"CA",Australien:"AU",Kosovo:"XK",Serbien:"RS",Montenegro:"ME",Slowenien:"SI",Elfenbeinküste:"CI",Slowakei:"SK",Marokko:"MA",Aserbaidschan:"AZ",Tschechien:"CZ",USA:"US",Türkei:"TR",Kroatien:"HR",Israel:"IL",Portugal:"PT",Russland:"RU",Luxemburg:"LU",Italien:"IT",Philippinen:"PH",Finnland:"FI",Irland:"IE",Schottland:"",Wales:"",Brasilien:"BR",Mexiko:"MX",Südkorea:"KR",China:"CN",Nigeria:"NG",Ghana:"GH",Kolumbien:"CO",Argentinien:"AR",Neuseeland:"NZ",Albanien:"AL",Bosnien:"BA",Griechenland:"GR",Rumänien:"RO",Ukraine:"UA",Bulgarien:"BG",Litauen:"LT",Lettland:"LV",Estland:"EE"};
   const flagge = n => n === "England" ? "\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}" : FLAGGE[n] ? [...FLAGGE[n]].map(c => String.fromCodePoint(127397 + c.charCodeAt(0))).join("") : "";
   const PLURAL = {TW: "Torhüterinnen", ABW: "Abwehrspielerinnen", MF: "Mittelfeldspielerinnen", ST: "Stürmerinnen"};
-  const SILH = (hpx, farbe) => `<svg width="${Math.round(hpx * .42)}" height="${hpx}" viewBox="0 0 42 100" aria-hidden="true"><circle cx="21" cy="10" r="9" fill="${farbe}"/><path d="M8 24c0-3 3-5 6-5h14c3 0 6 2 6 5l3 34c0 2-2 3-4 3l-3-1-1 37c0 2-2 3-4 3h-3l-1-34-1 34h-3c-2 0-4-1-4-3l-1-37-3 1c-2 0-4-1-4-3z" fill="${farbe}"/></svg>`;
-  const FUSS = (an) => `<svg width="15" height="26" viewBox="0 0 15 26" aria-hidden="true"><path d="M7.5 1c3.5 0 6 3 6 8 0 4-1 7-1.6 10-.5 3-2 5.5-4.4 5.5S3.6 22 3 19C2.4 16 1.5 13 1.5 9c0-5 2.5-8 6-8z" fill="${an ? "#8FB0FF" : "rgba(255,255,255,.12)"}"/></svg>`;
+  // Spielerin mit Ball (Seitenansicht), Höhe in Pixeln = Körpergröße im festen Maßstab
+  const SILH = (hpx, farbe) => `<svg width="${Math.round(hpx * .5)}" height="${hpx}" viewBox="0 0 50 100" aria-hidden="true"><g fill="${farbe}"><circle cx="24" cy="8" r="7.5"/><path d="M16 19c2-2 5-3 8-3s7 1 9 3l4 21-6 2-3-14-1 22 4 18 9 19-7 3-10-20-3-13-3 14-4 19-7-1 4-21 1-21-2-13-3 13-6-2z"/><circle cx="43" cy="93" r="6"/></g></svg>`;
+  const FUSS = (an, s) => `<span class="${an ? "an" : ""}"><svg width="24" height="15" viewBox="0 0 24 15" aria-hidden="true" style="transform:scaleX(${s === "L" ? -1 : 1})"><path d="M3 2h7l1 5c3 0 8 1 11 3 1 1 1 3-1 3H3c-1 0-2-1-2-2V3c0-1 1-1 2-1z" fill="${an ? "#8FB0FF" : "rgba(255,255,255,.14)"}"/><path d="M4 13v2M8 13v2M13 13v2M18 13v2" stroke="${an ? "#8FB0FF" : "rgba(255,255,255,.14)"}" stroke-width="1.4"/></svg>${s}</span>`;
   function ligaRang(s, f, filt){
     const peers = ((SPN && SPN.spielerinnen) || []).filter(x => x.pos === s.pos && (x.spiele || []).reduce((a, e) => a + (e.min || 0), 0) >= 270 && (!filt || filt(x)));
     const w = f(s); if (w == null || peers.length < 8) return null;
@@ -2620,7 +2632,7 @@ details.dzb[open]{padding-bottom:10px}
 
   // ---------------- Tabelle und Statistik (nur Liga, berechnet aus spielplan.json und spielerinnen.json)
   let STAUF = {};
-  const STKAT = [["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["sch","Torschüsse","laut Spielstatistik"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["note","Beste Note im Schnitt","ab 4 Einsätzen über 60 Minuten"],["kp90","Schlüsselpässe pro 90","ab 300 Einsatzminuten"],["par","Paraden pro Spiel","Torhüterinnen ab 3 Spielen"],["zkw","Zweikämpfe gewonnen","laut Spielstatistik"],["gef","Gefoult worden","laut Spielstatistik"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["karten","Karten","Gelb 1, Gelb-Rot 3, Rot 5 Punkte"],["fouls","Fouls","laut Spielstatistik"]];
+  const STKAT = [["note","Beste Note im Schnitt","ab 4 Einsätzen über 60 Minuten"],["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["sch","Torschüsse","laut Spielstatistik"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["kp90","Schlüsselpässe pro 90","ab 300 Einsatzminuten"],["schpg","Torschüsse pro Spiel","ab 4 Einsätzen"],["zkq","Zweikampfquote","gewonnene Zweikämpfe in Prozent, ab 40"],["pq","Passquote","angekommene Pässe in Prozent, ab 150"],["drib","Dribblings erfolgreich","Anzahl laut API-Football"],["bkpg","Ballkontakte pro Spiel","ab 4 Einsätzen"],["par","Paraden pro Spiel","Torhüterinnen ab 3 Spielen"],["zkw","Zweikämpfe gewonnen","laut Spielstatistik"],["gef","Gefoult worden","laut Spielstatistik"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["karten","Karten","Gelb 1, Gelb-Rot 3, Rot 5 Punkte"],["fouls","Fouls","laut Spielstatistik"]];
   function fairHtml(L){
     const W = ligaWerte(L.spiele), F = {}; ALLE.forEach(c => F[c] = {k: c, gelb: 0, gr: 0, rot: 0});
     W.forEach(v => { const f = F[v.s.k]; if (f) { f.gelb += v.gelb; f.gr += v.gr; f.rot += v.rot; } });
@@ -2648,12 +2660,14 @@ details.dzb[open]{padding-bottom:10px}
         if (z.art === "E") v.joker += t; if (z.gr) v.gr++; else if (z.rot) v.rot++; else if (z.gelb) v.gelb++;
         if (s.pos === "TW" && z.art === "S" && z.erg) { const [a, b] = z.erg.split(":").map(Number); if ((z.ha === "H" ? b : a) === 0) v.zunull++; } });
       const st = s.stat || {}; v.sch = st.sch || 0; v.zkw = st.zk_w || 0; v.gef = st.gef || 0; v.fouls = st.fouls || 0; v.scorer = v.tore + v.vorl; v.karten = v.gelb + 3 * v.gr + 5 * v.rot; v.p90 = v.minuten >= 270 && v.tore ? v.tore / v.minuten * 90 : 0;
-      { const af = afSp(s.id) || {}; v.note = af.avg && (af.no || []).filter(x => x[2] >= 60).length >= 4 ? af.avg : 0; v.kp90 = af.kp90 && v.minuten >= 300 ? af.kp90 : 0; v.par = af.parsp >= 3 ? af.par / af.parsp : 0; }
+      { const af = afSp(s.id) || {}; v.note = af.avg && (af.no || []).filter(x => x[2] >= 60).length >= 4 ? af.avg : 0; v.kp90 = af.kp90 && v.minuten >= 300 ? af.kp90 : 0; v.par = af.parsp >= 3 ? af.par / af.parsp : 0;
+        const sp2 = (s.stat || {}).spiele || 0; v.schpg = sp2 >= 4 && st.sch ? st.sch / sp2 : 0; v.zkq = st.zk_ges >= 40 ? st.zk_w / st.zk_ges * 100 : 0; v.pq = st.p_ges >= 150 ? st.p_ok / st.p_ges * 100 : 0;
+        v.drib = af.drib ? af.drib[0] : 0; v.bkpg = sp2 >= 4 && st.bk ? st.bk / sp2 : 0; }
       v.voll = sp[s.k] > 0 && g.length === sp[s.k] && g.every(z => z.art === "S" && !z.aus && !z.rot) ? 1 : 0;
       return v; });
   }
   const stKarten = v => `<span class="kt3"><span><i class="kg"></i>${v.gelb}</span><span><i class="kgr"></i>${v.gr}</span><span><i class="kr"></i>${v.rot}</span></span>`;
-  const stFmt = (k, x) => k === "minuten" ? x + "'" : k === "p90" || k === "note" ? x.toFixed(2).replace(".", ",") : k === "kp90" || k === "par" ? x.toFixed(1).replace(".", ",") : String(x);
+  const stFmt = (k, x) => k === "minuten" ? x + "'" : k === "p90" || k === "note" ? x.toFixed(2).replace(".", ",") : k === "zkq" || k === "pq" ? Math.round(x) + " %" : k === "kp90" || k === "par" || k === "schpg" || k === "bkpg" ? x.toFixed(1).replace(".", ",") : String(x);
   const stNach = s => esc(nachN(s.n));
   const stNamen = l => { const n = l.map(v => stNach(v.s)); return n.length > 5 ? n.slice(0, 4).join(", ") + ` und ${n.length - 4} weitere` : n.join(", "); };
   function stListe(k, l, n){
@@ -2995,16 +3009,16 @@ details.dzb[open]{padding-bottom:10px}
       if (af.parsp) ww.push([dez(af.par / af.parsp, 1), "Paraden pro Spiel", `${af.par} in ${af.parsp} Spielen`, ligaRang(s, x => (afSp(x.id) || {}).parsp >= 3 ? afSp(x.id).par / afSp(x.id).parsp : null)]);
       const gelb = sp.filter(e => e.gelb && !e.gr).length; if (gelb || st.fouls) ww.push([gelb + (gelb >= 4 ? " ⚠" : ""), "Gelbe Karten", gelb >= 4 ? "bei der 5. ein Spiel Sperre" : st.fouls ? st.fouls + (st.fouls === 1 ? " Foul" : " Fouls") + `, ${st.gef || 0}x gefoult worden` : "", null]);
       const pfarbe = p => p >= 75 ? "#4ADE80" : p >= 40 ? "#8FB0FF" : "#F5C26B";
-      if (ww.length) h += `<section class="pf-box">${kap("Weitere Werte")}<div class="af-ww">${ww.map(w => `<div><b>${w[0]}</b><span>${esc(w[1])}</span>${w[2] ? `<span class="su">${esc(w[2])}</span>` : ""}${w[3] ? `<div class="pz"><span class="bb"><i style="width:${Math.max(4, w[3].p)}%;background:${pfarbe(w[3].p)}"></i></span><small>${w[3].p >= 100 ? "Bestwert aller " + (PLURAL[s.pos] || "Spielerinnen") : "besser als " + w[3].p + " % der " + (PLURAL[s.pos] || "Spielerinnen")}</small></div>` : ""}</div>`).join("")}</div><p class="af-st">Balken: Vergleich mit allen ${PLURAL[s.pos] || "Spielerinnen"} der Liga ab 270 Minuten. Schlüsselpässe, Dribblings und Paraden: API-Football, übrige Werte: Spielstatistik der Sportschau.</p></section>`;
+      if (ww.length) h += `<section class="pf-box">${kap("Weitere Werte")}<div class="af-ww">${ww.map(w => `<div><b>${w[0]}</b><span>${esc(w[1])}</span>${w[2] ? `<span class="su">${esc(w[2])}</span>` : ""}${w[3] ? `<div class="pz"><span class="bb"><i style="width:${Math.max(4, w[3].p)}%;background:${pfarbe(w[3].p)}"></i></span><small>${w[3].p >= 100 ? "Bestwert aller " + (PLURAL[s.pos] || "Spielerinnen") : w[3].p <= 0 ? "niedrigster Wert aller " + (PLURAL[s.pos] || "Spielerinnen") : w[3].p >= 50 ? "besser als " + w[3].p + " % der " + (PLURAL[s.pos] || "Spielerinnen") : "schlechter als " + (100 - w[3].p) + " % der " + (PLURAL[s.pos] || "Spielerinnen")}</small></div>` : ""}</div>`).join("")}</div><p class="af-st">Balken: Vergleich mit allen ${PLURAL[s.pos] || "Spielerinnen"} der Liga ab 270 Minuten. Schlüsselpässe, Dribblings und Paraden: API-Football, übrige Werte: Spielstatistik der Sportschau.</p></section>`;
       const alleAF = Object.values((AF && AF.sp) || {}), grL = alleAF.map(x => x.gr).filter(Boolean), alL = alleAF.map(x => x.alter).filter(Boolean);
       const grP = ((SPN && SPN.spielerinnen) || []).filter(x => x.pos === s.pos).map(x => (afSp(x.id) || {}).gr).filter(Boolean);
       const mw = l => l.length ? l.reduce((a, b) => a + b, 0) / l.length : null, grLm = mw(grL), grPm = mw(grP);
       const grPct = af.gr && grL.length ? Math.round(grL.filter(g => g < af.gr).length / grL.length * 100) : null;
       const fu = af.fuss, fl = flagge(s.nation);
-      const t1 = `<div><span class="tx"><b>${fu ? fu[0].toUpperCase() + fu.slice(1) : "–"}</b><span>Starker Fuß</span></span><span class="ic">${FUSS(fu === "links" || fu === "beidfüßig")}${FUSS(fu === "rechts" || fu === "beidfüßig")}</span></div>`;
+      const t1 = `<div><span class="tx"><b>${fu ? fu[0].toUpperCase() + fu.slice(1) : "–"}</b><span>Starker Fuß</span></span><span class="ic fu">${FUSS(fu === "links" || fu === "beidfüßig", "L")}${FUSS(fu === "rechts" || fu === "beidfüßig", "R")}</span></div>`;
       const t2 = `<div><span class="tx"><b>${af.alter ? af.alter + " Jahre" : "–"}</b><span>${alL.length ? "Liga-Ø " + Math.round(mw(alL)) + " Jahre" : "Alter"}</span></span></div>`;
-      const t3 = `<div><span class="tx"><b>${af.gr ? dez(af.gr / 100, 2) + " m" : "–"}</b><span>${grPct != null ? `größer als ${grPct} % der Liga` : "Größe"}${grPm ? `<br>Ø ${esc(PLURAL[s.pos] || "Position")} ${dez(grPm / 100, 2)} m` : ""}</span></span>${af.gr && grLm ? `<span class="ic">${SILH(Math.round(af.gr / 190 * 50), "#8FB0FF")}${SILH(Math.round(grLm / 190 * 50), "rgba(255,255,255,.16)")}</span>` : ""}</div>`;
-      const t4 = `<div><span class="tx"><b>${esc(s.nation || "–")}</b><span>Nation</span></span>${fl ? `<span class="ic fl">${fl}</span>` : ""}</div>`;
+      const t3 = `<div class="gr"><span class="tx"><b>${af.gr ? dez(af.gr / 100, 2) + " m" : "–"}</b><span>${grPct != null ? (grPct >= 50 ? `größer als ${grPct} % der Liga` : `kleiner als ${100 - grPct} % der Liga`) : "Größe"}${grPm ? `<br>Ø ${esc(PLURAL[s.pos] || "Position")} ${dez(grPm / 100, 2)} m` : ""}</span></span>${af.gr && grLm ? `<span class="ic si"><span>${SILH(Math.round(af.gr / 185 * 58), "#8FB0FF")}SIE</span><span>${SILH(Math.round(grLm / 185 * 58), "rgba(255,255,255,.2)")}Ø</span></span>` : ""}</div>`;
+      const t4 = `<div class="gr"><span class="tx"><b>${esc(s.nation || "–")}</b><span>Nation</span></span>${fl ? `<span class="ic fl">${fl}</span>` : ""}</div>`;
       if (af.fuss || af.alter || af.gr) h += `<section class="pf-box">${kap("Steckbrief")}<div class="sb2">${t1}${t2}${t3}${t4}</div>${af.gr && grLm ? '<p class="af-st">Silhouetten: blau sie, grau der Liga-Schnitt. Größe und Alter: API-Football, Fuß: unsere Stammdaten.</p>' : ""}</section>`; }
     const f = FOTOS[s.n];
     h += `<div class="pf-fuss">${f && f.autor ? esc(nachweis(f).replace(/<[^>]+>/g, "")) + " · " : ""}Daten: Sportschau, Vereine, eigene Auswertung</div>`;
