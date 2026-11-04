@@ -155,3 +155,13 @@
       return inner ? `<div class="fw-q"><span class="fw-f">${esc(q.frage)}</span>${inner}<span class="fw-n">${zahlDE(ges)} Tipps</span></div>` : ""; }).join("");
     return rows ? `<div class="kartebox fw">${kap("Spielt sie? Das tippen die Fans")}${rows}</div>` : "";
   }
+  // Sammel-News (Finn 04.11.2026): hat mindestens eine Frage keinen passenden Artikel, steht eine normal große Meldung im Feed, die zum Tippschein führt
+  function tsRundeNews(){
+    const r = tippRunde(); if (!r || !SS) return;
+    const id = `tipp-runde-md${r.md}`; if (N.some(m => m.id === id)) return;
+    const ohne = r.fragen.filter(q => !N.some(m => m.typ !== "tipprunde" && (tsFrageZu(m) || {}).q === q));
+    if (!ohne.length) return;
+    N.push({id, typ: "tipprunde", zeit: SS.erstellt, tags: ["SPIELT SIE?"], headline: `Spielt sie? ${r.fragen.length} Fragen zum ${r.md}. Spieltag`,
+      kurz: `Spielt sie? ${r.fragen.length} Fragen zum ${r.md}. Spieltag`, spielerin: `Tippen bis ${wtUhr(r.schluss)}`, pos: "Spielansetzung", n_fragen: r.fragen.length});
+  }
+  const trBild = (m, g) => `<div class="bild fd-b" style="width:${g}px;height:${g}px;border-radius:${g > 70 ? 11 : 8}px" aria-hidden="true"><b>${m.n_fragen}</b><small>FRAGEN</small></div>`;

@@ -1309,6 +1309,7 @@ details.dzb[open]{padding-bottom:10px}
   const wm = k => k && WMG[k] ? `<img class="wm" src="logos/wm/${esc(k)}.png" alt="" style="width:${WMG[k][0]}%;height:${WMG[k][1]}%${k === "FCU" ? ";top:30%" : ""}" onerror="this.remove()">` : "";
   function bild(m, g, hh){
     if (m.grafik && m.grafik.typ === "fansdaten") return fdBild(m, g);
+    if (m.typ === "tipprunde") return trBild(m, g);
     const h = hh || g, r = g > 70 ? 11 : 8, k = KURZ[m.verein], f = bildPfad(m);
     const box = (inner, bg) => `<div class="bild" style="width:${g}px;height:${h}px;border-radius:${r}px;${bg ? `background:${bg}` : ""}" aria-hidden="true">${inner}</div>`;
     // Hochformat: Kopfmitte (cx aus fotos.json) waagerecht mittig setzen
@@ -1726,6 +1727,17 @@ details.dzb[open]{padding-bottom:10px}
       ${rest.length ? `<div class="ts-os" style="--n:${rest.length}">${rest.map(knopf).join("")}</div>` : ""}</div>`;
   }
 
+  // Sammel-News (Finn 04.11.2026): hat mindestens eine Frage keinen passenden Artikel, steht eine normal große Meldung im Feed, die zum Tippschein führt
+  function tsRundeNews(){
+    const r = tippRunde(); if (!r || !SS) return;
+    const id = `tipp-runde-md${r.md}`; if (N.some(m => m.id === id)) return;
+    const ohne = r.fragen.filter(q => !N.some(m => m.typ !== "tipprunde" && (tsFrageZu(m) || {}).q === q));
+    if (!ohne.length) return;
+    N.push({id, typ: "tipprunde", zeit: SS.erstellt, tags: ["SPIELT SIE?"], headline: `Spielt sie? ${r.fragen.length} Fragen zum ${r.md}. Spieltag`,
+      kurz: `Spielt sie? ${r.fragen.length} Fragen zum ${r.md}. Spieltag`, spielerin: `Tippen bis ${wtUhr(r.schluss)}`, pos: "Spielansetzung", n_fragen: r.fragen.length});
+  }
+  const trBild = (m, g) => `<div class="bild fd-b" style="width:${g}px;height:${g}px;border-radius:${g > 70 ? 11 : 8}px" aria-hidden="true"><b>${m.n_fragen}</b><small>FRAGEN</small></div>`;
+
   function tippschein(){
     VIEW = "tipp"; ARTIKEL = null; GAME = null; BACK = null;
     gLaden();
@@ -1802,6 +1814,7 @@ details.dzb[open]{padding-bottom:10px}
 
   function list(){
     GAME = null; ARTIKEL = null;
+    tsRundeNews();
     const now = Date.now();
     const fest = N.filter(angeheftet).sort((a, b) => dt(a.pin_bis) - dt(b.pin_bis));
     const alle = N.filter(m => !fest.includes(m)).sort((a, b) => (dt(b.zeit) || 0) - (dt(a.zeit) || 0));
@@ -2029,6 +2042,7 @@ details.dzb[open]{padding-bottom:10px}
   function article(id){
     const m = N.find(x => x.id === id); if (!m) return list();
     if (!SPN && (m.spiel_aufstellung || m.aufstellung)) ladeSPN().then(() => { SPIDX = null; if (VIEW === "meldungen" && decodeURIComponent(location.hash.slice(1)) === id) { const y = window.scrollY; article(id); window.scrollTo(0, y); } }).catch(() => {});
+    if (m.typ === "tipprunde") { tippschein(); return; }
     if (m.typ === "punkt") { $("#main").innerHTML = `<div class="det">${zurueck()}${punktArtikel(m)}</div>`; if (window.WIKOM) window.WIKOM.mount(m.id); window.scrollTo(0, 0); return; }
     const a = m.aufstellung, auf = a && (a.startelf || []).length;
     const st = STATUS[String(meldungsStatus(m) || "").toLowerCase()];
