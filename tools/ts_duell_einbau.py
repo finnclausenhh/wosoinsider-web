@@ -22,9 +22,9 @@ ERS = [
     # Artikel: Tippkarte statt Umfrage, wenn die Frage zur Meldung gehört
     ("ARTIKEL = id; const um = umfrageZu(m.id);", "ARTIKEL = id; const um = umfrageZu(m.id), tsA = tsArtikel(m);"),
     ('${zurueck()}${kopf}${um ? umfrageBlock(um) : ""}', '${zurueck()}${kopf}${tsA ? tsA : um ? umfrageBlock(um) : ""}'),
-    # Feed: zur Tippfrage nur ein Hinweis unter der Meldung, getippt wird im Artikel
+    # Feed: Meldungen bleiben einheitlich (Finn 04.11.2026). Tippfrage und Umfrage nur als schmale Zeile, Grafiken erst im Artikel
     ('uT ? `<div class="nkw">${newsKarte(m)}${umfrageBlock(uT, true)}</div>`',
-     'uT ? (tsFrageZu(m) ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}"><span class="kap" style="margin:0;color:#8FB0FF">SPIELT SIE?</span><span class="t">${esc(uT.frage)}</span><b>Tippen im Artikel</b></button></div>` : `<div class="nkw">${newsKarte(m)}${umfrageBlock(uT, true)}</div>`)'),
+     'uT ? (tsFrageZu(m) ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}"><span class="tag" style="background:rgba(47,91,255,.18);color:#8FB0FF">SPIELT SIE?</span><span class="t">${esc(uT.frage)}</span><b>Tippen ›</b></button></div>` : `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(uT.frage)}</span><b>${STIMMEN[uT.id] ? "abgestimmt" : "Abstimmen ›"}</b></button></div>`)'),
     # Tippen im Artikel zeichnet den Artikel neu
     ("tsSetzen(md, qid, TIPPS[md][qid]); const y = window.scrollY; tippschein(); window.scrollTo(0, y); return; }",
      "tsSetzen(md, qid, TIPPS[md][qid]); const y = window.scrollY; if (VIEW === \"tipp\") tippschein(); else if (ARTIKEL) article(ARTIKEL); window.scrollTo(0, y); return; }"),
