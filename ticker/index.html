@@ -923,6 +923,23 @@ details.dzb[open]{padding-bottom:10px}
 .fkk small{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
 .fkk small b{font-weight:700}
 .finh > p.fke{font-size:12.5px;color:var(--muted);line-height:1.4;margin:-4px 0 0}
+
+.af-tw button{font-size:14px}
+.af-swb .tb-k > .kd-btn{display:none}
+.af-swb .tb-k{justify-content:flex-end}
+.begr{gap:6px}
+.begr .ba{display:grid;gap:5px}
+.begr .ba .k1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.begr .ba .k1 b{font-size:14.5px}
+.begr .ba .z{font-size:12.5px;line-height:1.45;color:#C9D3E3}
+.begr .ba .z b{color:var(--ink);font-weight:600}
+.begr .ba .pl{justify-self:start;background:var(--soft);border-radius:999px;padding:6px 12px;font-weight:600;font-size:12.5px;color:#C7D7FF;margin-top:2px}
+.bigr{display:flex;align-items:center;gap:10px;margin-top:auto}
+.bigr .big{margin:0;font-size:36px}
+.bigr .bt{line-height:1.25}
+.fkomp .vn{flex-wrap:wrap;row-gap:2px}
+.eck-r .bw small b{color:#C9D3E3;font-weight:600}
+.af-innews{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px;font-size:13px;width:100%;text-align:left}
 </style>
 
 
@@ -1185,7 +1202,7 @@ details.dzb[open]{padding-bottom:10px}
       ? `<div class="hinw"><span>Alle Meldungen</span><button data-newsalle="0">Nur meine Vereine</button></div>`
       : !rest.length ? `<div class="leer" style="padding:28px 4px;display:grid;gap:10px;justify-items:center"><span>Keine Meldungen deiner Vereine in den letzten 14 Tagen.</span><button class="lk" data-newsalle="1">Alle zeigen</button></div>`
       : "";
-    rest.forEach(m => { if (A && dt(A.news_zeit) >= (dt(m.zeit) || 0)) { h += anaTeaser(A); A = null; } const u = m.typ !== "punkt" && umfrageZu(m.id), uT = u && u.top ? u : null; h += m.typ === "punkt" ? punktKarte(m) : uT ? `<div class="nkw">${newsKarte(m)}${umfrageBlock(uT, true)}</div>` : u ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(u.frage)}</span><b>${STIMMEN[u.id] ? "abgestimmt" : "im Artikel"}</b></button></div>` : newsKarte(m); });
+    rest.forEach(m => { if (A && dt(A.news_zeit) >= (dt(m.zeit) || 0)) { h += anaTeaser(A); A = null; } const u = m.typ !== "punkt" && umfrageZu(m.id), uT = u ? u : null; h += m.typ === "punkt" ? punktKarte(m) : uT ? `<div class="nkw">${newsKarte(m)}${umfrageBlock(uT, true)}</div>` : u ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(u.frage)}</span><b>${STIMMEN[u.id] ? "abgestimmt" : "im Artikel"}</b></button></div>` : newsKarte(m); });
     if (A) h += anaTeaser(A);
     if (filter && rest.length) h += `<div class="hinw"><span>${alle.length - rest.length} weitere Meldungen anderer Vereine</span><button data-newsalle="1">Alle zeigen</button></div>`;
     $("#main").innerHTML = vereinsZeile() + `<div class="liste">${h}</div>`;
@@ -1571,8 +1588,8 @@ details.dzb[open]{padding-bottom:10px}
   const AFSEITE = {};
   function teamSchalter(p){
     const sel = AFSEITE[p.id] || "heim";
-    return `<div class="af-tw" role="tablist">${[["heim", p.heim, p.heim_k], ["gast", p.gast, p.gast_k]].map(([s, n, k]) => `<button role="tab" data-afseite="${s}" aria-pressed="${sel === s}">${logo(k, 22)}<span>${esc(KNAME[k] || n)}</span></button>`).join("")}</div>`
-      + (sel === "heim" ? teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", false, p.anstoss) : teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", false, p.anstoss));
+    return `<div class="af-tw" role="tablist">${[["heim", p.heim, p.heim_k], ["gast", p.gast, p.gast_k]].map(([s, n, k]) => `<button role="tab" data-afseite="${s}" aria-pressed="${sel === s}"><span>${esc(KNAME[k] || n)}</span></button>`).join("")}</div>`
+      + `<div class="af-swb">${sel === "heim" ? teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", false, p.anstoss) : teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", false, p.anstoss)}</div>`;
   }
   document.addEventListener("click", e => { const b = e.target.closest("[data-afseite]"); if (!b || !GAME) return; AFSEITE[GAME] = b.dataset.afseite; spiel(GAME, true); });
   function teamBlock(name, k, a, seite, vorbei, anstoss){
@@ -1599,6 +1616,24 @@ details.dzb[open]{padding-bottom:10px}
     h += aenderungen(k, elf.filter(s => neuSet.has(s.n)), raus);
     return h + `</div>`;
   }
+  document.addEventListener("click", e => { if (e.target.closest("[data-anaart]") && typeof anaArticle === "function") anaArticle(); });
+  function begrAnalyse(k, g){
+    const s = spAus(k, g), st = STUFE[g.st], z = [];
+    z.push(`<span class="z"><b>Prognose:</b> ${esc(kurzWarum(g.warum))}</span>`);
+    if (s) {
+      const l3 = (s.spiele || []).slice(-3);
+      if (l3.length) z.push(`<span class="z"><b>Letzte 3 Ligaspiele:</b> ${l3.map(e => (e.art === "S" ? "Startelf " : e.art === "E" ? "Joker " : e.art === "B" ? "Bank" : "fehlte") + (e.art === "S" || e.art === "E" ? e.min + "'" : "")).join(" · ")}</span>`);
+      const a = afSp(s.id), v = a && (a.no || []).filter(x => x[2] >= 60);
+      if (v && v.length >= 4) { const n = v.map(x => x[1]), l = n.slice(-3).reduce((x, y) => x + y, 0) / 3, o = n.slice(0, -3).reduce((x, y) => x + y, 0) / (n.length - 3), d = l - o;
+        z.push(`<span class="z"><b>Form:</b> Note ${dez(o)} → ${dez(l)} in den letzten 3${d <= -.6 ? ", im Formtief" : d >= .6 ? ", im Aufwind" : ", stabil"}</span>`); }
+      const sp = s.spiele || [], to = sp.reduce((x, e) => x + (e.tore || []).length, 0), vo = sp.reduce((x, e) => x + (e.vorl || 0), 0);
+      if (to || vo) z.push(`<span class="z"><b>Saison:</b> ${to} ${to === 1 ? "Tor" : "Tore"}, ${vo} ${vo === 1 ? "Vorlage" : "Vorlagen"}</span>`);
+      const std = Object.keys(s.standards || {}).map(x => ({ecken: "Ecken", freistoesse: "Freistöße", elfmeter: "Elfmeter"}[x] || x));
+      if (std.length) z.push(`<span class="z"><b>Standards:</b> ${esc(std.join(", "))}</span>`);
+      if (s.status && s.status.s !== "fit" && s.status.grund) z.push(`<span class="z"><b>Status:</b> ${esc(s.status.grund)}</span>`);
+    }
+    return `<div class="ba"><span class="k1"><b>${esc(g.voll || g.n)}</b>${st ? `<span style="display:inline-flex;gap:5px;align-items:center;font-size:12px">${stufeSym(g.st, 14)}${esc(st[2])}</span>` : ""}</span>${z.join("")}${s ? `<button class="pl" data-profil="${esc(s.id)}">Zum Profil ›</button>` : ""}</div>`;
+  }
   function prognose(a, seite, k){
     const alle = (a.startelf || []).concat(a.bank || [], a.ausgeschlossen || []);
     const sel = CHIPSEL[seite];
@@ -1609,7 +1644,7 @@ details.dzb[open]{padding-bottom:10px}
     (a.startelf || []).filter(s => (s.st === "unsicher" || s.st === "unwahrscheinlich") && !zeilen.some(z => z[1].n === s.n)).forEach(s => zeilen.push([null, s]));
     if (zeilen.length) h += `<div class="wb"><h4>Alternativen</h4>${zeilen.map(([al, st]) => wxZeile(k, al, st, ["a", "ALTERNATIVE"], ["u", STUFE[st.st] ? STUFE[st.st][2].toUpperCase() : "UNSICHER"], "für")).join("")}</div>`;
     const g = sel && alle.find(x => x.n === sel);
-    h += `<div class="begr">${kap("Begründung")}${g ? `<span class="begr1"><b>${esc(nachN(g.voll || g.n))}</b> · ${esc(kurzWarum(g.warum))}</span>` : '<span class="mu">Spielerin antippen, dann steht hier, warum wir sie so einschätzen.</span>'}</div>`;
+    h += `<div class="begr">${kap("Begründung")}${g ? begrAnalyse(k, g) : '<span class="mu">Spielerin antippen, dann steht hier, warum wir sie so einschätzen.</span>'}</div>`;
     if ((a.bank || []).length) h += bankNamen(a.bank.map(s => ({...s, p: GRUPPE(s.p)})), null, "Bank (wahrscheinlich)");
     if ((a.ausgeschlossen || []).length) h += `<div class="zeile"><b>FEHLEN</b>${a.ausgeschlossen.map(s => esc(s.n) + (s.grund ? ` (${esc(s.grund)})` : "")).join(", ")}</div>`;
     if (a.datenluecke) h += `<p class="dat" style="font-size:11px">Datenlücke: ${esc(a.datenluecke)}, deshalb ohne Einstufung.</p>`;
@@ -1630,7 +1665,10 @@ details.dzb[open]{padding-bottom:10px}
   const formListe = key => { const l = (((IN.form || {})[key]) || []).slice(), F = (AF && AF.form) || {}, dabei = new Set(l.map(f => f.k + "|" + normS(nachN(f.n))));
     const dazu = key === "up" ? (F.hoch || []).map(x => afKarte(x, false)).concat((F.lauf || []).map(x => afKarte(x, true))) : key === "down" ? (F.tief || []).map(x => afKarte(x, false)) : key === "hold" ? (F.stabil || []).map(x => afKarte(x, false)) : [];
     dazu.forEach(f => { const s = f.k + "|" + normS(nachN(f.n)); if (!dabei.has(s)) { dabei.add(s); l.push(f); } });
-    return l.slice(0, 10).filter(f => zeigen(f.k)); };
+    const wert = f => { const s = SPN && (f.id ? spById(f.id) : findeSP(f.k, nachN(f.n))), a = s && afSp(s.id), v = a && (a.no || []).filter(x => x[2] >= 60);
+      if (!v || v.length < 4) return null; const n = v.map(x => x[1]), l = n.slice(-3).reduce((x, y) => x + y, 0) / 3; return key === "hold" ? a.avg : l - n.slice(0, -3).reduce((x, y) => x + y, 0) / (n.length - 3); };
+    const sortiert = l.map((f, i) => ({f, i, w: wert(f)})).sort((a, b) => (a.w == null) - (b.w == null) || (key === "down" ? a.w - b.w : b.w - a.w) || a.i - b.i).map(x => x.f);
+    return sortiert.slice(0, 10).filter(f => zeigen(f.k)); };
   function programmVon(k){
     const L = (((SPN && SPN.vereine) || {})[k] || {}).kommend; if (!L) return null;
     const n = L.filter(z => z.wb === "Liga" && z.gk).slice(0, 3); if (!n.length) return null;
@@ -1716,7 +1754,7 @@ details.dzb[open]{padding-bottom:10px}
       ? `<div class="fgross" style="--vc:${vc}"><img src="${esc(fo.datei)}" alt="${esc(f.n)}" loading="lazy">${badge}
           <div class="ov"><div><span class="nm">${esc(f.n)}</span><span class="vn">${esc(kname(f.k))}</span><span class="bg"><b>${esc(f.big)}</b><span>${esc(f.big_txt)}</span></span></div>${logo(f.k, 38)}</div></div>`
       : `<div class="fkomp"><div class="pic${fo && (fo.portrait || fo.datei) ? " fg" : ""}" style="--vc:${fo && (fo.portrait || fo.datei) ? "radial-gradient(circle at 50% 36%,#3A4F78 0%,#2A3B5E 70%)" : vc}">${fo && (fo.portrait || fo.datei) ? wm(f.k) + `<img class="f" src="${esc(fo.portrait || fo.datei)}" alt="${esc(f.n)}" loading="lazy">` : logo(f.k, 70)}</div>
-          <div class="tx">${badge}<span class="nm">${esc(f.n)}</span><span class="vn">${logo(f.k, 18)}${esc(kname(f.k))}</span>${afKurve(f)}<span class="big">${esc(f.big)}</span><span class="bt">${esc(f.big_txt)}</span></div></div>`;
+          <div class="tx">${badge}<span class="nm">${esc(f.n)}</span><span class="vn">${logo(f.k, 18)}${esc(kname(f.k))}${(() => { const s = SPN && (f.id ? spById(f.id) : findeSP(f.k, nachN(f.n))); if (!s) return ""; const pos = (s.slots && s.slots[0] && s.slots[0][2]) || ({TW: "Tor", ABW: "Abwehr", MF: "Mittelfeld", ST: "Sturm"})[s.pos] || ""; return `<span class="mu" style="flex-basis:100%;font-weight:500">${s.nr ? "Nr. " + esc(s.nr) + " · " : ""}${esc(pos)}</span>`; })()}</span>${afKurve(f)}<span class="bigr"><span class="big">${esc(f.big)}</span><span class="bt">${esc(f.big_txt)}</span></span></div></div>`;
     const geg = naechste(f.k).map(x => { const w = IN.ga ? IN.ga[x.k] : null;
       const s = w == null ? null : w >= 2 ? ["leicht", "#4ADE80"] : w >= 1.3 ? ["mittel", "#F5B041"] : ["schwer", "#FF8A8A"];
       return `<div class="geg">${logo(x.k, 22)}<div><span class="a"><b>${esc(kname(x.k))}</b> <span class="mu">${x.heim ? "zu Hause" : "auswärts"}</span></span>
@@ -1771,7 +1809,7 @@ details.dzb[open]{padding-bottom:10px}
     if (!AF || !AF.form) return "";
     const x = (AF.xg || []).filter(f => zeigen(f.k)).slice(0, 4);
     return `<div style="display:grid;gap:8px;padding-top:14px">
-      ${x.length ? `<h3 class="disp" style="font-size:19px">xG-Check ${(AF.xgmd || []).join(". und ")}. Spieltag</h3><div class="nc">${x.map(r => `<div class="nc-r">${logo(r.k, 26)}<span class="nm"><b>${esc(kname(r.k))} gegen ${esc(kname(r.gg))}</b><small>${r.md}. Spieltag: ${r.t} ${r.t === 1 ? "Tor" : "Tore"} bei ${dez(r.xg, 2)} xG. ${r.d > 0 ? "Mehr getroffen als erspielt, das gleicht sich meist aus." : "Chancen ungenutzt, die Offensive war besser als das Ergebnis."}</small></span><span class="w"><b style="color:${r.d > 0 ? "#4ADE80" : "#FF8A8A"}">${r.d > 0 ? "+" : ""}${dez(r.d)}</b><span>Tore minus xG</span></span></div>`).join("")}</div>` : ""}
+      ${x.length && !(AF.news || []).some(n => /^af-xg-/.test(n.id) && n.zeit && dt(n.zeit) <= new Date()) ? `<h3 class="disp" style="font-size:19px">xG-Check ${(AF.xgmd || []).join(". und ")}. Spieltag</h3><div class="nc">${x.map(r => `<div class="nc-r">${logo(r.k, 26)}<span class="nm"><b>${esc(kname(r.k))} gegen ${esc(kname(r.gg))}</b><small>${r.md}. Spieltag: ${r.t} ${r.t === 1 ? "Tor" : "Tore"} bei ${dez(r.xg, 2)} xG. ${r.d > 0 ? "Mehr getroffen als erspielt, das gleicht sich meist aus." : "Chancen ungenutzt, die Offensive war besser als das Ergebnis."}</small></span><span class="w"><b style="color:${r.d > 0 ? "#4ADE80" : "#FF8A8A"}">${r.d > 0 ? "+" : ""}${dez(r.d)}</b><span>Tore minus xG</span></span></div>`).join("")}</div>` : ""}
       ${teamForm()}
       <p class="af-st">${NOTE_ERKL}</p></div>`;
   }
@@ -1804,7 +1842,7 @@ details.dzb[open]{padding-bottom:10px}
         <div class="std-l"><span class="g1"><i class="gp"></i>gesetzt</span><span class="g2">2 bis 3 Belege</span><span class="g3">erster Hinweis</span><button class="std-i" data-stdinfo="1" aria-label="Erklärung">i</button></div><p class="std-e" hidden>Gesetzt heißt: viele Belege aus Spielberichten oder ein Tor nach ihrem Standard. Normal: 2 bis 3 Belege. Kursiv: bisher nur ein Hinweis.</p></div>
       ${SEL.size ? `<button class="lk" style="font-size:12px;justify-self:start;text-decoration:none" data-stdalle="1">${STDALLE ? "Nur meine Vereine" : "Alle 14 Vereine"}</button>` : ""}
       <div class="stab"><div class="r h"><span></span><span>ECKEN</span><span>FREISTÖSSE</span><span>ELFMETER</span></div>
-        ${r.map(s => `<div class="r"><div class="wk">${logo(s.k, 24)}<span>${esc(s.k)}</span></div>${zelle(s.ecken)}${zelle(s.fs)}${zelle((s.elfer || []).length ? s.elfer : ((AF && AF.elf) || []).filter(x => x.k === s.k).map(x => [nachN(x.n), 1]))}
+        ${r.map(s => `<div class="r"><div class="wk">${logo(s.k, 24)}<span>${esc(s.k)}</span></div>${zelle(s.ecken)}${zelle((s.fs || []).length ? s.fs : ((AF && AF.stdt && AF.stdt[s.k] && AF.stdt[s.k].fs) || []).slice(0, 1).map(x => [nachN(x[0]), 1]))}${zelle((s.elfer || []).length ? s.elfer : ((AF && AF.elf) || []).filter(x => x.k === s.k).map(x => [nachN(x.n), 1]))}
           ${s.hinweis ? `<div class="hw">${svg(P.warn, "").replace("<svg", '<svg style="width:13px;height:13px;flex:none;stroke:currentColor;fill:none;stroke-width:2"')}<span>${esc(s.hinweis)}</span></div>` : ""}</div>`).join("")}</div>${afStandards()}</section>`;
   }
   function afStandards(){
@@ -1812,9 +1850,10 @@ details.dzb[open]{padding-bottom:10px}
     const e = Object.entries(AF.ecken).filter(([k]) => STDALLE || zeigen(k)).sort((a, b) => b[1].f - a[1].f), mx = Math.max(...Object.values(AF.ecken).map(x => x.f), 1);
     const el = (AF.elf || []).filter(x => STDALLE || zeigen(x.k));
     return `<div style="display:grid;gap:8px;padding-top:14px"><h3 class="disp" style="font-size:21px">Ecken pro Spiel</h3><p class="af-st" style="font-size:12px">Viele eigene Ecken = viele Chancen für die Schützin und die Kopfballspielerinnen.</p>
-      <div class="eck"><div class="eck-h"><span></span><span>EIGENE</span><span></span><span>GEGEN</span></div>${e.map(([k, x]) => `<div class="eck-r">${logo(k, 22)}<span class="f">${dez(x.f)}</span><span class="bw"><span class="bb"><i style="width:${x.f / mx * 100}%"></i></span>${(() => { const st = (IN.standards || []).find(q => q.k === k), w = st && (st.ecken || [])[0]; return w ? `<small>Ecken: ${esc(w[0])}</small>` : ""; })()}</span><span class="g">${x.g != null ? dez(x.g) : "–"}</span></div>`).join("")}</div>
+      <div class="eck"><div class="eck-h"><span></span><span>EIGENE</span><span></span><span>GEGEN</span></div>${e.map(([k, x]) => `<div class="eck-r">${logo(k, 22)}<span class="f">${dez(x.f)}</span><span class="bw"><span class="bb"><i style="width:${x.f / mx * 100}%"></i></span>${(() => { const st = (IN.standards || []).find(q => q.k === k), w = st && (st.ecken || [])[0]; const t = AF && AF.stdt && AF.stdt[k], ab = t && t.kopf.filter(x => x[1] || x[2]).slice(0, 2), ec = w ? w[0] : t && t.ecke[0] ? nachN(t.ecke[0][0]) : null;
+        return (ec ? `<small>Ecken: <b>${esc(ec)}</b></small>` : "") + (ab && ab.length ? `<small>Kopfball nach Standard: ${ab.map(x => `<b>${esc(nachN(x[0]))}</b> ${[x[1] ? x[1] + "x" : "", x[2] ? x[2] + " Tor" + (x[2] > 1 ? "e" : "") : ""].filter(Boolean).join(", ")}`).join(" · ")}</small>` : ""); })()}</span><span class="g">${x.g != null ? dez(x.g) : "–"}</span></div>`).join("")}</div>
       ${el.length ? `<h3 class="disp" style="font-size:19px;margin-top:8px">Elfmeter in der Liga</h3><div class="af-best">${el.map(x => `<button class="pf-std${x.v ? "" : " el"}" data-profil="${esc(x.id)}" style="display:flex;gap:5px;align-items:center">${logo(x.k, 14)}${esc(nachN(x.n))} <i>${x.t}/${x.t + x.v}${x.fuss ? ", " + x.fuss : ""}</i></button>`).join("")}</div>` : ""}
-      <p class="af-st">Quelle: API-Football, Stand nach dem ${AF.md}. Spieltag. Fuß aus unseren Stammdaten.</p></div>`;
+      <p class="af-st">Ecken pro Spiel und Elfmeter: API-Football, Stand nach dem ${AF.md}. Spieltag. Schützinnen und Kopfbälle nach Standards: ausgewertet aus dem Sportschau-Liveticker (nur beschriebene Szenen). Fuß aus unseren Stammdaten.</p></div>`;
   }
   function spieleSektion(){
     // Abgelaufene Partien ausblenden (Abgleich mit dem Spielplan), leere Spieltage weglassen
@@ -1886,7 +1925,7 @@ details.dzb[open]{padding-bottom:10px}
     $("#main").innerHTML = vereinsZeile() + `<div class="iv">
       ${pm ? `<button class="phl" data-punkt="${esc(ph.id)}"><b>Keine Zeit?</b> ${esc(ph.text)} ›</button>` : ""}
       ${IN.ausgabe ? hero(IN.ausgabe) : ""}${formSektion()}${standardSektion()}${spieleSektion()}${IN.kalender ? kalenderSektion(IN.kalender) : ""}
-      ${A ? `<section class="sek" id="analyse">${sektion("06", "Analyse")}${analyseKopf(A, String(A.tag || "Analyse der Woche").toUpperCase())}${analyseInhalt(A)}</section>` : ""}
+      ${A && A.news_zeit && dt(A.news_zeit) <= new Date() ? `<button class="af-innews" data-anaart="1"><span><b>Analyse der Woche</b><br><span class="mu">${esc(A.titel || "")}: steht jetzt in den News</span></span><span>›</span></button>` : A ? `<section class="sek" id="analyse">${sektion("06", "Analyse")}${analyseKopf(A, String(A.tag || "Analyse der Woche").toUpperCase())}${analyseInhalt(A)}</section>` : ""}
       <p class="dbasis">Datenbasis: Statistik, Aufstellungen und Liveticker der Sportschau, Termine von DFB und UEFA, Sperren aus der DFB-Sperrenliste. Inside enthält Einschätzungen der Redaktion von WOSOINSIDER und wird mit KI erstellt.</p></div>`;
     railAnbinden();
   }
