@@ -1090,7 +1090,7 @@ details.dzb[open]{padding-bottom:10px}
 .fv-leg{display:flex;gap:12px;font-size:11px;color:var(--muted);align-items:center;flex-wrap:wrap;margin-bottom:2px}
 .fv-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;box-sizing:border-box}
 .fv-leg i.v{border:2px solid #A9B4C6}.fv-leg i.l{background:#F4F5F7}.fv-r{margin-left:auto}
-.fv-z{display:grid;grid-template-columns:34px 88px minmax(0,1fr);gap:10px;align-items:center;min-height:48px;padding:6px 8px;border-radius:12px;background:transparent;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;width:100%}
+.fv-z{display:grid;grid-template-columns:34px 80px minmax(0,1fr) 58px;gap:10px;align-items:center;min-height:48px;padding:6px 8px;border-radius:12px;background:transparent;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;width:100%}
 .fv-z.h{background:rgba(245,158,11,.10)}
 .fv-p{width:34px;height:34px;border-radius:50%;overflow:hidden;background:#2A3B5E;box-shadow:inset 0 0 0 2px var(--vc);display:grid;place-items:center;font-size:13px}
 .fv-p img{width:100%;height:100%;object-fit:cover}
@@ -1102,6 +1102,7 @@ details.dzb[open]{padding-bottom:10px}
 .fv-t i.v{border:2px solid #A9B4C6;background:var(--card)}
 .fv-h{font-size:11px;color:var(--muted);margin:4px 0 0;line-height:1.4}
 .pf-eins-leg{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);margin-top:8px}
+.fv-tf{display:grid;gap:1px;font-size:12px;font-weight:700;text-align:right;line-height:1.2}.fv-tf em{font-style:normal;font-weight:600;font-size:10px;color:var(--muted);margin-right:4px}.fv-tf span:last-child{color:var(--muted);font-weight:600}
 </style>
 
 
@@ -1809,7 +1810,7 @@ details.dzb[open]{padding-bottom:10px}
       <div class="fv-leg"><span><i class="v"></i>vorher</span><span><i class="l"></i>letzte 3 Spiele</span><span class="fv-r">schwächer ‹ › stärker</span></div>
       ${sp.map(x => { const a = pz(x.vorher), b = pz(x.l3), ab = x.l3 < x.vorher - .2, auf = x.l3 > x.vorher + .2, f = ab ? "#F59E0B" : auf ? "#4ADE80" : "#A9B4C6";
         return `<button class="fv-z${x.hervor ? " h" : ""}" data-profilname="${esc(x.k + "|" + nachN(x.n))}">${scFoto(x, "fv-p")}<span class="fv-n"><b>${esc(nachN(x.n))}</b><small style="color:${f}">${ab ? "schwächer" : auf ? "stärker" : "etwa gleich"}</small></span>
-          <span class="fv-t"><span class="fv-l" style="left:${Math.min(a, b)}%;width:${Math.abs(a - b).toFixed(1)}%;background:${f}"></span><i class="v" style="left:${a}%"></i><i class="l" style="left:${b}%;background:${f}"></i></span></button>`; }).join("")}
+          <span class="fv-t"><span class="fv-l" style="left:${Math.min(a, b)}%;width:${Math.abs(a - b).toFixed(1)}%;background:${f}"></span><i class="v" style="left:${a}%"></i><i class="l" style="left:${b}%;background:${f}"></i></span>${x.top != null ? `<span class="fv-tf"><span><em>Top</em>${Number(x.top).toFixed(1).replace(".", ",")}</span><span><em>Flop</em>${Number(x.flop).toFixed(1).replace(".", ",")}</span></span>` : "<span></span>"}</button>`; }).join("")}
       ${g.hinweis ? `<p class="fv-h">${esc(g.hinweis)}</p>` : ""}</section>`;
   }
   function article(id){
