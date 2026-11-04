@@ -115,7 +115,7 @@
     const zu = new Date() >= r.schluss, mein = TIPPS[r.md] || {}, n = r.fragen.filter(q => mein[q.id]).length;
     return `<button class="tz" data-tipp="1">
       <span class="tz-i">${svg(POKAL)}</span>
-      <span class="tz-t"><span class="kap">TIPPSPIEL · ${r.md}. SPIELTAG</span><b>Spielt sie?</b><small>${r.fragen.length} Fragen · ${zu ? "Tippen beendet" : "bis " + wtUhr(r.schluss)}${n ? ` · ${n} getippt` : ""}</small></span>
+      <span class="tz-t"><span class="kap">TIPPSPIEL ${r.md}. SPIELTAG</span><b>Spielt sie?</b><small>${r.fragen.length} Fragen · ${zu ? "Tippen beendet" : "bis " + wtUhr(r.schluss)}</small></span>
       <span class="tz-b">${zu ? "Ansehen" : n === r.fragen.length ? "Ändern" : "Tippen"}</span></button>`;
   }
 
@@ -142,11 +142,11 @@
       </section>`;
     }).join("");
     $("#main").innerHTML = `<div class="det ts"><button class="back" data-tippzu="1">‹ Zurück</button>
-      <div class="ts-kopf"><span class="kap">TIPPSPIEL · ${r.md}. SPIELTAG</span><h1>Spielt sie?</h1></div>
+      <div class="ts-kopf"><span class="kap">TIPPSPIEL ${r.md}. SPIELTAG</span><h1>Spielt sie?</h1></div>
       <div class="ts-hin">${svg(P.uhr)}<span>${zu ? `Tippen beendet. ${gewertet ? `${punkte} Punkte aus ${gewertet} gewerteten Fragen.` : "Die Wertung folgt mit den Aufstellungen."}` : `Tippen bis <b>${esc(wtUhr(r.schluss))}</b>, bevor die ersten Aufstellungen kommen.`}</span></div>
       ${karten}
       <div class="ts-fuss"><span>Jede richtige Antwort: 10 Punkte · max. ${r.fragen.length * 10}</span>
-      <span class="ts-vs">Vorschau auf der Testseite: Deine Tipps bleiben nur auf diesem Gerät. Rangliste und Fans-Werte kommen, sobald die Tipps gespeichert werden (Supabase, ohne Konto).</span></div></div>`;
+      <span class="ts-vs">Deine Tipps bleiben vorerst nur auf diesem Gerät. Rangliste und Fan-Werte kommen, sobald die Tipps gespeichert werden.</span></div></div>`;
     window.scrollTo(0, 0);
   }
 
