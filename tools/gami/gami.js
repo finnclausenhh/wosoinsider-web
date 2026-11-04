@@ -113,10 +113,10 @@
     gLaden();
     const r = tippRunde(); if (!r || !r.fragen.length) return "";
     const zu = new Date() >= r.schluss, mein = TIPPS[r.md] || {}, n = r.fragen.filter(q => mein[q.id]).length;
-    return `<button class="tz" data-tipp="1">
-      <span class="tz-i">${svg(POKAL)}</span>
-      <span class="tz-t"><span class="kap">TIPPSPIEL ${r.md}. SPIELTAG</span><b>Spielt sie?</b><small>${r.fragen.length} Fragen · ${zu ? "Tippen beendet" : "bis " + wtUhr(r.schluss)}</small></span>
-      <span class="tz-b">${zu ? "Ansehen" : n === r.fragen.length ? "Ändern" : "Tippen"}</span></button>`;
+    return `<button class="tipz" data-tipp="1">
+      <span class="tipz-i">${svg(POKAL)}</span>
+      <span class="tipz-t"><span class="kap">TIPPSPIEL ${r.md}. SPIELTAG</span><b>Spielt sie?</b><small>${r.fragen.length} Fragen · ${zu ? "Tippen beendet" : "bis " + wtUhr(r.schluss)}</small></span>
+      <span class="tipz-b">${zu ? "Ansehen" : n === r.fragen.length ? "Ändern" : "Tippen"}</span></button>`;
   }
 
   function tippschein(){

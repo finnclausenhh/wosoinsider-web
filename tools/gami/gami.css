@@ -4,14 +4,14 @@
 .eins-z{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);margin-top:6px;justify-content:center}
 .pf-km .eins{margin-left:6px;vertical-align:-1px}
 .pf-km .eins svg{width:15px;height:15px}
-.tz{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border-radius:14px;padding:10px 10px 10px 12px;background:#1A2A52;border:1.5px solid #2F5BFF;color:var(--ink);font:inherit;cursor:pointer}
-.tz-i{width:40px;height:40px;flex:none;border-radius:10px;background:#2F5BFF;display:grid;place-items:center}
-.tz-i svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.tz-t{flex:1;min-width:0;display:grid;gap:2px}
-.tz-t .kap{color:#8FB0FF;margin:0;font-size:11px}
-.tz-t b{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1}
-.tz-t small{font-size:12px;color:#C9D2E0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tz-b{min-height:44px;display:inline-flex;align-items:center;padding:0 14px;border-radius:10px;background:#2F5BFF;color:#fff;font-weight:700;font-size:14px}
+.tipz{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border-radius:14px;padding:10px 10px 10px 12px;background:#1A2A52;border:1.5px solid #2F5BFF;color:var(--ink);font:inherit;cursor:pointer}
+.tipz-i{width:40px;height:40px;flex:none;border-radius:10px;background:#2F5BFF;display:grid;place-items:center}
+.tipz-i svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tipz-t{flex:1;min-width:0;display:grid;gap:2px}
+.tipz-t .kap{color:#8FB0FF;margin:0;font-size:11px}
+.tipz-t b{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1}
+.tipz-t small{font-size:12px;color:#C9D2E0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tipz-b{min-height:44px;display:inline-flex;align-items:center;padding:0 14px;border-radius:10px;background:#2F5BFF;color:#fff;font-weight:700;font-size:14px}
 .gfw{display:grid;gap:8px;padding:4px 0}
 .gfw .kap{display:flex;align-items:center;gap:6px;color:#8FB0FF;margin:0}
 .gfw .kap svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}

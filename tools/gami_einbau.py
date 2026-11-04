@@ -51,8 +51,7 @@ def einbau(s, test=False):
                 "    if ((x = q(\"[data-profilname]\")))")
     # Standard-Check: Karte im Feed und Artikel mit Messlatte (Daten: grafik in der Meldung, apifootball.json)
     s = ersetze(s, "  const angeheftet = m => m.typ === \"punkt\"", sjs + "  const angeheftet = m => m.typ === \"punkt\"")
-    s = ersetze(s, "  function newsKarte(m){\n    const a = m.aufstellung",
-                "  function newsKarte(m){\n    if (m.grafik && m.grafik.typ === \"messlatte\" && scSp(m).length) return scKarte(m);\n    const a = m.aufstellung")
+    # Feed: normale Meldungskarte (Foto der ersten Spielerin über das Feld spielerin), Finn 04.11.2026
     s = ersetze(s, "    const st = STATUS[String(meldungsStatus(m) || \"\").toLowerCase()];\n    const kopf = auf",
                 "    const st = STATUS[String(meldungsStatus(m) || \"\").toLowerCase()];\n    const sc = m.grafik && m.grafik.typ === \"messlatte\" && scSp(m).length;\n    const kopf = sc ? scArtikel(m) : auf")
     s = ersetze(s, "    const fi = FOTOS[m.spielerin], fc = m.foto_credit;", "    const fi = FOTOS[sc ? scSp(m)[0].n : m.spielerin], fc = m.foto_credit;")
