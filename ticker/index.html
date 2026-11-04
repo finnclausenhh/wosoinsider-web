@@ -2075,9 +2075,12 @@ details.dzb[open]{padding-bottom:10px}
       text: lauf ? `Starke Noten zuletzt und ein leichtes Programm: Die nächsten drei Gegner stehen im Schnitt auf Platz ${Math.round(x.nr)}.` : Math.abs(x.diff) < .3 ? `Konstant starke Noten: zuletzt ${dez(x.l3)}, davor ${dez(x.vorher)}.` : x.diff < 0 ? `Ihre Noten sind zuletzt deutlich gefallen, von ${dez(x.vorher)} auf ${dez(x.l3)}.` : `Ihre Noten sind zuletzt deutlich gestiegen, von ${dez(x.vorher)} auf ${dez(x.l3)}.`,
       kb: `Minuten der letzten 3 Ligaspiele: ${x.min3.map(m => m + "'").join(" · ")}${x.prog && PS[x.prog] ? `, nächstes Spiel ${PS[x.prog]}` : ""}.`};
   }
-  const formListe = key => { const l = (((IN.form || {})[key]) || []).slice(), F = (AF && AF.form) || {}, dabei = new Set(l.map(f => f.k + "|" + normS(nachN(f.n))));
+  // Jede Spielerin nur in einer Gruppe (Finn 04.11.2026): API-Football-Einordnung zuerst (Formtief, Formhoch, Stabil, dann gute Form mit leichten Gegnern), Inside-Karten nur, wenn API-Football nichts anderes sagt
+  const afGruppe = f => { const F = (AF && AF.form) || {}, s = f.k + "|" + normS(nachN(f.n)), hat = L => (L || []).some(x => x.k + "|" + normS(nachN(x.n)) === s);
+    return hat(F.tief) ? "down" : hat(F.hoch) ? "up" : hat(F.stabil) ? "hold" : hat(F.lauf) ? "up" : null; };
+  const formListe = key => { const l = (((IN.form || {})[key]) || []).filter(f => { const g = afGruppe(f); return !g || g === key; }), F = (AF && AF.form) || {}, dabei = new Set(l.map(f => f.k + "|" + normS(nachN(f.n))));
     const dazu = key === "up" ? (F.hoch || []).map(x => afKarte(x, false)).concat((F.lauf || []).map(x => afKarte(x, true))) : key === "down" ? (F.tief || []).map(x => afKarte(x, false)) : key === "hold" ? (F.stabil || []).map(x => afKarte(x, false)) : [];
-    dazu.forEach(f => { const s = f.k + "|" + normS(nachN(f.n)); if (!dabei.has(s)) { dabei.add(s); l.push(f); } });
+    dazu.forEach(f => { const s = f.k + "|" + normS(nachN(f.n)); if (!dabei.has(s) && afGruppe(f) === key) { dabei.add(s); l.push(f); } });
     const wert = f => { const s = SPN && (f.id ? spById(f.id) : findeSP(f.k, nachN(f.n))), a = s && afSp(s.id), v = a && (a.no || []).filter(x => x[2] >= 60);
       if (!v || v.length < 4) return null; const n = v.map(x => x[1]), l = n.slice(-3).reduce((x, y) => x + y, 0) / 3; return key === "hold" ? a.avg : l - n.slice(0, -3).reduce((x, y) => x + y, 0) / (n.length - 3); };
     const sortiert = l.map((f, i) => ({f, i, w: wert(f)})).sort((a, b) => (a.w == null) - (b.w == null) || (key === "down" ? a.w - b.w : b.w - a.w) || a.i - b.i).map(x => x.f);
