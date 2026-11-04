@@ -992,18 +992,18 @@ details.dzb[open]{padding-bottom:10px}
 .tsd{gap:12px;padding:14px;border-radius:16px}
 .tsd .ts-kz{justify-content:space-between}
 .tsd-q{margin:0;font-size:17px;font-weight:700;line-height:1.25}
-.tsd-g{position:relative;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:8px;--h:160px}
-.tsd-g[style*="--n:3"]{--h:116px}
+.tsd-g{position:relative;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:8px;container-type:inline-size}
 .tsd-k{position:relative;display:flex;flex-direction:column;padding:0;border-radius:14px;overflow:hidden;border:2px solid var(--line);background:var(--soft);text-align:center;font:inherit;color:var(--ink);cursor:pointer}
 .tsd-k.on{border-color:#2F5BFF}
 .tsd-k.ok{border-color:#22C55E}
 .tsd-k:disabled{cursor:default}
-.tsd-b{display:block;width:100%;height:var(--h);background:#EEF1F5;overflow:hidden}
-.tsd-b img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 12%}
-.tsd-b img.g,.tsd-b.g{filter:grayscale(1) brightness(.55)}
+.tsd-b{position:relative;display:block;width:100%;aspect-ratio:1/1;background:radial-gradient(circle at 50% 45%,#3A4F78 0%,#2A3B5E 70%);overflow:hidden}
+.tsd-b .wm{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);object-fit:contain;opacity:.32}
+.tsd-b .f{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0}
+.tsd-b.g .f,.tsd-ph.g{filter:grayscale(1) brightness(.5)}
 .tsd-ph{display:grid;place-items:center}
 .tsd-ph b{font-family:var(--f-display);font-weight:800;font-size:40px;color:#fff;line-height:1}
-.tsd-fd{display:grid;place-items:center;width:100%;height:var(--h);background:#24345A}
+.tsd-fd{display:grid;place-items:center;width:100%;aspect-ratio:1/1;background:#24345A}
 .tsd-fd img{max-width:56px;max-height:56px}
 .tsd-z{font-family:var(--f-display);font-weight:800;font-size:48px;line-height:1;color:var(--ink)}
 .tsd-i{width:38px;height:38px;fill:none;stroke:#C7D6FF;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -1012,10 +1012,11 @@ details.dzb[open]{padding-bottom:10px}
 .tsd-t small{font-size:11.5px;color:var(--muted);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tsd-hk{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:#2F5BFF;display:grid;place-items:center;box-shadow:0 0 0 2px var(--bg)}
 .tsd-hk svg{width:13px;height:13px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-.tsd-vs{position:absolute;left:50%;top:calc(var(--h) / 2 + 2px);transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;background:var(--bg);border:2px solid var(--line);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;color:var(--ink);pointer-events:none}
+.tsd-vs{position:absolute;left:50%;top:calc((100cqw - 8px) / 4 + 2px);transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;background:var(--bg);border:2px solid var(--line);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;color:var(--ink);pointer-events:none}
 .tsd-vs.w{font-size:14px}
+.tsd-vs.c{top:50%}
 .tsd-kopf{display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;border:2px solid var(--line);background:var(--soft)}
-.tsd-kopf .tsd-b{width:64px;height:64px;flex:none;border-radius:12px}
+.tsd-kopf .tsd-b{width:64px;flex:none;border-radius:12px}
 .tsd-kopf .tsd-ph b{font-size:24px}
 .tsd-kopf>span:last-child{display:grid;gap:3px;min-width:0}
 .tsd-kopf>span:last-child b{font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1}
@@ -1031,13 +1032,20 @@ details.dzb[open]{padding-bottom:10px}
 .tsd-mehr{display:flex;align-items:center;justify-content:center;min-height:46px;border-top:1px solid var(--line);color:var(--hell);font-size:13px;font-weight:600;width:100%}
 .tsd .ts-o{text-align:center}
 .tsd-um{display:grid;gap:8px;padding:8px 12px}
-.tsd-um.feed .tsd-g{--h:120px}
-.tsd-um.feed .tsd-g[style*="--n:3"]{--h:96px}
-.tsd-um .tsd-g[style*="--n:3"] .tsd-fd{--h:96px}
 .tsd-um .ts-o{text-align:center}
 .tsd-pz{font-family:var(--f-display);font-weight:800;font-size:22px;line-height:1;color:var(--ink);margin-top:4px}
 .tsd-t .ks{justify-content:center;margin-top:4px}
 .tsd-ak{padding:14px 14px 0}
+.tsd-fz{display:flex;align-items:center;gap:6px;margin-top:6px}
+.tsd-fz .fb{position:relative;flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.tsd-fz .fb i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:#8FB0FF}
+.tsd-k.on .tsd-fz .fb i{background:#2F5BFF}
+.tsd-fz b{font-family:var(--f-display);font-weight:800;font-size:18px;line-height:1;min-width:38px;text-align:right}
+.tsd-bars{display:flex;align-items:flex-end;gap:5px;height:42px;margin-top:4px}
+.tsd-bars span{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:var(--muted)}
+.tsd-bars i{display:block;width:16px;border-radius:3px;background:#2F5BFF}
+.tsd-bars i.z{background:var(--line);height:3px}
+.tsd-g[style*="--n:3"] .tsd-t b{font-size:17px}
 .bil h2{font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1.05;margin:2px 0 4px}
 .bil .mu{color:var(--muted);font-size:12px;margin:0 0 10px}
 .bil-test{font-size:11px;color:#F5B041;background:rgba(245,176,65,.12);border-radius:8px;padding:6px 8px;margin-bottom:8px}
@@ -1521,7 +1529,8 @@ details.dzb[open]{padding-bottom:10px}
       ladeSPN().catch(() => {}),
       json("tracking/trefferquote.json").then(d => { TQ = d; }).catch(() => { TQ = {}; }),
       json("klickzahlen.json").then(d => { KZ = d; }).catch(() => { KZ = {}; }),
-      json("spielt_sie.json").then(d => { SS = d; }).catch(() => { SS = null; })
+      json("spielt_sie.json").then(d => { SS = d; }).catch(() => { SS = null; }),
+      json("tipp_loesung.json").then(d => { TL = d; }).catch(() => { TL = null; })
     ]).then(() => {
       if (ARTIKEL && !BACK && !GAME && VIEW === "meldungen" && SS) { const y = window.scrollY; article(ARTIKEL); window.scrollTo(0, y); return; }
       if (BACK || ARTIKEL || GAME) return;
@@ -1591,45 +1600,57 @@ details.dzb[open]{padding-bottom:10px}
   };
   const tsSym = n => { const s = normS(n); return /startelf|beginnt/.test(s) ? "start" : /bank|kader/.test(s) && !/nicht/.test(s) ? "bank" : /nicht|fehlt|keine/.test(s) ? "raus" : "leute"; };
   const tsSrc = n => { const f = FOTOS[n] || {}; return f.portrait || f.datei || ""; };
+  let TL = null;   // tipp_loesung.json: Auflösung aller Fragen (spielt_sie.py), mehrere richtige mit Komma
+  const tsOk = (erg, id) => !!erg && String(erg).split(",").includes(id);
+  const TS_NEU = ["mvp", "weste", "flaute", "serie"];
+  const tsErg = q => { const l = TL && TL.md === (SS && SS.md) && TL.loesung ? TL.loesung[q.id] : null;
+    if (l != null) return l; return TS_NEU.includes(q.typ) ? null : tippErgebnis(q); };
   function tsBild(src, k, kurz, grau){
-    if (src) return `<span class="tsd-b"><img src="${esc(src)}" alt="" loading="lazy"${grau ? ' class="g"' : ""} onerror="this.remove()"></span>`;
+    const g = WMG[k], wmi = g ? `<img class="wm" src="logos/wm/${esc(k)}.png" alt="" style="width:${g[0]}%;height:${g[1]}%" onerror="this.remove()">` : "";
+    if (src) return `<span class="tsd-b fg${grau ? " g" : ""}">${wmi}<img class="f" src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()"></span>`;
     return `<span class="tsd-b tsd-ph${grau ? " g" : ""}" style="background:${KFARBE[k] || "var(--soft)"}"><b>${esc(kurz)}</b></span>`;
   }
   function tsOpts(q){
     return q.optionen.map(o => {
+      if (o.sid) { const s = spById(o.sid); return {id: o.id, n: o.n, name: o.n, info: o.info || "", src: s ? tsSrc(s.n) : "", sp: true, k: o.k || (s && s.k), logo: null}; }
       const u = q.umfrage ? (q.umfrage.optionen || []).find(x => x.id === o.id) : null;
       const sp = u && u.nachname && !u.logo && u.bild !== false;
-      return {id: o.id, n: o.n, name: (u && u.nachname) || o.n, info: (u && u.info) || "", src: sp ? tsSrc(u.n) : "", sp, logo: u && u.logo};
+      return {id: o.id, n: o.n, name: (u && u.nachname) || o.n, info: o.info || (u && u.info) || "", src: sp ? tsSrc(u.n) : "", sp, k: q.k, logo: u && u.logo};
     });
   }
   function tsKarte(q, r, zu, mein, srv, imArtikel){
-    const erg = tippErgebnis(q), t = mein[q.id];
+    const erg = tsErg(q), t = mein[q.id];
     const st = srv ? (t || zu ? srv[q.id] || {} : null) : q.umfrage && UST[q.umfrage.id] ? UST[q.umfrage.id].stimmen || {} : null, ges = st ? Object.values(st).reduce((a, b) => a + (Number(b) || 0), 0) : 0;
     const pz = id => ges ? Math.round((Number(st[id]) || 0) / ges * 100) : 0;
     const os = tsOpts(q), jn = q.s && os.length === 2 && os[0].id === "ja" && os[1].id === "nein";
-    const zust = o => { const on = t === o.id, ok = erg && erg === o.id; return {on, cls: `${on ? " on" : ""}${ok ? " ok" : ""}`, attr: `data-tv="${esc(r.md)}|${esc(q.id)}|${esc(o.id)}" ${zu ? "disabled" : ""} aria-pressed="${on}"`}; };
+    const zust = o => { const on = t === o.id, ok = tsOk(erg, o.id); return {on, cls: `${on ? " on" : ""}${ok ? " ok" : ""}`, attr: `data-tv="${esc(r.md)}|${esc(q.id)}|${esc(o.id)}" ${zu ? "disabled" : ""} aria-pressed="${on}"`}; };
     const haken = on => on ? `<span class="tsd-hk" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span>` : "";
+    const fz = o => st && ges ? `<span class="tsd-fz"><span class="fb"><i style="width:${pz(o.id)}%"></i></span><b>${pz(o.id)} %</b></span>` : "";
     const karte = (o, oben, name, info) => { const z = zust(o);
-      return `<button class="tsd-k${z.cls}" ${z.attr}>${oben}${haken(z.on)}<span class="tsd-t">${name ? `<b>${esc(name)}</b>` : ""}${info ? `<small>${esc(info)}</small>` : ""}</span></button>`; };
+      return `<button class="tsd-k${z.cls}" ${z.attr}>${oben}${haken(z.on)}<span class="tsd-t">${name ? `<b>${esc(name)}</b>` : ""}${info ? `<small>${esc(info)}</small>` : ""}${fz(o)}</span></button>`; };
     const feld = inner => `<span class="tsd-fd">${inner}</span>`;
     const ohneFoto = o => o.logo ? feld(logo(o.logo, 44)) : /^[0-9]/.test(o.n) ? feld(`<span class="tsd-z">${esc(o.n)}</span>`) : feld(`<svg class="tsd-i" viewBox="0 0 24 24">${TSI[tsSym(o.n)]}</svg>`);
     const kurzSp = s => s ? s.n.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() : "";
     let felder = "", knoepfe = "", kopf = "";
     if (jn) {
       const src = tsSrc(q.s.n), nn = nachN(q.s.n);
-      felder = `<div class="tsd-g" style="--n:2">${karte(os[0], tsBild(src, q.k, kurzSp(q.s)), "JA", `${nn} beginnt`)}${karte(os[1], tsBild(src, q.k, kurzSp(q.s), true), "NEIN", "Bank oder nicht dabei")}<span class="tsd-vs w" aria-hidden="true">ODER</span></div>`;
+      if (q.typ === "serie") { const L = (q.s.spiele || []).filter(e => e.md < r.md), mx = Math.max(1, ...L.map(e => (e.tore || []).length));
+        kopf = `<div class="tsd-kopf">${tsBild(src, q.k, kurzSp(q.s))}<span><b>${esc(nn.toUpperCase())}</b><small>Tore je Spieltag</small><span class="tsd-bars" aria-label="Tore je Spieltag">${L.map(e => { const n = (e.tore || []).length; return `<span>${n ? `<i style="height:${Math.round(n / mx * 26) + 4}px"></i>` : `<i class="z"></i>`}${e.md}</span>`; }).join("")}</span></span></div>`; }
+      felder = `<div class="tsd-g" style="--n:2">${karte(os[0], tsBild(src, q.k, kurzSp(q.s)), "JA", os[0].info || `${nn} beginnt`)}${karte(os[1], tsBild(src, q.k, kurzSp(q.s), true), "NEIN", os[1].info || "Bank oder nicht dabei")}<span class="tsd-vs w" aria-hidden="true">ODER</span></div>`;
     } else {
-      const fo = os.filter(o => o.sp), rest = os.filter(o => !o.sp), duell = fo.length === 2 && os.length === 4;
+      const fo = os.filter(o => o.sp), duell = fo.length === 2 && os.length >= 3, vier = fo.length === 4,
+        haupt0 = duell || vier ? fo : fo.length >= 2 && q.optionen.some(o => o.sid) ? fo : os, rest = os.filter(o => !haupt0.includes(o));
       if (q.s) kopf = `<div class="tsd-kopf">${tsBild(tsSrc(q.s.n), q.k, kurzSp(q.s))}<span><b>${esc(nachN(q.s.n).toUpperCase())}</b><small>${esc(q.s.n)}</small></span></div>`;
-      const haupt = duell ? fo : os, n = haupt.length <= 3 ? haupt.length : 2, mitInfo = n === 2;
-      felder = `<div class="tsd-g" style="--n:${n}">${haupt.map(o => karte(o, o.sp ? tsBild(o.src, q.k, o.name.slice(0, 2).toUpperCase()) : ohneFoto(o), String(o.name).toUpperCase(), mitInfo ? o.info : "")).join("")}${fo.length === 2 && haupt.length === 2 ? `<span class="tsd-vs" aria-hidden="true">VS</span>` : ""}</div>`;
-      if (duell) knoepfe = `<div class="ts-os" style="--n:${rest.length}">${rest.map(o => { const z = zust(o); return `<button class="ts-o${z.cls}" ${z.attr}>${esc(o.n)}</button>`; }).join("")}</div>`;
+      const haupt = haupt0, n = haupt.length <= 3 ? haupt.length : 2, mitInfo = n === 2 || haupt.every(o => String(o.info || "").length <= 16);
+      felder = `<div class="tsd-g" style="--n:${n}">${haupt.map(o => karte(o, o.sp ? tsBild(o.src, o.k || q.k, o.name.slice(0, 2).toUpperCase()) : ohneFoto(o), String(o.name).toUpperCase(), mitInfo ? o.info : "")).join("")}${vier ? `<span class="tsd-vs c" aria-hidden="true">VS</span>` : fo.length === 2 && haupt.length === 2 ? `<span class="tsd-vs" aria-hidden="true">VS</span>` : ""}</div>`;
+      if (rest.length) knoepfe = `<div class="ts-os" style="--n:${rest.length}">${rest.map(o => { const z = zust(o); return `<button class="ts-o${z.cls}" ${z.attr}>${esc(o.n)}${st && ges ? ` · ${pz(o.id)} %` : ""}</button>`; }).join("")}</div>`;
     }
-    const fans = erg ? `<div class="ts-f ${t ? (erg === t ? "r" : "f") : ""}">${t ? (erg === t ? "Richtig · +10" : "Leider daneben") : "Nicht getippt"}</div>`
+    const fans = erg ? `<div class="ts-f ${t ? (tsOk(erg, t) ? "r" : "f") : ""}">${t ? (tsOk(erg, t) ? "Richtig · +10" : "Leider daneben") : "Nicht getippt"}</div>`
+      : st && ges ? `<div class="tsd-fans"><span>${t ? `Dein Tipp: <b>${esc((os.find(o => o.id === t) || {}).name || "")}</b>` : "Fans"}</span><span>${zahlDE(ges)} ${ges === 1 ? "Tipp" : "Tipps"}</span></div>`
       : st ? (ges && os.length === 2 ? `<div class="tsd-fans"><span><b>${pz(os[0].id)} %</b> ${esc(jn ? "Ja" : os[0].name)}</span><span>${zahlDE(ges)} ${ges === 1 ? "Tipp" : "Tipps"}</span><span>${esc(jn ? "Nein" : os[1].name)} <b>${pz(os[1].id)} %</b></span></div>`
         : `<div class="ts-f">${ges ? `Fans: ${os.map(o => `${esc(o.n)} ${pz(o.id)} %`).join(" · ")} · ${zahlDE(ges)} ${ges === 1 ? "Tipp" : "Tipps"}` : "Noch keine Tipps"}</div>`) : "";
     const html = `<section class="ts-k tsd">
-        ${imArtikel ? "" : `<div class="ts-kz"><span class="kap">${esc(q.art)} · ${esc(q.p.heim_k)}-${esc(q.p.gast_k)} · ${esc(WT[dt(q.p.anstoss).getDay()])}</span>${q.ein ? einsTag() : ""}</div>`}
+        ${imArtikel ? "" : `<div class="ts-kz"><span class="kap">${esc(q.art)} · ${q.multi ? `${r.md}. SPIELTAG` : `${esc(q.p.heim_k)}-${esc(q.p.gast_k)} · ${esc(WT[dt(q.p.anstoss).getDay()])}`}</span>${(q.multi ? q.einsehbar : q.ein) ? einsTag() : ""}</div>`}
         <h3 class="tsd-q">${esc(q.frage)}</h3>
         ${kopf}${felder}${knoepfe}${fans}
         <div class="ts-i"><span class="l">WARUM</span><span>${esc(q.warum)}</span></div>
@@ -1689,7 +1710,7 @@ details.dzb[open]{padding-bottom:10px}
     const zu = new Date() >= r.schluss, mein = TIPPS[r.md] || {}, srv = TS.ok && TS.stand[r.md];
     let punkte = 0, gewertet = 0;
     const karten = r.fragen.map(q => { const k = tsKarte(q, r, zu, mein, srv);
-      if (k.erg && k.t) { gewertet++; if (k.erg === k.t) punkte += 10; }
+      if (k.erg && k.t) { gewertet++; if (tsOk(k.erg, k.t)) punkte += 10; }
       return k.html; }).join("");
     $("#main").innerHTML = `<div class="det ts"><button class="back" data-tippzu="1">‹ Zurück</button>
       <div class="ts-kopf"><span class="kap">TIPPSPIEL ${r.md}. SPIELTAG</span><h1>Spielt sie?</h1></div>

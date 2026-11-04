@@ -208,6 +208,7 @@ revoke all on public.tipp_loesung from anon, authenticated;
 grant select on public.tipp_loesung to anon, authenticated;
 
 -- tipp_loesung.json: {"md": 9, "loesung": {"frage-id": "antwort-id", ...}} (fehlt die Datei, passiert nichts)
+-- Mehrere richtige Antworten (Weiße Weste, MVP bei gleicher Note) stehen mit Komma: "johannes-id,giuliani-id" (04.11.2026)
 create or replace function public.tipp_loesung_laden() returns int
 language plpgsql security definer set search_path = '' as $$
 declare antwort extensions.http_response; d jsonb; n int := 0;
@@ -227,8 +228,8 @@ revoke all on function public.tipp_loesung_laden() from public, anon, authentica
 create or replace function public.tipp_rangliste(p_md int default null, p_anzahl int default 50) returns jsonb
 language sql stable security definer set search_path = '' as $$
   with pkt as (
-    select t.nutzer, sum(case when t.antwort = l.antwort then 10 else 0 end) as punkte,
-           count(*) filter (where t.antwort = l.antwort) as richtig, count(*) as gewertet
+    select t.nutzer, sum(case when t.antwort = any(string_to_array(l.antwort, ',')) then 10 else 0 end) as punkte,
+           count(*) filter (where t.antwort = any(string_to_array(l.antwort, ','))) as richtig, count(*) as gewertet
     from public.tipp t join public.tipp_loesung l on l.md = t.md and l.frage = t.frage
     where p_md is null or t.md = p_md
     group by t.nutzer

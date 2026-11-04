@@ -16,6 +16,8 @@ CSS = (G / "ts_duell.css").read_text(encoding="utf-8")
 MARK = "function tsKarte("
 
 ERS = [
+    # Auflösung aller Tippfragen aus tipp_loesung.json (spielt_sie.py)
+    ('json("spielt_sie.json").then(d => { SS = d; }).catch(() => { SS = null; })', 'json("spielt_sie.json").then(d => { SS = d; }).catch(() => { SS = null; }),\n      json("tipp_loesung.json").then(d => { TL = d; }).catch(() => { TL = null; })'),
     # Umfragen im Duell-Stil, alte Liste nur noch als Rückfall
     ('<div class="um-o${kurz ? " kurz" : ""}" style="--n:${O.length}">${opts}</div>',
      '${umKarten(u, feed, {meine, zeigt, zp, pz, auf}) || `<div class="um-o${kurz ? " kurz" : ""}" style="--n:${O.length}">${opts}</div>`}'),
