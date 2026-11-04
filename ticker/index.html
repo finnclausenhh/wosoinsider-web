@@ -896,6 +896,24 @@ details.dzb[open]{padding-bottom:10px}
 .af-hin .o{background:rgba(34,197,94,.18);color:#86EFAC}
 .af-sprung{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;font-size:12px}
 .af-sprung button{background:var(--soft);border-radius:999px;padding:6px 11px;font-weight:600;font-size:12.5px;color:var(--ink)}
+
+.fkomp .tx{align-items:center;text-align:center}
+.fkomp .tx .fbadge{align-self:center}
+.fkomp .vn{justify-content:center}
+.fnc{display:grid;gap:6px;background:var(--soft);border-radius:10px;padding:9px 10px}
+.fnc .r{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.fnc .r > span:first-child{display:grid;gap:2px}
+.fnc .r small{font-size:11.5px;color:#C9D3E3;line-height:1.4}
+.fnc .w{display:grid;justify-items:end;gap:2px;font-size:12px;white-space:nowrap}
+.pf-fm{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--soft);border-radius:10px;padding:8px 10px}
+.pf-fm .l{display:grid;gap:2px}
+.pf-fm .l b{font:700 10px var(--f-mono);letter-spacing:.04em}
+.pf-fm .l span{font-size:12.5px}
+.af-tw{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.af-tw button{display:flex;gap:8px;align-items:center;justify-content:center;background:var(--soft);border-radius:10px;padding:9px 6px;font-weight:600;font-size:13.5px;color:var(--ink)}
+.af-tw button[aria-pressed="true"]{outline:2px solid #6E9BFF;background:rgba(110,155,255,.14)}
+.eck-r .bw{display:grid;gap:2px}
+.eck-r .bw small{font-size:10px;color:var(--muted);line-height:1}
 </style>
 
 
@@ -1493,7 +1511,7 @@ details.dzb[open]{padding-bottom:10px}
     AFNOTEN = AS ? AS.no : null; AFBEST = null;
     if (AS && SPN) { AFBEST = new Set(); [p.heim_k, p.gast_k].forEach(k => { const l = Object.entries(AS.no).filter(([id]) => (spById(id) || {}).k === k).sort((a, b) => b[1] - a[1]); if (l[0]) AFBEST.add(l[0][0]); }); }
     const hatV = p.status !== "beendet" && AF && (AF.vorschau || []).some(v => v.id === p.id), hatA = p.status !== "beendet" && [p.heim_aufstellung, p.gast_aufstellung].some(Boolean), offA = [p.heim_aufstellung, p.gast_aufstellung].some(a => a && a.typ === "offiziell");
-    const sprung = hatV && hatA ? '<div class="af-sprung"><button data-afsprung="af-dz">Daten zum Spiel ↓</button></div>' : "";
+    const sprung = "";
     const afBox = AS ? afStatBox(p, AS) : hatV ? `<div class="kartebox" id="af-dz">${kap("Daten zum Spiel")}${datenZumSpiel(AF.vorschau.find(v => v.id === p.id))}</div>` : "";
     $("#main").innerHTML = `<div class="det">
       <button class="back" data-back="1">‹ ${p.md ? `${p.md}. Spieltag` : "Spielplan"}</button>
@@ -1506,7 +1524,7 @@ details.dzb[open]{padding-bottom:10px}
       ${sprung}${AS ? afBox : ""}${pv.length ? `<div class="kartebox">${kap("Platzverweise")}${pv.map(x => `<div style="display:flex;gap:8px;align-items:center;font-size:14px">${karte(true)}<span style="flex:1">${x.n ? esc(x.n) : '<span class="mu">ohne Namen im Spielbericht</span>'} (${esc(x.min)}')</span>${logo(x.seite === "heim" ? p.heim_k : p.gast_k, 20)}</div>`).join("")}</div>` : ""}
       ${bs.length ? `<div class="kartebox" style="gap:8px">${kap("Englische Woche")}${bs.map(([n, b]) => `<div style="display:grid;gap:2px"><b style="font-size:14px;font-weight:600">${esc(n)}: ${esc(b.text)}</b><span class="dat">${(b.spiele || []).map(esc).join(" · ")}</span></div>`).join("")}${prog ? '<span style="font-size:12px;color:var(--frag)">Deshalb stufen wir Feldspielerinnen höchstens als Erwartet ein.</span>' : ""}</div>` : ""}
       ${!p.heim_aufstellung && !p.gast_aufstellung && p.status === "beendet" ? '<p class="dat">Zu diesem Spiel hat der Spielbericht keine offizielle Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : !p.heim_aufstellung && !p.gast_aufstellung ? '<p class="dat">Die mögliche Aufstellung erscheint, sobald dieser Spieltag als nächster ansteht. Die offizielle kommt ca. 60 Minuten vor Anpfiff.</p>'
-        : `<span id="af-auf"></span>` + teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", p.status === "beendet", p.anstoss) + teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", p.status === "beendet", p.anstoss)}
+        : `<span id="af-auf"></span>` + (p.status !== "beendet" ? teamSchalter(p) : teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", p.status === "beendet", p.anstoss) + teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", p.status === "beendet", p.anstoss))}
       ${prog ? `<div class="leg" style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)">${Object.keys(STUFE).filter(k => ["sicher","erwartet","unsicher"].includes(k)).map(k => `<span>${stufeSym(k, 14)}${STUFE[k][2]}</span>`).join("")}</div><button class="hk" data-legal="so-entsteht" style="background:none;padding:6px 0"><span class="mu" style="font-size:12px">Prognose von WOSOINSIDER, die offizielle Aufstellung kommt ca. 60 Minuten vor Anpfiff und ersetzt sie hier. <span class="lk">So entsteht sie</span></span></button>` : ""}
       ${!AS ? afBox : ""}
     </div>`;
@@ -1534,13 +1552,20 @@ details.dzb[open]{padding-bottom:10px}
     const fo = s => `<span class="dz-form">${String(s || "").split("").map(c => `<i class="${c}">${c}</i>`).join("")}</span>`;
     const sz = d => { if (d.includes("md")) { const j = Number(d.slice(0, 4)); return String(j).slice(2) + "/" + String(j + 1).slice(2); } const j = Number(d.slice(0, 4)) - (Number(d.slice(5, 7)) < 7 ? 1 : 0); return String(j).slice(2) + "/" + String(j + 1).slice(2); };
     const du = (v.du || []).map(d => `<span>${sz(d.d)} ${d.h === v.h ? "H" : "A"} ${d.t[0]}:${d.t[1]}</span>`).join("");
-    return `<div class="dz"><div class="dz-k"><div class="t">${logo(v.h, 30)}<span>${esc(kname(v.h))}</span><small>${v.rang[0]}. Platz · zu Hause</small>${fo(v.form[0])}</div><span class="mu" style="font-size:11px">Form<br>letzte 5</span><div class="t">${logo(v.g, 30)}<span>${esc(kname(v.g))}</span><small>${v.rang[1]}. Platz · auswärts</small>${fo(v.form[1])}</div></div>
+    return `<div class="dz"><div class="dz-k"><div class="t">${logo(v.h, 30)}<span>${esc(kname(v.h))}</span><small>Tabelle ${v.rang[0]}.${v.rolle && v.rolle[0] ? ` · Heim ${v.rolle[0]}.` : ""}</small>${fo(v.form[0])}</div><span class="mu" style="font-size:11px">Form<br>letzte 5</span><div class="t">${logo(v.g, 30)}<span>${esc(kname(v.g))}</span><small>Tabelle ${v.rang[1]}.${v.rolle && v.rolle[1] ? ` · Auswärts ${v.rolle[1]}.` : ""}</small>${fo(v.form[1])}</div></div>
       <div class="dz-t">${reihe("Punkte pro Spiel", f(H.pkt), f(G.pkt), "hoch")}${reihe("Tore pro Spiel", f(H.t), f(G.t), "hoch")}${reihe("Gegentore", f(H.g), f(G.g), "tief")}${reihe("Spiele zu Null", H.zn, G.zn, "hoch")}${reihe("Ecken pro Spiel", f(H.eck), f(G.eck), "hoch")}</div>
-      ${du ? `<div style="display:grid;gap:5px;justify-items:center;text-align:center">${kap("Direkte Duelle seit 2023")}<span style="font-size:12px;color:var(--muted)">${esc(kname(v.h))}: ${v.dus[0]} ${v.dus[0] === 1 ? "Sieg" : "Siege"}, ${v.dus[1]} Remis, ${v.dus[2]} ${v.dus[2] === 1 ? "Niederlage" : "Niederlagen"}</span><div class="dz-du">${du}</div></div>` : ""}
+      ${du ? `<div style="display:grid;gap:5px;justify-items:center;text-align:center">${kap("Direkte Duelle seit 2023")}<span style="font-size:12px;color:var(--muted)">${esc(kname(v.h))}: ${v.dus[0]} ${v.dus[0] === 1 ? "Sieg" : "Siege"}, ${v.dus[1]} Remis, ${v.dus[2]} ${v.dus[2] === 1 ? "Niederlage" : "Niederlagen"}</span></div>` : ""}
       ${(v.satz || []).length ? `<div class="dz-s">${kap("Was die Daten sagen")}${v.satz.map(t => `<p>${esc(t)}</p>`).join("")}</div>` : ""}
       ${(v.kb || []).length ? `<div class="af-kb"><b>Für Kickbase:</b> ${v.kb.map(esc).join(" ")}</div>` : ""}
-      <p class="af-st">Stand nach dem ${AF.md}. Spieltag (${esc(kurz(dt(AF.stand)))}). Heimwerte von ${esc(kname(v.h))} (${H.sp} Spiele), Auswärtswerte von ${esc(kname(v.g))} (${G.sp} Spiele), nur diese Saison. H/A = Heim- oder Auswärtsspiel von ${esc(kname(v.h))}. Grün = besserer Wert. Duelle aus API-Football, Sicht ${esc(kname(v.h))}.</p></div>`;
+      <p class="af-st">Stand nach dem ${AF.md}. Spieltag (${esc(kurz(dt(AF.stand)))}). Heimwerte von ${esc(kname(v.h))} (${H.sp} Spiele), Auswärtswerte von ${esc(kname(v.g))} (${G.sp} Spiele), nur diese Saison. Grün = besserer Wert. Heim/Auswärts = Platz in der Heim- bzw. Auswärtstabelle. Duelle aus API-Football.</p></div>`;
   }
+  const AFSEITE = {};
+  function teamSchalter(p){
+    const sel = AFSEITE[p.id] || "heim";
+    return `<div class="af-tw" role="tablist">${[["heim", p.heim, p.heim_k], ["gast", p.gast, p.gast_k]].map(([s, n, k]) => `<button role="tab" data-afseite="${s}" aria-pressed="${sel === s}">${logo(k, 22)}<span>${esc(KNAME[k] || n)}</span></button>`).join("")}</div>`
+      + (sel === "heim" ? teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", false, p.anstoss) : teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", false, p.anstoss));
+  }
+  document.addEventListener("click", e => { const b = e.target.closest("[data-afseite]"); if (!b || !GAME) return; AFSEITE[GAME] = b.dataset.afseite; spiel(GAME, true); });
   function teamBlock(name, k, a, seite, vorbei, anstoss){
     let inh;
     if (a && (a.startelf || []).length) inh = a.typ === "offiziell" ? offiziell(a, k, anstoss) : prognose(a, seite, k);
@@ -1585,7 +1610,33 @@ details.dzb[open]{padding-bottom:10px}
   // ---------------- Inside
   const sektion = (nr, kat, titel, notiz) => `<div class="sk"><span class="nr">${nr} · ${esc(kat)}</span>${titel ? `<h2 class="disp">${esc(titel)}</h2>` : ""}${notiz ? `<p>${esc(notiz)}</p>` : ""}</div>`;
   const FG = [["up", "Aufwind", "Im Aufwind", "#4ADE80"], ["down", "Formtief", "Im Formtief", "#FF8A8A"], ["hold", "Stabil", "Stabil", "#8FB0FF"]];
-  const formListe = key => (((IN.form || {})[key]) || []).filter(f => zeigen(f.k));
+  function afKarte(x, lauf){
+    const s = (SPN && (spById(x.id) || findeSP(x.k, nachN(x.n)))) || {}, sp = s.spiele || [];
+    const PS = {sicher: "sicher in der Startelf", erwartet: "erwartet in der Startelf", unsicher: "unsicher", unwahrscheinlich: "eher Bank", ausgeschlossen: "fällt aus"};
+    return {n: x.n, k: x.k, id: x.id, af: true, lauf, big: dez(x.l3), big_txt: x.vorher ? `Ø Note letzte 3 (vorher ${dez(x.vorher)})` : "Ø Note letzte 3 Spiele",
+      s: sp.map(z => [z.min || 0, z.art === "S" ? 1 : 0, (z.tore || []).length]),
+      text: lauf ? `Starke Noten zuletzt und ein leichtes Programm: Die nächsten drei Gegner stehen im Schnitt auf Platz ${Math.round(x.nr)}.` : Math.abs(x.diff) < .3 ? `Konstant starke Noten: zuletzt ${dez(x.l3)}, davor ${dez(x.vorher)}.` : x.diff < 0 ? `Ihre Noten sind zuletzt deutlich gefallen, von ${dez(x.vorher)} auf ${dez(x.l3)}.` : `Ihre Noten sind zuletzt deutlich gestiegen, von ${dez(x.vorher)} auf ${dez(x.l3)}.`,
+      kb: `Minuten der letzten 3 Ligaspiele: ${x.min3.map(m => m + "'").join(" · ")}${x.prog && PS[x.prog] ? `, nächstes Spiel ${PS[x.prog]}` : ""}.`};
+  }
+  const formListe = key => { const l = (((IN.form || {})[key]) || []).slice(), F = (AF && AF.form) || {}, dabei = new Set(l.map(f => f.k + "|" + normS(nachN(f.n))));
+    const dazu = key === "up" ? (F.hoch || []).map(x => afKarte(x, false)).concat((F.lauf || []).map(x => afKarte(x, true))) : key === "down" ? (F.tief || []).map(x => afKarte(x, false)) : key === "hold" ? (F.stabil || []).map(x => afKarte(x, false)) : [];
+    dazu.forEach(f => { const s = f.k + "|" + normS(nachN(f.n)); if (!dabei.has(s)) { dabei.add(s); l.push(f); } });
+    return l.slice(0, 10).filter(f => zeigen(f.k)); };
+  function programmVon(k){
+    const L = (((SPN && SPN.vereine) || {})[k] || {}).kommend; if (!L) return null;
+    const n = L.filter(z => z.wb === "Liga" && z.gk).slice(0, 3); if (!n.length) return null;
+    const r = n.map(z => z.rang).filter(Boolean), av = r.length ? r.reduce((a, b) => a + b, 0) / r.length : null;
+    return {next: n.map(z => [z.gk, z.ha, z.rang]), nr: av, ns: av == null ? null : av <= 5.5 ? "schwer" : av >= 9.5 ? "leicht" : "mittel"};
+  }
+  function afFormZeile(f){
+    if (!AF || !AF.sp) return "";
+    const s = SPN && (f.id ? spById(f.id) : findeSP(f.k, nachN(f.n))); if (!s) return "";
+    const a = afSp(s.id), v = a && (a.no || []).filter(x => x[2] >= 60); if (!v || v.length < 4) return "";
+    const n = v.map(x => x[1]), l3 = n.slice(-3).reduce((x, y) => x + y, 0) / 3, vor = n.length > 3 ? n.slice(0, -3).reduce((x, y) => x + y, 0) / (n.length - 3) : l3;
+    const fl = (AF.form ? [].concat(AF.form.tief || [], AF.form.hoch || [], AF.form.lauf || [], AF.form.stabil || []) : []).find(x => x.id === s.id) || {};
+    const c = l3 - vor <= -.6 ? "#F59E0B" : l3 - vor >= .6 ? "#4ADE80" : "#8FB0FF", e = fl.id ? einordnungSatz(fl) : "";
+    return `<div class="fnc"><div class="r"><span><span class="kap">Noten ab 60 Minuten</span>${e ? `<small>${esc(e)}</small>` : ""}</span><span class="w">${spark(n.slice(-6), c)}<span><span class="mu">${dez(vor)}</span> → <b style="color:${c}">${dez(l3)}</b></span></span></div></div>`;
+  }
   function vzKnopf(){
     const gew = ALLE.filter(k => SEL.has(k)), b = document.querySelector(".vz-btn"); if (!b) return;
     b.setAttribute("aria-pressed", VZOFFEN); b.classList.toggle("an", gew.length > 0);
@@ -1640,7 +1691,7 @@ details.dzb[open]{padding-bottom:10px}
       const s = w == null ? null : w >= 2 ? ["leicht", "#4ADE80"] : w >= 1.3 ? ["mittel", "#F5B041"] : ["schwer", "#FF8A8A"];
       return `<div class="geg">${logo(x.k, 22)}<div><span class="a"><b>${esc(kname(x.k))}</b> <span class="mu">${x.heim ? "zu Hause" : "auswärts"}</span></span>
         <small>${esc(x.term ? tagDatum(x.z) : "Wochenende " + wochenende(x.z))}${w != null ? ` · ${Number(w).toFixed(1).replace(".", ",")} Gegentore pro Spiel` : ""}</small></div>${s ? `<span class="cap" style="background:${s[1]}">${s[0]}</span>` : ""}</div>`; }).join("");
-    return `<article class="fk">${kopf}<div class="finh">${minutenBalken(f.s || [], /Tor/.test(f.big_txt || "") && !/Gegentor/.test(f.big_txt || ""))}<p>${esc(f.text)}</p>
+    return `<article class="fk">${kopf}<div class="finh">${minutenBalken(f.s || [], /Tor/.test(f.big_txt || "") && !/Gegentor/.test(f.big_txt || ""))}${afFormZeile(f)}<p>${esc(f.text)}</p>
       ${geg ? `<div style="display:grid;gap:8px">${kap("Nächste Gegner")}${geg}</div>` : ""}${kbBox(f.kb)}
       ${fo && fo.datei && nachweis(fo) ? `<div class="credit" style="font-size:9.5px">${nachweis(fo)}</div>` : ""}</div></article>`;
   }
@@ -1688,16 +1739,9 @@ details.dzb[open]{padding-bottom:10px}
   }
   function notenCheck(){
     if (!AF || !AF.form) return "";
-    const g = NCG.find(x => x[0] === NCDIR) || NCG[0], l = (AF.form[NCDIR] || []).filter(f => zeigen(f.k)), x = (AF.xg || []).filter(f => zeigen(f.k)).slice(0, 4);
-    const POSN = {TW: "Torhüterin", ABW: "Abwehr", MF: "Mittelfeld", ST: "Sturm"};
-    return `<div style="display:grid;gap:8px;padding-top:14px"><h3 class="disp" style="font-size:21px">Noten-Check</h3>
-      <p class="af-st" style="font-size:12px">Schnitt der letzten 3 Noten gegen die Spiele davor, nur Einsätze ab 60 Minuten, nur Stammspielerinnen. Unten: Minuten und Einordnung.</p>
-      <div class="nc-tabs v4">${NCG.map(t => `<button data-nc="${t[0]}" aria-pressed="${NCDIR === t[0]}">${t[1]} (${(AF.form[t[0]] || []).filter(f => zeigen(f.k)).length})</button>`).join("")}</div>
-      <div class="nc">${l.length ? l.map(f => { const sp = spById(f.id) || {}, ps = PST2[f.prog], e = einordnungSatz(f);
-        return `<button class="ncf" data-profil="${esc(f.id)}"><span class="a">${logo(f.k, 24)}<span><b>${esc(f.n)}</b><small>${esc(kname(f.k))} · ${esc(POSN[f.pos || sp.pos] || "")}</small></span></span>
-          <span class="sp">${spark(f.noten, g[2])}<div><span class="mu">${dez(f.vorher)}</span> → <b style="color:${g[2]}">${dez(f.l3)}</b></div></span>
-          <span class="u"><span>Minuten letzte 3: ${f.min3.map(m => m + "'").join(" · ")}${e ? "<br>" + esc(e) : ""}${programmZeile(f)}</span>${ps ? `<span class="st" style="background:${ps[1]};color:${ps[2]}">${ps[0]}</span>` : ""}</span></button>`; }).join("") : '<p class="dat">Keine Spielerin deiner Vereine in dieser Gruppe.</p>'}</div>
-      ${x.length ? `<h3 class="disp" style="font-size:19px;margin-top:8px">xG-Check ${(AF.xgmd || []).join(". und ")}. Spieltag</h3><div class="nc">${x.map(r => `<div class="nc-r">${logo(r.k, 26)}<span class="nm"><b>${esc(kname(r.k))} gegen ${esc(kname(r.gg))}</b><small>${r.md}. Spieltag: ${r.t} ${r.t === 1 ? "Tor" : "Tore"} bei ${dez(r.xg, 2)} xG. ${r.d > 0 ? "Mehr getroffen als erspielt, das gleicht sich meist aus." : "Chancen ungenutzt, die Offensive war besser als das Ergebnis."}</small></span><span class="w"><b style="color:${r.d > 0 ? "#4ADE80" : "#FF8A8A"}">${r.d > 0 ? "+" : ""}${dez(r.d)}</b><span>Tore minus xG</span></span></div>`).join("")}</div>` : ""}
+    const x = (AF.xg || []).filter(f => zeigen(f.k)).slice(0, 4);
+    return `<div style="display:grid;gap:8px;padding-top:14px">
+      ${x.length ? `<h3 class="disp" style="font-size:19px">xG-Check ${(AF.xgmd || []).join(". und ")}. Spieltag</h3><div class="nc">${x.map(r => `<div class="nc-r">${logo(r.k, 26)}<span class="nm"><b>${esc(kname(r.k))} gegen ${esc(kname(r.gg))}</b><small>${r.md}. Spieltag: ${r.t} ${r.t === 1 ? "Tor" : "Tore"} bei ${dez(r.xg, 2)} xG. ${r.d > 0 ? "Mehr getroffen als erspielt, das gleicht sich meist aus." : "Chancen ungenutzt, die Offensive war besser als das Ergebnis."}</small></span><span class="w"><b style="color:${r.d > 0 ? "#4ADE80" : "#FF8A8A"}">${r.d > 0 ? "+" : ""}${dez(r.d)}</b><span>Tore minus xG</span></span></div>`).join("")}</div>` : ""}
       ${teamForm()}
       <p class="af-st">${NOTE_ERKL}</p></div>`;
   }
@@ -1730,7 +1774,7 @@ details.dzb[open]{padding-bottom:10px}
         <div class="std-l"><span class="g1"><i class="gp"></i>gesetzt</span><span class="g2">2 bis 3 Belege</span><span class="g3">erster Hinweis</span><button class="std-i" data-stdinfo="1" aria-label="Erklärung">i</button></div><p class="std-e" hidden>Gesetzt heißt: viele Belege aus Spielberichten oder ein Tor nach ihrem Standard. Normal: 2 bis 3 Belege. Kursiv: bisher nur ein Hinweis.</p></div>
       ${SEL.size ? `<button class="lk" style="font-size:12px;justify-self:start;text-decoration:none" data-stdalle="1">${STDALLE ? "Nur meine Vereine" : "Alle 14 Vereine"}</button>` : ""}
       <div class="stab"><div class="r h"><span></span><span>ECKEN</span><span>FREISTÖSSE</span><span>ELFMETER</span></div>
-        ${r.map(s => `<div class="r"><div class="wk">${logo(s.k, 24)}<span>${esc(s.k)}</span></div>${zelle(s.ecken)}${zelle(s.fs)}${zelle(s.elfer)}
+        ${r.map(s => `<div class="r"><div class="wk">${logo(s.k, 24)}<span>${esc(s.k)}</span></div>${zelle(s.ecken)}${zelle(s.fs)}${zelle((s.elfer || []).length ? s.elfer : ((AF && AF.elf) || []).filter(x => x.k === s.k).map(x => [nachN(x.n), 1]))}
           ${s.hinweis ? `<div class="hw">${svg(P.warn, "").replace("<svg", '<svg style="width:13px;height:13px;flex:none;stroke:currentColor;fill:none;stroke-width:2"')}<span>${esc(s.hinweis)}</span></div>` : ""}</div>`).join("")}</div>${afStandards()}</section>`;
   }
   function afStandards(){
@@ -1738,7 +1782,7 @@ details.dzb[open]{padding-bottom:10px}
     const e = Object.entries(AF.ecken).filter(([k]) => STDALLE || zeigen(k)).sort((a, b) => b[1].f - a[1].f), mx = Math.max(...Object.values(AF.ecken).map(x => x.f), 1);
     const el = (AF.elf || []).filter(x => STDALLE || zeigen(x.k));
     return `<div style="display:grid;gap:8px;padding-top:14px"><h3 class="disp" style="font-size:21px">Ecken pro Spiel</h3><p class="af-st" style="font-size:12px">Viele eigene Ecken = viele Chancen für die Schützin und die Kopfballspielerinnen.</p>
-      <div class="eck"><div class="eck-h"><span></span><span>EIGENE</span><span></span><span>GEGEN</span></div>${e.map(([k, x]) => `<div class="eck-r">${logo(k, 22)}<span class="f">${dez(x.f)}</span><span class="bb"><i style="width:${x.f / mx * 100}%"></i></span><span class="g">${x.g != null ? dez(x.g) : "–"}</span></div>`).join("")}</div>
+      <div class="eck"><div class="eck-h"><span></span><span>EIGENE</span><span></span><span>GEGEN</span></div>${e.map(([k, x]) => `<div class="eck-r">${logo(k, 22)}<span class="f">${dez(x.f)}</span><span class="bw"><span class="bb"><i style="width:${x.f / mx * 100}%"></i></span>${(() => { const st = (IN.standards || []).find(q => q.k === k), w = st && (st.ecken || [])[0]; return w ? `<small>Ecken: ${esc(w[0])}</small>` : ""; })()}</span><span class="g">${x.g != null ? dez(x.g) : "–"}</span></div>`).join("")}</div>
       ${el.length ? `<h3 class="disp" style="font-size:19px;margin-top:8px">Elfmeter in der Liga</h3><div class="af-best">${el.map(x => `<button class="pf-std${x.v ? "" : " el"}" data-profil="${esc(x.id)}" style="display:flex;gap:5px;align-items:center">${logo(x.k, 14)}${esc(nachN(x.n))} <i>${x.t}/${x.t + x.v}${x.fuss ? ", " + x.fuss : ""}</i></button>`).join("")}</div>` : ""}
       <p class="af-st">Quelle: API-Football, Stand nach dem ${AF.md}. Spieltag. Fuß aus unseren Stammdaten.</p></div>`;
   }
@@ -1806,6 +1850,7 @@ details.dzb[open]{padding-bottom:10px}
   document.addEventListener("click", e => { const b = e.target.closest("[data-afsprung]"); if (!b) return; const z = document.getElementById(b.dataset.afsprung); if (z) window.scrollTo({top: z.getBoundingClientRect().top + window.scrollY - 70, behavior: "smooth"}); });
   document.addEventListener("click", e => { const b = e.target.closest("[data-nc]"); if (!b) return; NCDIR = b.dataset.nc; const y = window.scrollY; inside(); window.scrollTo(0, y); });
   function inside(){
+    if (!SPN) ladeSPN().then(() => { if (VIEW === "inside") { const y = window.scrollY; inside(); window.scrollTo(0, y); } }).catch(() => {});
     if (!IN){ $("#main").innerHTML = '<p class="leer">Inside wird geladen …</p>'; return; }
     const ph = IN.punkt_hinweis, pm = ph && N.find(m => m.id === ph.id), A = IN.analyse && (!SEL.size || !IN.analyse.verein || SEL.has(IN.analyse.verein)) ? IN.analyse : null;
     $("#main").innerHTML = vereinsZeile() + `<div class="iv">
@@ -2134,7 +2179,14 @@ details.dzb[open]{padding-bottom:10px}
 
   // ---------------- Tabelle und Statistik (nur Liga, berechnet aus spielplan.json und spielerinnen.json)
   let STAUF = {};
-  const STKAT = [["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["sch","Torschüsse","laut Spielstatistik"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["note","Beste Note im Schnitt","ab 4 Einsätzen über 60 Minuten"],["kp90","Schlüsselpässe pro 90","ab 300 Einsatzminuten"],["par","Paraden pro Spiel","Torhüterinnen ab 3 Spielen"],["zkw","Zweikämpfe gewonnen","laut Spielstatistik"],["gef","Gefoult worden","laut Spielstatistik"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["karten","Karten","Gelb 1, Gelb-Rot 3, Rot 5 Punkte"],["fouls","Fouls","laut Spielstatistik"],["fair","Fairnesstabelle","Kartenpunkte der Spielerinnen je Verein, wenigste oben"]];
+  const STKAT = [["tore","Tore",""],["vorl","Vorlagen",""],["scorer","Scorerpunkte","Tore plus Vorlagen"],["joker","Joker-Tore","Tore nach Einwechslung"],["sch","Torschüsse","laut Spielstatistik"],["zunull","Weiße Weste","Spiele ohne Gegentor als Torhüterin in der Startelf"],["p90","Tore pro 90 Minuten","ab 270 Einsatzminuten"],["note","Beste Note im Schnitt","ab 4 Einsätzen über 60 Minuten"],["kp90","Schlüsselpässe pro 90","ab 300 Einsatzminuten"],["par","Paraden pro Spiel","Torhüterinnen ab 3 Spielen"],["zkw","Zweikämpfe gewonnen","laut Spielstatistik"],["gef","Gefoult worden","laut Spielstatistik"],["voll","Dauerbrennerinnen","jede Ligaminute gespielt"],["karten","Karten","Gelb 1, Gelb-Rot 3, Rot 5 Punkte"],["fouls","Fouls","laut Spielstatistik"]];
+  function fairHtml(L){
+    const W = ligaWerte(L.spiele), F = {}; ALLE.forEach(c => F[c] = {k: c, gelb: 0, gr: 0, rot: 0});
+    W.forEach(v => { const f = F[v.s.k]; if (f) { f.gelb += v.gelb; f.gr += v.gr; f.rot += v.rot; } });
+    const FL = Object.values(F).map(f => Object.assign(f, {p: f.gelb + 3 * f.gr + 5 * f.rot})).sort((a, b) => a.p - b.p || kname(a.k).localeCompare(kname(b.k), "de"));
+    return `<section class="stk" id="st-fair" style="margin-top:18px"><div class="stk-k"><h2>Fairnesstabelle</h2><small>Kartenpunkte der Spielerinnen je Verein, wenigste oben (Gelb 1, Gelb-Rot 3, Rot 5)</small></div><div class="ft"><div class="ft-r ft-h"><span>#</span><span></span><span>VEREIN</span><span><i class="kg"></i></span><span><i class="kgr"></i></span><span><i class="kr"></i></span><span>PKT</span></div>
+      ${FL.map((f, i) => `<button class="ft-r" data-statverein="${f.k}"><span class="tb-pl">${i && f.p === FL[i - 1].p ? "" : i + 1}</span>${logo(f.k, 18)}<span class="tb-vn">${esc(kname(f.k))}</span><span>${f.gelb}</span><span>${f.gr}</span><span>${f.rot}</span><span class="tb-pk">${f.p}</span></button>`).join("")}</div></section>`;
+  }
   function ligaStand(){
     const T = {}, fertig = [];
     ALLE.forEach(k => T[k] = {k, sp: 0, s: 0, u: 0, n: 0, tp: 0, tm: 0, pkt: 0});
@@ -2184,7 +2236,7 @@ details.dzb[open]{padding-bottom:10px}
           const zo = i === 0 ? " z-cl" : i <= 2 ? " z-q" : i >= L.tab.length - 2 ? " z-ab" : "";
           return `<button class="tb-r${zo}${SEL.has(r.k) ? " mein" : ""}" ${SEL.has(r.k) ? `style="--vc:${ring(r.k)}" ` : ""}data-statverein="${r.k}" aria-label="${esc(kname(r.k))}, Kader öffnen"><span class="tb-pl">${pl}</span>${logo(r.k, 20)}<span class="tb-vn">${esc(kname(r.k))}</span><span class="tb-mu">${r.sp}</span><span>${r.s}-${r.u}-${r.n}</span><span class="tb-mu">${r.tp}:${r.tm}</span><span>${d > 0 ? "+" : ""}${d}</span><span class="tb-pk">${r.pkt}</span></button>`; }).join("")}</div>
         <div class="tb-leg"><span><i style="background:rgba(47,91,255,.55)"></i>Champions League, Ligaphase</span><span><i style="background:rgba(110,155,255,.3)"></i>Champions League, Qualifikation</span><span><i style="background:rgba(226,74,74,.45)"></i>Abstieg</span></div>
-        <p class="st-notiz">Startplätze wie in der Saison 2026/27 laut DFB: Meister direkt in die Ligaphase, Platz 2 und 3 in die Qualifikation (wer dort ausscheidet, spielt im Europa Cup weiter). Die beiden Letzten steigen ab. Die UEFA kann die Zahl der Plätze über die Länderwertung ändern. Bei Punktgleichheit entscheidet die Tordifferenz, dann die Zahl der Tore. Verein antippen öffnet den Kader. Ergebnisse: Sportschau.</p></div>`;
+        <p class="st-notiz">Startplätze wie in der Saison 2026/27 laut DFB: Meister direkt in die Ligaphase, Platz 2 und 3 in die Qualifikation (wer dort ausscheidet, spielt im Europa Cup weiter). Die beiden Letzten steigen ab. Die UEFA kann die Zahl der Plätze über die Länderwertung ändern. Bei Punktgleichheit entscheidet die Tordifferenz, dann die Zahl der Tore. Verein antippen öffnet den Kader. Ergebnisse: Sportschau.</p>${fairHtml(L)}</div>`;
     } else {
       const W = ligaWerte(L.spiele);
       let h = `<div class="det sv">${zur}<h1 class="disp">Statistik</h1><div class="dat">Nur Liga, nach dem ${L.md}. Spieltag</div>
@@ -2407,7 +2459,10 @@ details.dzb[open]{padding-bottom:10px}
     const l5 = sp.slice(-5), s5 = l5.filter(e => e.art === "S"), aus5 = s5.filter(e => (e.min || 0) < 85 && !e.rot).length, e5 = l5.filter(e => e.art === "E").length;
     const kbz = l5.length ? `<div class="pf-kbz"><div><b>${s5.length}/${l5.length}</b><span>in der Startelf (letzte ${l5.length} Ligaspiele)${aus5 ? `, davon ${aus5}x vorzeitig ausgewechselt` : s5.length ? ", immer durchgespielt" : ""}${e5 ? `, ${e5}x eingewechselt` : ""}</span></div></div>` : "";
     const elf = (afSp(s.id) || {}).elf, elfC = elf ? `<span class="pf-std el">Elfmeter <i>${elf[0]} von ${elf[0] + elf[1]} verwandelt</i></span>` : "";
-    h += `<section class="pf-box pf-kb">${kap("Für Kickbase")}${pr ? `<p class="pf-w">${esc(warumSatz(s, pr))}</p>` : `<p class="pf-w">Für den nächsten Spieltag gibt es noch keine Prognose.</p>`}
+    h += `<section class="pf-box pf-kb">${kap("Für Kickbase")}${pr ? `<p class="pf-w">${esc(warumSatz(s, pr))}</p>` : `<p class="pf-w">Für den nächsten Spieltag gibt es noch keine Prognose.</p>`}${(() => { const a = afSp(s.id), v = a && (a.no || []).filter(x => x[2] >= 60); if (!v || v.length < 4) return "";
+        const n = v.map(x => x[1]), l3 = n.slice(-3).reduce((x, y) => x + y, 0) / 3, vor = n.length > 3 ? n.slice(0, -3).reduce((x, y) => x + y, 0) / (n.length - 3) : l3, d = l3 - vor;
+        const g = d <= -.6 ? ["FORMTIEF", "#F59E0B"] : d >= .6 ? ["AUFWIND", "#4ADE80"] : ["STABIL", "#8FB0FF"], pg = programmVon(s.k);
+        return `<div class="pf-fm"><span class="l"><b style="color:${g[1]}">${g[0]}</b><span>Note <span class="mu">${dez(vor)}</span> → <b style="color:${g[1]}">${dez(l3)}</b> in den letzten 3</span>${pg && pg.ns && pg.ns !== "mittel" ? `<span style="font:700 10px var(--f-mono);color:${pg.ns === "schwer" ? "#FF8A8A" : "#4ADE80"}">${pg.ns === "schwer" ? "SCHWERES" : "LEICHTES"} PROGRAMM (Ø PLATZ ${Math.round(pg.nr)})</span>` : ""}</span>${spark(n.slice(-6), g[1])}</div>`; })()}
       ${std || elfC ? kap("Standards") + `<div class="pf-stds">${std}${elfC}</div>` : ""}
       ${komH ? `<div class="kap">Nächste Spiele${dicht >= 3 ? ` <span class="pf-warn">${dicht} Spiele in 8 Tagen</span>` : ""}</div>${komH}` : ""}</section>`;
     // Ihre Position im Vereinssystem (Finn 01.11.: feste Plätze der Formation, gespielte ausgemalt)
@@ -2612,7 +2667,7 @@ details.dzb[open]{padding-bottom:10px}
   }).catch(() => { if (VIEW === "meldungen") $("#main").innerHTML = '<p class="leer">Die Meldungen konnten nicht geladen werden. Seite neu laden.</p>'; });
   Object.assign(TAGF, {FORMTIEF: ["#F59E0B", "#1A1206"], FORMHOCH: ["#22C55E", "#06210f"], ELFMETER: ["#6E9BFF", "#0B1220"], JOKER: ["#4ADE80", "#06210f"], GELBSPERRE: ["#F5C518", "#1A1606"], "xG-CHECK": ["#9B6BE8", "#fff"], INSIDER: ["#2A3B5E", "#C7D7FF"], AUFWIND: ["#22C55E", "#06210f"]});
   ladeAF().then(afNeu).then(() => { ladeSPN().catch(() => {}); const mische = () => { if (!N.length) return setTimeout(mische, 400);
-    const neu = (AF.news || []).filter(n => !N.some(m => m.id === n.id) && dt(n.zeit) <= new Date()); if (!neu.length) return;
+    const neu = (AF.news || []).filter(n => !N.some(m => m.id === n.id) && n.zeit && dt(n.zeit) <= new Date()); if (!neu.length) return;
     N = N.concat(neu).sort((a, b) => String(b.zeit).localeCompare(String(a.zeit)));
     if (VIEW === "meldungen" && document.querySelector("#main .liste")) { const y = window.scrollY; list(); window.scrollTo(0, y); } }; mische(); });
   fetch("patchnotes.json", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(d => { PATCH = d; if (decodeURIComponent(location.hash.slice(1)) === "patches") legal("patches"); }).catch(() => {});
