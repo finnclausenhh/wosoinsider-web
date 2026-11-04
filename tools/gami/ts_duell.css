@@ -1,0 +1,42 @@
+/* Tippkarte im Duell-Stil (Finn 04.11.2026) */
+.tsd{gap:12px;padding:14px;border-radius:16px}
+.tsd .ts-kz{justify-content:space-between}
+.tsd-q{margin:0;font-size:17px;font-weight:700;line-height:1.25}
+.tsd-g{position:relative;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:8px;--h:160px}
+.tsd-g[style*="--n:3"]{--h:116px}
+.tsd-k{position:relative;display:flex;flex-direction:column;padding:0;border-radius:14px;overflow:hidden;border:2px solid var(--line);background:var(--soft);text-align:center;font:inherit;color:var(--ink);cursor:pointer}
+.tsd-k.on{border-color:#2F5BFF}
+.tsd-k.ok{border-color:#22C55E}
+.tsd-k:disabled{cursor:default}
+.tsd-b{display:block;width:100%;height:var(--h);background:#EEF1F5;overflow:hidden}
+.tsd-b img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 12%}
+.tsd-b img.g,.tsd-b.g{filter:grayscale(1) brightness(.55)}
+.tsd-ph{display:grid;place-items:center}
+.tsd-ph b{font-family:var(--f-display);font-weight:800;font-size:40px;color:#fff;line-height:1}
+.tsd-fd{display:grid;place-items:center;width:100%;height:var(--h);background:#24345A}
+.tsd-fd img{max-width:56px;max-height:56px}
+.tsd-z{font-family:var(--f-display);font-weight:800;font-size:48px;line-height:1;color:var(--ink)}
+.tsd-i{width:38px;height:38px;fill:none;stroke:#C7D6FF;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tsd-t{display:grid;gap:3px;padding:10px 6px 12px}
+.tsd-t b{font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tsd-t small{font-size:11.5px;color:var(--muted);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tsd-hk{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:#2F5BFF;display:grid;place-items:center;box-shadow:0 0 0 2px var(--bg)}
+.tsd-hk svg{width:13px;height:13px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.tsd-vs{position:absolute;left:50%;top:calc(var(--h) / 2 + 2px);transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;background:var(--bg);border:2px solid var(--line);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;color:var(--ink);pointer-events:none}
+.tsd-vs.w{font-size:14px}
+.tsd-kopf{display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;border:2px solid var(--line);background:var(--soft)}
+.tsd-kopf .tsd-b{width:64px;height:64px;flex:none;border-radius:12px}
+.tsd-kopf .tsd-ph b{font-size:24px}
+.tsd-kopf>span:last-child{display:grid;gap:3px;min-width:0}
+.tsd-kopf>span:last-child b{font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1}
+.tsd-kopf small{font-size:12px;color:var(--muted)}
+.tsd-fans{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;color:var(--muted)}
+.tsd-fans b{color:var(--ink);font-size:15px}
+.tsd-art{display:grid;gap:0;margin-top:4px;border-radius:16px;background:var(--card);overflow:hidden}
+.tsd-art .tsd{padding-top:8px;border-radius:0}
+.tsd-ak{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 14px 0}
+.tsd-ak .kap{margin:0;font-size:11px;color:#8FB0FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tsd-bis{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
+.tsd-bis svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tsd-mehr{display:flex;align-items:center;justify-content:center;min-height:46px;border-top:1px solid var(--line);color:var(--hell);font-size:13px;font-weight:600;width:100%}
+.tsd .ts-o{text-align:center}
