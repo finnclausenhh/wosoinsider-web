@@ -47,7 +47,7 @@ def einbau(s, test=False):
                 "if (q(\"[data-tipp]\")) { tippschein(); return; }\n"
                 "    if (q(\"[data-tippzu]\")) { VIEW = \"meldungen\"; list(); window.scrollTo(0, 0); return; }\n"
                 "    if ((x = q(\"[data-tv]\"))) { if (x.disabled) return; const [md, qid, oid] = x.dataset.tv.split(\"|\"); TIPPS[md] = TIPPS[md] || {};"
-                " TIPPS[md][qid] = TIPPS[md][qid] === oid ? undefined : oid; tippsSpeichern(); const y = window.scrollY; tippschein(); window.scrollTo(0, y); return; }\n"
+                " TIPPS[md][qid] = TIPPS[md][qid] === oid ? undefined : oid; tippsSpeichern(); tsSetzen(md, qid, TIPPS[md][qid]); const y = window.scrollY; tippschein(); window.scrollTo(0, y); return; }\n"
                 "    if ((x = q(\"[data-profilname]\")))")
     # Standard-Check: Karte im Feed und Artikel mit Messlatte (Daten: grafik in der Meldung, apifootball.json)
     s = ersetze(s, "  const angeheftet = m => m.typ === \"punkt\"", sjs + "  const angeheftet = m => m.typ === \"punkt\"")

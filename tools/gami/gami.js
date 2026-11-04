@@ -7,6 +7,36 @@
   let G_LADEN = null, TQ = null, KZ = null;
   let TIPPS = {}; try { TIPPS = JSON.parse(localStorage.getItem("woso-tipps") || "{}") || {}; } catch (e) {}
   const tippsSpeichern = () => { try { localStorage.setItem("woso-tipps", JSON.stringify(TIPPS)); } catch (e) {} };
+  // Tipps in Supabase (supabase/tippspiel.sql, 04.11.2026): gleiche anonyme Sitzung wie die Kommentare.
+  // Fehlt die Datenbank-Funktion oder das Netz, bleibt alles wie bisher auf dem Gerät.
+  const TS = { sb: null, ok: null, stand: {}, geladen: {} };
+  function tsClient(){
+    if (TS.sb || TS.ok === false) return TS.sb;
+    const c = window.WI_KOMMENTARE || {};
+    if (!(c.url && c.key && window.supabase && window.supabase.createClient)) { TS.ok = false; return null; }
+    TS.sb = window.supabase.createClient(c.url, c.key, { auth: { persistSession: true, autoRefreshToken: true } });
+    return TS.sb;
+  }
+  const tsSitzung = (anlegen) => { const sb = tsClient(); if (!sb) return Promise.reject(new Error("aus"));
+    return sb.auth.getSession().then(r => r.data && r.data.session ? r.data.session : anlegen ? sb.auth.signInAnonymously().then(x => { if (x.error) throw x.error; return x.data.session; }) : null); };
+  const tsNeu = () => { if (VIEW === "tipp") { const y = window.scrollY; tippschein(); window.scrollTo(0, y); } };
+  function tsLaden(md){
+    if (TS.geladen[md]) return; TS.geladen[md] = true;
+    tsSitzung(false).then(se => {
+      const sb = TS.sb;
+      return Promise.all([se ? sb.rpc("meine_tipps", { p_md: Number(md) }) : Promise.resolve({ data: null }), sb.rpc("tipp_stand", { p_md: Number(md) })]);
+    }).then(([m, st]) => {
+      if (st && st.error) { TS.ok = false; return; }
+      TS.ok = true; TS.stand[md] = (st && st.data) || {};
+      if (m && m.data) { TIPPS[md] = Object.assign({}, TIPPS[md] || {}, m.data); tippsSpeichern(); }
+      tsNeu();
+    }).catch(() => { TS.ok = TS.ok || false; });
+  }
+  function tsSetzen(md, qid, oid){
+    tsSitzung(true).then(() => TS.sb.rpc("tipp_setzen", { p_md: Number(md), p_frage: qid, p_antwort: oid || null }))
+      .then(r => { if (r.error) throw r.error; TS.ok = true; TS.stand[md] = r.data || {}; tsNeu(); })
+      .catch(e => { if (/Tippschluss/.test(String(e && e.message))) { alert("Der Tippschluss ist vorbei."); } });
+  }
 
   // Daten für die Bausteine einmal nachladen, danach die aktuelle Ansicht neu zeichnen
   function gLaden(){
@@ -124,12 +154,13 @@
     gLaden();
     const r = tippRunde();
     if (!r) { $("#main").innerHTML = `<div class="det"><button class="back" data-tippzu="1">‹ Zurück</button><p class="leer">Tippspiel wird geladen …</p></div>`; return; }
-    const zu = new Date() >= r.schluss, mein = TIPPS[r.md] || {};
+    tsLaden(r.md);
+    const zu = new Date() >= r.schluss, mein = TIPPS[r.md] || {}, srv = TS.ok && TS.stand[r.md];
     let punkte = 0, gewertet = 0;
     const karten = r.fragen.map(q => {
       const erg = tippErgebnis(q), t = mein[q.id];
       if (erg && t) { gewertet++; if (erg === t) punkte += 10; }
-      const st = q.umfrage && UST[q.umfrage.id] ? UST[q.umfrage.id].stimmen || {} : null, ges = st ? Object.values(st).reduce((a, b) => a + (Number(b) || 0), 0) : 0;
+      const st = srv ? (t || zu ? srv[q.id] || {} : null) : q.umfrage && UST[q.umfrage.id] ? UST[q.umfrage.id].stimmen || {} : null, ges = st ? Object.values(st).reduce((a, b) => a + (Number(b) || 0), 0) : 0;
       const opts = q.optionen.map(o => { const on = t === o.id, ok = erg && erg === o.id;
         return `<button class="ts-o${on ? " on" : ""}${ok ? " ok" : ""}" data-tv="${esc(r.md)}|${esc(q.id)}|${esc(o.id)}" ${zu ? "disabled" : ""} aria-pressed="${on}">${esc(o.n)}</button>`; }).join("");
       const foto = q.s ? pfFoto(q.s, 44, 44, 22) : "";
@@ -146,7 +177,7 @@
       <div class="ts-hin">${svg(P.uhr)}<span>${zu ? `Tippen beendet. ${gewertet ? `${punkte} Punkte aus ${gewertet} gewerteten Fragen.` : "Die Wertung folgt mit den Aufstellungen."}` : `Tippen bis <b>${esc(wtUhr(r.schluss))}</b>, bevor die ersten Aufstellungen kommen.`}</span></div>
       ${karten}
       <div class="ts-fuss"><span>Jede richtige Antwort: 10 Punkte · max. ${r.fragen.length * 10}</span>
-      <span class="ts-vs">Deine Tipps bleiben vorerst nur auf diesem Gerät. Rangliste und Fan-Werte kommen, sobald die Tipps gespeichert werden.</span></div></div>`;
+      <span class="ts-vs">${TS.ok ? "Ohne Konto gespeichert. Ändern geht bis zum Tippschluss, gewertet wird dein letzter Tipp. Die Fan-Werte siehst du, sobald du selbst getippt hast." : "Deine Tipps bleiben vorerst nur auf diesem Gerät."}</span></div></div>`;
     window.scrollTo(0, 0);
   }
 
