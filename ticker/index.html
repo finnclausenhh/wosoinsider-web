@@ -914,6 +914,15 @@ details.dzb[open]{padding-bottom:10px}
 .af-tw button[aria-pressed="true"]{outline:2px solid #6E9BFF;background:rgba(110,155,255,.14)}
 .eck-r .bw{display:grid;gap:2px}
 .eck-r .bw small{font-size:10px;color:var(--muted);line-height:1}
+
+.fkomp .tx{align-items:stretch;text-align:left}
+.fkomp .tx .fbadge{align-self:flex-start}
+.fkomp .vn{justify-content:flex-start}
+.fkk{display:grid;gap:2px;margin-top:6px}
+.fkk svg{width:100%;height:40px;display:block;overflow:visible}
+.fkk small{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
+.fkk small b{font-weight:700}
+.finh > p.fke{font-size:12.5px;color:var(--muted);line-height:1.4;margin:-4px 0 0}
 </style>
 
 
@@ -1628,6 +1637,27 @@ details.dzb[open]{padding-bottom:10px}
     const r = n.map(z => z.rang).filter(Boolean), av = r.length ? r.reduce((a, b) => a + b, 0) / r.length : null;
     return {next: n.map(z => [z.gk, z.ha, z.rang]), nr: av, ns: av == null ? null : av <= 5.5 ? "schwer" : av >= 9.5 ? "leicht" : "mittel"};
   }
+  function afKurve(f){
+    if (!AF || !AF.sp || !SPN) return "";
+    const s = f.id ? spById(f.id) : findeSP(f.k, nachN(f.n)), a = s && afSp(s.id); if (!a || !(a.no || []).length) return "";
+    const sp = s.spiele || [], N = Math.max(...sp.map(z => z.md), ...a.no.map(x => x[0]), 2), voll = a.no.filter(x => x[2] >= 60);
+    const W = 200, H = 40, X = md => 4 + (md - 1) / (N - 1) * (W - 8), Y = n => 4 + (10 - Math.max(4, Math.min(10, n))) / 6 * (H - 8);
+    const n3 = voll.slice(-3).map(x => x[1]), l3 = n3.length ? n3.reduce((x, y) => x + y, 0) / n3.length : null;
+    const vor = voll.length > 3 ? voll.slice(0, -3).reduce((x, y) => x + y[1], 0) / (voll.length - 3) : null;
+    const c = vor == null ? "#8FB0FF" : l3 - vor <= -.6 ? "#F59E0B" : l3 - vor >= .6 ? "#4ADE80" : "#8FB0FF";
+    const linie = voll.map(x => X(x[0]).toFixed(1) + "," + Y(x[1]).toFixed(1)).join(" ");
+    return `<span class="fkk"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="Noten je Spieltag">
+      ${sp.map(z => `<line x1="${X(z.md).toFixed(1)}" x2="${X(z.md).toFixed(1)}" y1="${H - 2}" y2="${H}" stroke="rgba(255,255,255,.18)" vector-effect="non-scaling-stroke"/>`).join("")}
+      ${voll.length > 1 ? `<polyline points="${linie}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>` : ""}
+      ${a.no.map(x => `<circle cx="${X(x[0]).toFixed(1)}" cy="${Y(x[1]).toFixed(1)}" r="${x[2] >= 60 ? 3 : 2.4}" fill="${x[2] >= 60 ? NFARBE(x[1]) : "none"}" stroke="${x[2] >= 60 ? "#16223A" : "rgba(255,255,255,.45)"}" stroke-width="1.2" vector-effect="non-scaling-stroke"/>`).join("")}
+    </svg><small><span>Note je Spieltag</span><span>${vor != null ? `<span class="mu">${dez(vor)}</span> → <b style="color:${c}">${dez(l3)}</b>` : `Ø <b>${dez(a.avg || a.no.reduce((x, y) => x + y[1], 0) / a.no.length)}</b>`}</span></small></span>`;
+  }
+  function afEinordnung(f){
+    if (!AF || !AF.form || !SPN) return "";
+    const s = f.id ? spById(f.id) : findeSP(f.k, nachN(f.n)); if (!s) return "";
+    const fl = [].concat(AF.form.tief || [], AF.form.hoch || [], AF.form.lauf || [], AF.form.stabil || []).find(x => x.id === s.id), t = fl ? einordnungSatz(fl) : "";
+    return t ? `<p class="fke">${esc(t)}</p>` : "";
+  }
   function afFormZeile(f){
     if (!AF || !AF.sp) return "";
     const s = SPN && (f.id ? spById(f.id) : findeSP(f.k, nachN(f.n))); if (!s) return "";
@@ -1686,12 +1716,12 @@ details.dzb[open]{padding-bottom:10px}
       ? `<div class="fgross" style="--vc:${vc}"><img src="${esc(fo.datei)}" alt="${esc(f.n)}" loading="lazy">${badge}
           <div class="ov"><div><span class="nm">${esc(f.n)}</span><span class="vn">${esc(kname(f.k))}</span><span class="bg"><b>${esc(f.big)}</b><span>${esc(f.big_txt)}</span></span></div>${logo(f.k, 38)}</div></div>`
       : `<div class="fkomp"><div class="pic${fo && (fo.portrait || fo.datei) ? " fg" : ""}" style="--vc:${fo && (fo.portrait || fo.datei) ? "radial-gradient(circle at 50% 36%,#3A4F78 0%,#2A3B5E 70%)" : vc}">${fo && (fo.portrait || fo.datei) ? wm(f.k) + `<img class="f" src="${esc(fo.portrait || fo.datei)}" alt="${esc(f.n)}" loading="lazy">` : logo(f.k, 70)}</div>
-          <div class="tx">${badge}<span class="nm">${esc(f.n)}</span><span class="vn">${logo(f.k, 18)}${esc(kname(f.k))}</span><span class="big">${esc(f.big)}</span><span class="bt">${esc(f.big_txt)}</span></div></div>`;
+          <div class="tx">${badge}<span class="nm">${esc(f.n)}</span><span class="vn">${logo(f.k, 18)}${esc(kname(f.k))}</span>${afKurve(f)}<span class="big">${esc(f.big)}</span><span class="bt">${esc(f.big_txt)}</span></div></div>`;
     const geg = naechste(f.k).map(x => { const w = IN.ga ? IN.ga[x.k] : null;
       const s = w == null ? null : w >= 2 ? ["leicht", "#4ADE80"] : w >= 1.3 ? ["mittel", "#F5B041"] : ["schwer", "#FF8A8A"];
       return `<div class="geg">${logo(x.k, 22)}<div><span class="a"><b>${esc(kname(x.k))}</b> <span class="mu">${x.heim ? "zu Hause" : "auswärts"}</span></span>
         <small>${esc(x.term ? tagDatum(x.z) : "Wochenende " + wochenende(x.z))}${w != null ? ` · ${Number(w).toFixed(1).replace(".", ",")} Gegentore pro Spiel` : ""}</small></div>${s ? `<span class="cap" style="background:${s[1]}">${s[0]}</span>` : ""}</div>`; }).join("");
-    return `<article class="fk">${kopf}<div class="finh">${minutenBalken(f.s || [], /Tor/.test(f.big_txt || "") && !/Gegentor/.test(f.big_txt || ""))}${afFormZeile(f)}<p>${esc(f.text)}</p>
+    return `<article class="fk">${kopf}<div class="finh">${minutenBalken(f.s || [], /Tor/.test(f.big_txt || "") && !/Gegentor/.test(f.big_txt || ""))}${afEinordnung(f)}<p>${esc(f.text)}</p>
       ${geg ? `<div style="display:grid;gap:8px">${kap("Nächste Gegner")}${geg}</div>` : ""}${kbBox(f.kb)}
       ${fo && fo.datei && nachweis(fo) ? `<div class="credit" style="font-size:9.5px">${nachweis(fo)}</div>` : ""}</div></article>`;
   }
