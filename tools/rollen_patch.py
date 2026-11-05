@@ -22,7 +22,7 @@ JS = r'''  // Rollen im Kader (Finn 05.11.2026)
 
 CSS = '''
 /* Rollen im Kader (05.11.2026) */
-.kd-r{font-weight:600}.kd-t{font:700 9.5px var(--f-mono);letter-spacing:.04em;color:#C9A7FF;border:1px solid rgba(201,167,255,.5);border-radius:5px;padding:0 4px;margin-left:5px}
+.kd-r{font-weight:600}.kd-t{font:700 9.5px var(--f-mono);letter-spacing:.04em;color:#C9A7FF;border:1px solid rgba(201,167,255,.5);border-radius:5px;padding:0 4px;justify-self:start;width:max-content;margin-top:3px}
 .kd-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--muted);margin:2px 0 6px}.kd-leg span b{font-weight:600}
 '''
 
@@ -30,7 +30,7 @@ def patch(s):
     s = rep(s, '  function vereinsKader(k, von){', JS + '  function vereinsKader(k, von){')
     s = rep(s, '''    const zeile = s => { const st = stArt(s.status); return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small>''',
                '''    const ROL = kaderRollen(L, kdMd);
-    const zeile = s => { const st = stArt(s.status), r = ROLLE[ROL[s.id]]; return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) + " · " : ""}<span class="kd-r" style="color:${r[1]}">${r[0]}</span>${istTalent(s) ? '<span class="kd-t">TALENT</span>' : ""}</small>''')
+    const zeile = s => { const st = stArt(s.status), r = ROLLE[ROL[s.id]]; return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) + " · " : ""}<span class="kd-r" style="color:${r[1]}">${r[0]}</span></small>${istTalent(s) ? '<span class="kd-t">TALENT</span>' : ""}''')
     s = rep(s, '''<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>${stdFeld(k)}''',
                '''<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>${stdFeld(k)}${kap("Kader")}<div class="kd-leg"><span><b style="color:#4ADE80">Stammelf</b> die 11 mit den meisten Startelf-Spielen</span><span><b style="color:#8FB0FF">Rotation</b> mehrfach in der Startelf</span><span><b style="color:#F5C26B">Joker</b> meist eingewechselt</span><span><b>Ergänzung</b> wenige Einsätze</span><span><b style="color:#C9A7FF">TALENT</b> bis 19 Jahre</span></div>''')
     i = s.find("</style>", s.find("--f-display")); s = s[:i] + CSS + s[i:]

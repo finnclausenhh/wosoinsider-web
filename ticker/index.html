@@ -102,7 +102,7 @@
 .stl-z{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
 
 /* Rollen im Kader (05.11.2026) */
-.kd-r{font-weight:600}.kd-t{font:700 9.5px var(--f-mono);letter-spacing:.04em;color:#C9A7FF;border:1px solid rgba(201,167,255,.5);border-radius:5px;padding:0 4px;margin-left:5px}
+.kd-r{font-weight:600}.kd-t{font:700 9.5px var(--f-mono);letter-spacing:.04em;color:#C9A7FF;border:1px solid rgba(201,167,255,.5);border-radius:5px;padding:0 4px;justify-self:start;width:max-content;margin-top:3px}
 .kd-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--muted);margin:2px 0 6px}.kd-leg span b{font-weight:600}
 </style><script>
 // Reichweitenmessung mit GoatCounter (ohne Cookies, ohne Skript von Dritten, ohne Gerätespeicher).
@@ -3259,7 +3259,7 @@ details.dzb[open]{padding-bottom:10px}
     const einsatz = (s, STX) => { const sp = s.spiele || [], mi = sp.reduce((a, e) => a + (e.min || 0), 0), st11 = sp.filter(e => e.art === "S").length, q = Math.min(100, mi / (kdMd * 90) * 100);
       return `<span class="kd-e" title="${mi} Minuten, ${st11} von ${kdMd} Spielen in der Startelf"><span class="kd-b"><i style="width:${Math.max(mi ? 4 : 0, q).toFixed(0)}%;background:${q >= 75 ? "#4ADE80" : q >= 35 ? "#8FB0FF" : "rgba(255,255,255,.3)"}"></i></span><small>${mi.toLocaleString("de-DE")}' · ${st11}/${kdMd} Startelf</small>${STX}</span>`; };
     const ROL = kaderRollen(L, kdMd);
-    const zeile = s => { const st = stArt(s.status), r = ROLLE[ROL[s.id]]; return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) + " · " : ""}<span class="kd-r" style="color:${r[1]}">${r[0]}</span>${istTalent(s) ? '<span class="kd-t">TALENT</span>' : ""}</small>${stilKader(s)}</span>${einsatz(s, st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : "")}</button>`; };
+    const zeile = s => { const st = stArt(s.status), r = ROLLE[ROL[s.id]]; return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) + " · " : ""}<span class="kd-r" style="color:${r[1]}">${r[0]}</span></small>${istTalent(s) ? '<span class="kd-t">TALENT</span>' : ""}${stilKader(s)}</span>${einsatz(s, st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : "")}</button>`; };
     $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>${stdFeld(k)}${kap("Kader")}<div class="kd-leg"><span><b style="color:#4ADE80">Stammelf</b> die 11 mit den meisten Startelf-Spielen</span><span><b style="color:#8FB0FF">Rotation</b> mehrfach in der Startelf</span><span><b style="color:#F5C26B">Joker</b> meist eingewechselt</span><span><b>Ergänzung</b> wenige Einsätze</span><span><b style="color:#C9A7FF">TALENT</b> bis 19 Jahre</span></div>
       ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}<div id="kd-trainer"></div>${kaderExtras(k, L)}</div>`;
     trainerteam(k);
