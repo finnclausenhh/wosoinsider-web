@@ -100,6 +100,10 @@
 .stl.k{font-size:9.5px;padding:1px 6px}
 .stl-l{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stl-l > div{display:grid;gap:4px;justify-items:start;align-content:start}.stl-l small{font-size:11.5px;line-height:1.35;color:var(--muted)}
 .stl-z{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+
+/* Rollen im Kader (05.11.2026) */
+.kd-r{font-weight:600}.kd-t{font:700 9.5px var(--f-mono);letter-spacing:.04em;color:#C9A7FF;border:1px solid rgba(201,167,255,.5);border-radius:5px;padding:0 4px;margin-left:5px}
+.kd-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--muted);margin:2px 0 6px}.kd-leg span b{font-weight:600}
 </style><script>
 // Reichweitenmessung mit GoatCounter (ohne Cookies, ohne Skript von Dritten, ohne Gerätespeicher).
 // Sendet nur Pfad, Titel, Referrer und Kampagnen-Parameter (z. B. ?utm_source=instagram) als Zählpixel.
@@ -3234,6 +3238,19 @@ details.dzb[open]{padding-bottom:10px}
       return `<div class="sf-h">${svg(P.warn, "")}<span><b>${esc(f.n)}</b> nicht in der Startelf. ${teile.join(". ")}.</span><button class="lk" data-kader="${esc(k)}">Standards</button></div>`; });
     return zeilen.join("");
   }
+  // Rollen im Kader (Finn 05.11.2026)
+  const ROLLE = {stamm: ["Stammelf", "#4ADE80"], rot: ["Rotation", "#8FB0FF"], joker: ["Joker", "#F5C26B"], erg: ["Ergänzung", "#A9B4C6"], ohne: ["ohne Einsatz", "#7F8BA0"], nie: ["nicht im Kader", "#7F8BA0"]};
+  function kaderRollen(L, nMd){
+    const z = s => { const sp = (s.spiele || []).filter(e => e.erg); return {S: sp.filter(e => e.art === "S").length, E: sp.filter(e => e.art === "E").length, B: sp.filter(e => e.art === "B").length, M: sp.reduce((a, e) => a + (e.min || 0), 0)}; };
+    const Z = new Map(L.map(s => [s.id, z(s)])), R = {}, ok = s => Z.get(s.id).S >= Math.max(1, Math.ceil(nMd * .4));
+    const sort = l => l.slice().sort((a, b) => Z.get(b.id).S - Z.get(a.id).S || Z.get(b.id).M - Z.get(a.id).M);
+    const tw = sort(L.filter(s => s.pos === "TW")).filter(ok).slice(0, 1), feld = sort(L.filter(s => s.pos !== "TW")).filter(ok).slice(0, 10);
+    tw.concat(feld).forEach(s => R[s.id] = "stamm");
+    L.forEach(s => { if (R[s.id]) return; const x = Z.get(s.id);
+      R[s.id] = x.S >= 2 ? "rot" : x.E >= 3 && x.E >= x.S ? "joker" : x.S + x.E > 0 ? "erg" : x.B > 0 ? "ohne" : "nie"; });
+    return R;
+  }
+  const istTalent = s => { const a = (afSp(s.id) || {}).alter; return a != null && a <= 19; };
   function vereinsKader(k, von){
     BACK = von === "zurueck" ? "kaderzu" : von ? "statkader" : "suche"; KADER_K = k; KADER_VON = von;
     const L = SPN.spielerinnen.filter(s => s.k === k), ord = {TW:0, ABW:1, MF:2, ST:3};
@@ -3241,8 +3258,9 @@ details.dzb[open]{padding-bottom:10px}
     const kdMd = [...new Set(L.flatMap(x => (x.spiele || []).filter(e => e.erg).map(e => e.md)))].length || 1;
     const einsatz = (s, STX) => { const sp = s.spiele || [], mi = sp.reduce((a, e) => a + (e.min || 0), 0), st11 = sp.filter(e => e.art === "S").length, q = Math.min(100, mi / (kdMd * 90) * 100);
       return `<span class="kd-e" title="${mi} Minuten, ${st11} von ${kdMd} Spielen in der Startelf"><span class="kd-b"><i style="width:${Math.max(mi ? 4 : 0, q).toFixed(0)}%;background:${q >= 75 ? "#4ADE80" : q >= 35 ? "#8FB0FF" : "rgba(255,255,255,.3)"}"></i></span><small>${mi.toLocaleString("de-DE")}' · ${st11}/${kdMd} Startelf</small>${STX}</span>`; };
-    const zeile = s => { const st = stArt(s.status); return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small>${stilKader(s)}</span>${einsatz(s, st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : "")}</button>`; };
-    $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>${stdFeld(k)}
+    const ROL = kaderRollen(L, kdMd);
+    const zeile = s => { const st = stArt(s.status), r = ROLLE[ROL[s.id]]; return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) + " · " : ""}<span class="kd-r" style="color:${r[1]}">${r[0]}</span>${istTalent(s) ? '<span class="kd-t">TALENT</span>' : ""}</small>${stilKader(s)}</span>${einsatz(s, st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : "")}</button>`; };
+    $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>${stdFeld(k)}${kap("Kader")}<div class="kd-leg"><span><b style="color:#4ADE80">Stammelf</b> die 11 mit den meisten Startelf-Spielen</span><span><b style="color:#8FB0FF">Rotation</b> mehrfach in der Startelf</span><span><b style="color:#F5C26B">Joker</b> meist eingewechselt</span><span><b>Ergänzung</b> wenige Einsätze</span><span><b style="color:#C9A7FF">TALENT</b> bis 19 Jahre</span></div>
       ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}<div id="kd-trainer"></div>${kaderExtras(k, L)}</div>`;
     trainerteam(k);
     window.scrollTo(0, 0);
