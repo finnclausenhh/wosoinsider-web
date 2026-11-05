@@ -1203,6 +1203,25 @@ details.dzb[open]{padding-bottom:10px}
 .dz-sa{display:grid;gap:8px}
 .dz-sa > div:not(.kap){display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start;font-size:13px;line-height:1.45}
 .dz-sa > div:not(.kap) i{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-style:normal;font:700 12px var(--f-mono);color:#0B1220}
+
+/* Standards als Spielfeld (04.11.2026) */
+.sf{position:relative;height:200px;border-radius:12px;background:linear-gradient(#1E3A2B,#17301F);overflow:hidden}
+.sf svg{position:absolute;inset:0;width:100%;height:100%}
+.sf-t{position:absolute;display:flex;flex-direction:column;gap:2px;align-items:flex-start;padding:0;background:none;border:0;color:inherit;text-align:left}
+.sf-t b{font-size:12.5px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.sf-t small{font-size:10px;color:#C9D3E2;display:flex;gap:4px;align-items:center;white-space:nowrap}
+.sf-t small i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.sf-q{width:30px;height:30px;border-radius:50%;border:1.5px dashed rgba(255,255,255,.35);display:grid;place-items:center;color:#A9B4C6;font-size:12px;font-weight:700}
+.sf-q.sf-i{border:0;color:#fff}
+.sf-lb{position:absolute;font:700 8.5px var(--f-mono);letter-spacing:.8px;color:rgba(255,255,255,.45)}
+.sf-m{left:50%;transform:translateX(-50%)}
+.sf-leg{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted);margin-top:6px}.sf-leg span{display:flex;gap:4px;align-items:center}.sf-leg i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.sf-h{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:start;font-size:12.5px;line-height:1.4;color:#F5D08A;background:rgba(245,176,65,.1);border-radius:10px;padding:8px 10px;margin:8px 0 4px}
+.sf-vl{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.sf-v{display:flex;gap:8px;align-items:center;background:var(--card);border-radius:10px;padding:8px 10px;font-size:13.5px;font-weight:600;color:inherit;text-align:left}
+.bb.sch{position:relative}.bb.sch i{position:absolute;left:0;top:0;bottom:0;background:#2F5BFF}.bb.sch i.t{background:#C7D6FF}
+.sf-el{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;align-items:start;background:var(--card);border-radius:10px;padding:9px 12px;margin-top:8px;font-size:12.5px}.sf-el .k{font:700 9.5px var(--f-mono);letter-spacing:.7px;color:#8FB0FF;padding-top:2px}.sf-el span{display:grid;gap:2px}.sf-el small{font-size:10.5px;color:var(--muted)}.sf-el b{font-weight:600}.sf-el em{font-style:normal;display:block}.sf-el em small{display:inline}
+.sf-neu .ph,.sf-neu .bild,.sf-neu .sf-q{box-shadow:0 0 0 2.5px #6E9BFF}.sf-nt{font:700 9px var(--f-mono);background:#2F5BFF;color:#fff;border-radius:4px;padding:1px 4px}.sf-art{margin-top:14px}.sf-cap{font-size:13px;color:var(--muted);margin:8px 0 0}.sf-cap b{color:var(--ink)}
+.sf-h svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;margin-top:2px}.sf-h b{color:#fff}.sf-h .lk{font-size:12px}
 </style>
 
 
@@ -2055,7 +2074,7 @@ details.dzb[open]{padding-bottom:10px}
           <div class="wer">${m.pos === "Spielansetzung" ? esc(m.spielerin && m.spielerin !== "Spielansetzung" ? m.spielerin : [m.verein, m.aufstellung && m.aufstellung.gegner].filter(Boolean).join(" gegen ")) : istSpielerin(m) && m.spielerin ? `<button class="wer-btn" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}">${esc(m.spielerin)}</button>` : esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc(m.pos === "Spielansetzung" ? ((m.tags || []).includes("SPIELBERICHT") ? "Spielbericht" : (m.aufstellung ? "Aufstellung" : "Vorbericht")) : [m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
           ${st ? `<div class="mk-st">${plakette(meldungsStatus(m), 28)}<span>${st[2]}</span></div>` : ""}</div>
           <h1 class="disp" style="font-size:30px">${esc(m.headline)}</h1><div class="dat">${esc(lang(m.zeit))}</div></div>
-          <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>${m.grafik && m.grafik.typ === "formvergleich" ? fvGrafik(m.grafik) : m.grafik && m.grafik.typ === "fansdaten" ? fdGrafik(m.grafik) : ""}${m.platzhalter && m.partie_id ? `<button class="btn-prog" data-game="${esc(m.partie_id)}" data-tabspiel="1">Unsere Prognose ansehen ›</button>` : ""}${spielAufstellung(m.spiel_aufstellung, m.verein)}`;
+          <div class="body">${(m.text || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>${m.grafik && m.grafik.typ === "formvergleich" ? fvGrafik(m.grafik) : m.grafik && m.grafik.typ === "fansdaten" ? fdGrafik(m.grafik) : m.grafik && m.grafik.typ === "stdfeld" ? stdFeld(m.grafik.k, m.grafik) : ""}${m.platzhalter && m.partie_id ? `<button class="btn-prog" data-game="${esc(m.partie_id)}" data-tabspiel="1">Unsere Prognose ansehen ›</button>` : ""}${spielAufstellung(m.spiel_aufstellung, m.verein)}`;
     // Nachweis zum gezeigten Foto: Eintrag aus fotos.json hat Vorrang, sonst der Nachweis aus der Meldung
     const fi = FOTOS[sc ? scSp(m)[0].n : m.spielerin], fc = m.foto_credit;
     const credit = fi && fi.datei && nachweis(fi)
@@ -2239,7 +2258,7 @@ details.dzb[open]{padding-bottom:10px}
     if (a && (a.startelf || []).length) inh = a.typ === "offiziell" ? offiziell(a, k, anstoss) : prognose(a, seite, k);
     else inh = vorbei ? '<p class="dat">Der Spielbericht enthält keine Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : '<p class="dat">Noch keine Aufstellung.</p>';
     const badge = a ? (a.typ === "offiziell" ? '<span class="badge off">OFFIZIELL</span>' : '<span class="badge ein">PROGNOSE</span>') : "";
-    return `<div class="kartebox"><div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${badge}</div>${inh}</div>`;
+    return `<div class="kartebox"><div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${badge}</div>${!vorbei && a ? stdHinweis(k, a) : ""}${inh}</div>`;
   }
   function offiziell(a, k, anstoss){
     const elf = a.startelf || [], vor = anstoss ? vorherElf(k, anstoss) : null;
@@ -2481,12 +2500,9 @@ details.dzb[open]{padding-bottom:10px}
     const w = (IN.swaps || []).filter(s => zeigen(s.k)), r = (IN.standards || []).filter(s => STDALLE || zeigen(s.k));
     return `<section class="sek">${sektion("03", "Standards", "Standards", "Wer Ecken, Freistöße und Elfmeter schießt. Wechsel bei den Schützinnen kommen als Meldung.")}
 
-      <div style="display:grid;gap:6px;padding-top:8px"><h3 class="disp" style="font-size:21px">Alle Schützinnen</h3>
-        <div class="std-l"><span class="g1"><i class="gp"></i>gesetzt</span><span class="g2">2 bis 3 Belege</span><span class="g3">erster Hinweis</span><button class="std-i" data-stdinfo="1" aria-label="Erklärung">i</button></div><p class="std-e" hidden>Gesetzt heißt: viele Belege aus Spielberichten oder ein Tor nach ihrem Standard. Normal: 2 bis 3 Belege. Kursiv: bisher nur ein Hinweis.</p></div>
-      ${SEL.size ? `<button class="lk" style="font-size:12px;justify-self:start;text-decoration:none" data-stdalle="1">${STDALLE ? "Nur meine Vereine" : "Alle 14 Vereine"}</button>` : ""}
-      <div class="stab"><div class="r h"><span></span><span>ECKEN</span><span>FREISTÖSSE</span><span>ELFMETER</span></div>
-        ${r.map(s => `<div class="r"><div class="wk">${logo(s.k, 24)}<span>${esc(s.k)}</span></div>${zelle(s.ecken)}${zelle((s.fs || []).length ? s.fs : ((AF && AF.stdt && AF.stdt[s.k] && AF.stdt[s.k].fs) || []).slice(0, 1).map(x => [nachN(x[0]), 1]))}${zelle((s.elfer || []).length ? s.elfer : ((AF && AF.elf) || []).filter(x => x.k === s.k).map(x => [nachN(x.n), 1]))}
-          ${s.hinweis ? `<div class="hw">${svg(P.warn, "").replace("<svg", '<svg style="width:13px;height:13px;flex:none;stroke:currentColor;fill:none;stroke-width:2"')}<span>${esc(s.hinweis)}</span></div>` : ""}</div>`).join("")}</div>${afStandards()}</section>`;
+      <div style="display:grid;gap:4px;padding-top:8px"><h3 class="disp" style="font-size:21px">Wer schießt die Standards?</h3>
+        <p class="af-st" style="font-size:12px">Je Verein als Spielfeld auf der Vereinsseite: Ecke links und rechts, Freistoß, Elfmeter mit Quote.</p></div>
+      <div class="sf-vl">${(IN.standards || []).map(s => `<button class="sf-v" data-kader="${esc(s.k)}">${logo(s.k, 26)}<span>${esc(kname(s.k))}</span></button>`).join("")}</div>${afStandards()}</section>`;
   }
   function afStandards(){
     if (!AF || !AF.ecken) return "";
@@ -2495,13 +2511,16 @@ details.dzb[open]{padding-bottom:10px}
     return `<div style="display:grid;gap:8px;padding-top:14px"><h3 class="disp" style="font-size:21px">Ecken pro Spiel</h3><p class="af-st" style="font-size:12px">Viele eigene Ecken = viele Chancen für die Schützin und die Kopfballspielerinnen.</p>
       <div class="eck"><div class="eck-h"><span></span><span>EIGENE</span><span></span><span>GEGEN</span></div>${e.map(([k, x]) => `<div class="eck-r">${logo(k, 22)}<span class="f">${dez(x.f)}</span><span class="bw"><span class="bb"><i style="width:${x.f / mx * 100}%"></i></span>${(() => { const st = (IN.standards || []).find(q => q.k === k), w = st && (st.ecken || [])[0]; const t = AF && AF.stdt && AF.stdt[k], ab = t && t.kopf.filter(x => x[1] || x[2]).slice(0, 2), ec = w ? w[0] : t && t.ecke[0] ? nachN(t.ecke[0][0]) : null;
         return (ec ? `<small>Ecken: <b>${esc(ec)}</b></small>` : "") + (ab && ab.length ? `<small>Kopfball nach Standard: ${ab.map(x => `<b>${esc(nachN(x[0]))}</b> ${[x[1] ? x[1] + "x" : "", x[2] ? x[2] + " Tor" + (x[2] > 1 ? "e" : "") : ""].filter(Boolean).join(", ")}`).join(" · ")}</small>` : ""); })()}</span><span class="g">${x.g != null ? dez(x.g) : "–"}</span></div>`).join("")}</div>
+      ${AF.schuesse ? (() => { const f = Object.entries(AF.schuesse).filter(([k, x]) => (STDALLE || zeigen(k)) && x.f != null).sort((a, b) => b[1].f - a[1].f), m3 = Math.max(...Object.values(AF.schuesse).map(x => Math.max(x.f || 0, x.g || 0)), 1);
+        return `<h3 class="disp" style="font-size:21px;margin-top:8px">Schüsse pro Spiel</h3><p class="af-st" style="font-size:12px">Viele eigene Schüsse = viele Chancen für die Offensive. Viele Schüsse gegen = viel Arbeit für die Torhüterin, Paraden bringen Kickbase-Punkte. Heller Teil = aufs Tor.</p>
+        <div class="eck"><div class="eck-h"><span></span><span>EIGENE</span><span></span><span>GEGEN</span></div>${f.map(([k, x]) => `<div class="eck-r">${logo(k, 22)}<span class="f">${dez(x.f)}</span><span class="bw"><span class="bb sch"><i style="width:${x.f / m3 * 100}%"></i><i class="t" style="width:${(x.tf || 0) / m3 * 100}%"></i></span><small>aufs Tor ${dez(x.tf || 0)} · gegen aufs Tor ${dez(x.tg || 0)}</small></span><span class="g">${x.g != null ? dez(x.g) : "–"}</span></div>`).join("")}</div>`; })() : ""}
       ${AF.freist ? (() => { const f = Object.entries(AF.freist).filter(([k]) => STDALLE || zeigen(k)).sort((a, b) => b[1].f - a[1].f), m2 = Math.max(...Object.values(AF.freist).map(x => x.f), 1);
         return `<h3 class="disp" style="font-size:21px;margin-top:8px">Freistöße pro Spiel</h3><p class="af-st" style="font-size:12px">Gezählt als Fouls des Gegners. Viele Freistöße heißen viele Chancen für die Schützin.</p>
         <div class="eck"><div class="eck-h"><span></span><span>EIGENE</span><span></span><span>GEGEN</span></div>${f.map(([k, x]) => { const st = (IN.standards || []).find(q => q.k === k), w = st && (st.fs || [])[0], t = AF.stdt && AF.stdt[k], sz = w ? w[0] : t && t.fs[0] ? nachN(t.fs[0][0]) : null;
           return `<div class="eck-r">${logo(k, 22)}<span class="f">${dez(x.f)}</span><span class="bw"><span class="bb"><i style="width:${x.f / m2 * 100}%"></i></span>${sz ? `<small>Freistöße: <b>${esc(sz)}</b></small>` : ""}</span><span class="g">${x.g != null ? dez(x.g) : "–"}</span></div>`; }).join("")}</div>`; })() : ""}
       ${el.length ? `<h3 class="disp" style="font-size:21px;margin-top:8px">Elfmeter in der Liga</h3><div class="elf-l">${el.map(x => `<button class="elf-r" data-profil="${esc(x.id)}">${logo(x.k, 22)}<span><b>${esc(x.n)}</b><small>${esc(kname(x.k))}${x.fuss ? " · " + esc(x.fuss) : ""}</small></span><span class="pk">${"<i class=t></i>".repeat(x.t)}${"<i class=v></i>".repeat(x.v)}</span><span class="q">${x.t}/${x.t + x.v}</span></button>`).join("")}</div><p class="af-st">Grün: verwandelt, roter Ring: verschossen oder gehalten.</p>` : ""}
       ${false && el.length ? `<h3 class="disp" style="font-size:19px;margin-top:8px">Elfmeter in der Liga</h3><div class="af-best">${el.map(x => `<button class="pf-std${x.v ? "" : " el"}" data-profil="${esc(x.id)}" style="display:flex;gap:5px;align-items:center">${logo(x.k, 14)}${esc(nachN(x.n))} <i>${x.t}/${x.t + x.v}${x.fuss ? ", " + x.fuss : ""}</i></button>`).join("")}</div>` : ""}
-      <p class="af-st">Ecken pro Spiel und Elfmeter: API-Football, Stand nach dem ${AF.md}. Spieltag. Schützinnen und Kopfbälle nach Standards: ausgewertet aus dem Sportschau-Liveticker (nur beschriebene Szenen). Fuß aus unseren Stammdaten.</p></div>`;
+      <p class="af-st">Ecken, Schüsse pro Spiel und Elfmeter: API-Football, Stand nach dem ${AF.md}. Spieltag. Schützinnen und Kopfbälle nach Standards: ausgewertet aus dem Sportschau-Liveticker (nur beschriebene Szenen). Fuß aus unseren Stammdaten.</p></div>`;
   }
   function spieleSektion(){
     // Abgelaufene Partien ausblenden (Abgleich mit dem Spielplan), leere Spieltage weglassen
@@ -3037,12 +3056,81 @@ details.dzb[open]{padding-bottom:10px}
     setTimeout(() => inp.focus(), 50);
   }
   let KADER_K = null, KADER_VON = null, KADER_HER = null;
+  // Standards als Spielfeld (Finn 04.11.2026, Route B): Vereinsseite und Hinweis in der Aufstellung
+  const SF_STUFE = {3: "#6E9BFF", 2: "#22C55E", 1: "#F59E0B", 0: "#7F8BA0"};
+  const sfGl = (a, b) => a && b && normS(nachN(a)) === normS(nachN(b));
+  function sfDaten(k){
+    const st = ((IN && IN.standards) || []).find(s => s.k === k) || {k}, d = (AF && AF.stdt && AF.stdt[k]) || {}, h = normS(st.hinweis || "");
+    const raus = n => new RegExp(normS(nachN(n)) + "[^.]*(raus|verletzt|\\bop\\b)").test(h);
+    const stand = (lst, af, sd, fd) => {
+      const l = (lst || []).length ? lst.map(x => [x[0], Number(x[1]) || 1]) : ((af || []).length ? af : (fd || [])).slice(0, 2).map(x => [nachN(x[0]), 1]);
+      if (!l.length) return null;
+      return {n: l[0][0], b: Math.min(3, l[0][1]), alt: l.slice(1).map(x => x[0]), L: sd && sd.l ? nachN(sd.l[0]) : null, R: sd && sd.r ? nachN(sd.r[0]) : null};
+    };
+    const ecke = stand(st.ecken, d.ecke, d.seiten), fs = stand(st.fs, d.fs, d.fs_seiten, d.fs_direkt);
+    if (fs) fs.direkt = (d.fs_direkt || []).some(x => sfGl(x[0], fs.n));
+    const akt = ((AF && AF.elf) || []).filter(x => x.k === k), vs = ((AF && AF.elf_vorsaison && AF.elf_vorsaison[k]) || []);
+    const il = (st.elfer || []).filter(x => !raus(x[0]));
+    let elf = null;
+    if (il.length) { const q = akt.find(a => sfGl(a.n, il[0][0])); elf = {n: il[0][0], b: Math.min(3, Number(il[0][1]) || 1), q: q ? [q.t, q.v] : null, alt: il.slice(1).map(x => x[0])}; }
+    else {
+      const a2 = akt.filter(a => !raus(a.n)).sort((a, b) => b.t - a.t || a.v - b.v), v2 = vs.filter(x => !x[3]);
+      if (a2.length) elf = {n: nachN(a2[0].n), b: a2[0].t + a2[0].v >= 2 ? 2 : 1, q: [a2[0].t, a2[0].v], alt: a2.slice(1).map(a => nachN(a.n))};
+      else if (v2.length) elf = {n: nachN(v2[0][0]), b: 0, vs: true, q: [v2[0][1], v2[0][2]], alt: v2.slice(1).map(x => nachN(x[0]))};
+    }
+    return {st, ecke, fs, elf, akt, vs};
+  }
+  function sfTag(k, x, pos, sub, neu){
+    if (!x || !x.n) return `<div class="sf-t sf-off" style="${pos}"><span class="sf-q">?</span><small>offen</small></div>`;
+    const s = SPN && findeSP(k, x.n), f = s ? pfFoto(s, 30, 30, 15) : `<span class="sf-q sf-i" style="background:${KFARBE[k] || "var(--soft)"}">${initialen(x.n)}</span>`;
+    const inn = `${f}<b>${esc(x.n)}</b><small><i style="background:${SF_STUFE[x.vs ? 0 : x.b] || SF_STUFE[1]}"></i>${sub || ""}</small>`;
+    if (neu) return `<div class="sf-t sf-neu" style="${pos}">${f}<b>${esc(x.n)}</b><small><span class="sf-nt">NEU</span>${sub || ""}</small></div>`;
+    return s ? `<button class="sf-t" style="${pos}" data-profil="${esc(s.id)}">${inn}</button>` : `<div class="sf-t" style="${pos}">${inn}</div>`;
+  }
+  function stdFeld(k, g){  // g: Grafik einer Wechsel-Meldung {art, alt, neu}, markiert die geänderte Position
+    if (!IN || !(IN.standards || []).some(s => s.k === k)) return "";
+    const D = sfDaten(k), e = D.ecke, seiteBek = e && (e.L || e.R);
+    let L = e && seiteBek ? {...e, n: e.L || e.n} : e, R = e && seiteBek ? {...e, n: e.R || e.n} : e;
+    let lsub = e && !e.L ? "Seite offen" : "", rsub = e && !e.R ? "Seite offen" : "";
+    let esub = D.elf && D.elf.q ? `${D.elf.q[0]}/${D.elf.q[0] + D.elf.q[1]}${D.elf.vs ? " · Vorsaison" : ""}` : "";
+    const art = g ? normS(g.art) : "", vorher = g && g.alt ? `vorher ${esc(nachN(g.alt))}` : "", NEU = {};
+    if (g && g.neu) {
+      const neu = {n: nachN(g.neu), b: 2};
+      if (art.startsWith("elf")) { const q = D.akt.find(a => sfGl(a.n, g.neu)); D.elf = neu; esub = q ? `${q.t}/${q.t + q.v}` : ""; NEU.elf = 1; }
+      else if (art.startsWith("frei")) { D.fs = {...neu, direkt: false}; NEU.fs = 1; }
+      else { const nurL = L && g.alt && sfGl(L.n, g.alt) && !(R && sfGl(R.n, g.alt)), nurR = R && g.alt && sfGl(R.n, g.alt) && !(L && sfGl(L.n, g.alt));
+        if (!nurR) { L = neu; lsub = ""; NEU.L = 1; } if (!nurL) { R = neu; rsub = ""; NEU.R = 1; } }
+    }
+    const Lin = 'fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1.5"';
+    return `${g ? "" : kap("Standards")}<div class="sf${g ? " sf-art" : ""}"><svg viewBox="0 0 340 200" preserveAspectRatio="none" aria-hidden="true"><g ${Lin}><rect x="2" y="2" width="336" height="196"/><rect x="70" y="2" width="200" height="80"/><rect x="125" y="2" width="90" height="28"/><path d="M130 82 A45 45 0 0 0 210 82"/><path d="M2 14 A12 12 0 0 0 14 2"/><path d="M326 2 A12 12 0 0 0 338 14"/></g><circle cx="170" cy="58" r="2.5" fill="rgba(255,255,255,.45)"/><rect x="140" y="0" width="60" height="5" fill="rgba(255,255,255,.35)"/></svg>
+      <span class="sf-lb" style="left:20px;top:6px">ECKE L</span><span class="sf-lb" style="right:20px;top:6px">ECKE R</span><span class="sf-lb sf-m" style="top:32px">ELFMETER</span><span class="sf-lb sf-m" style="top:124px">FREISTOSS</span>
+      ${sfTag(k, L, "left:8px;top:22px", lsub, NEU.L)}${sfTag(k, R, "right:8px;top:22px;align-items:flex-end;text-align:right", rsub, NEU.R)}
+      ${sfTag(k, D.elf, "left:50%;top:42px;transform:translateX(-50%);align-items:center;text-align:center", esub, NEU.elf)}
+      ${sfTag(k, D.fs, "left:50%;top:136px;transform:translateX(-50%);align-items:center;text-align:center", NEU.fs ? "" : D.fs && D.fs.direkt ? "direkt" : "", NEU.fs)}</div>
+      <div class="sf-leg"><span><i style="background:${SF_STUFE[3]}"></i>Sicher</span><span><i style="background:${SF_STUFE[2]}"></i>Wahrscheinlich</span><span><i style="background:${SF_STUFE[1]}"></i>Unsicher</span><span><i style="background:${SF_STUFE[0]}"></i>Vorsaison</span></div>
+      ${g && g.alt ? `<p class="sf-cap"><span class="sf-nt">NEU</span> <b>${esc(nachN(g.neu))}</b> übernimmt ${esc(g.art || "die Standards")}, vorher <b>${esc(nachN(g.alt))}</b>.</p>` : ""}
+      ${!g && (D.akt.length || D.vs.length) ? `<div class="sf-el"><span class="k">ELFMETER</span><span><small>Diese Saison</small>${D.akt.length ? D.akt.map(a => `<em><b>${esc(nachN(a.n))}</b> ${a.t}/${a.t + a.v}</em>`).join("") : "noch keiner"}</span><span><small>Letzte Saison</small>${D.vs.length ? D.vs.map(x => `<em><b>${esc(nachN(x[0]))}</b> ${x[1]}/${x[1] + x[2]}${x[3] ? ` <small>für ${esc(x[3])}</small>` : ""}</em>`).join("") : "keine Daten"}</span></div>` : ""}
+      ${!g && D.st.hinweis ? `<p class="ki" style="color:#F5B041">${esc(D.st.hinweis)}</p>` : ""}`;
+  }
+  // Aufstellung: fehlt eine Schützin in der Startelf, nennen wir die nächste aus den Daten, die spielt
+  function stdHinweis(k, a){
+    const elf = (a && a.startelf) || []; if (elf.length < 11 || !IN) return "";
+    const D = sfDaten(k), drin = n => elf.some(s => sfGl(s.voll || s.n, n));
+    const fehlt = {};
+    [["Ecken", D.ecke], ["Freistöße", D.fs], ["Elfmeter", D.elf]].forEach(([lbl, x]) => { if (!x || !x.n || drin(x.n)) return;
+      const ers = (x.alt || []).find(drin), key = normS(nachN(x.n)); (fehlt[key] = fehlt[key] || {n: x.n, z: []}).z.push([lbl, ers]); });
+    const zeilen = Object.values(fehlt).map(f => {
+      const nachE = {}; f.z.forEach(([l, e]) => (nachE[e || ""] = nachE[e || ""] || []).push(l));
+      const teile = Object.entries(nachE).map(([e, ls]) => `${ls.join(" und ")}: ${e ? `voraussichtlich <b>${esc(e)}</b>` : "Ersatz unklar"}`);
+      return `<div class="sf-h">${svg(P.warn, "")}<span><b>${esc(f.n)}</b> nicht in der Startelf. ${teile.join(". ")}.</span><button class="lk" data-kader="${esc(k)}">Standards</button></div>`; });
+    return zeilen.join("");
+  }
   function vereinsKader(k, von){
     BACK = von === "zurueck" ? "kaderzu" : von ? "statkader" : "suche"; KADER_K = k; KADER_VON = von;
     const L = SPN.spielerinnen.filter(s => s.k === k), ord = {TW:0, ABW:1, MF:2, ST:3};
     L.sort((a, b) => (ord[a.pos] ?? 9) - (ord[b.pos] ?? 9) || (parseInt(a.nr, 10) || 99) - (parseInt(b.nr, 10) || 99));
     const zeile = s => { const st = stArt(s.status); return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small></span>${st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : ""}</button>`; };
-    $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>
+    $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>${stdFeld(k)}
       ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}<div id="kd-trainer"></div>${kaderExtras(k, L)}</div>`;
     trainerteam(k);
     window.scrollTo(0, 0);
