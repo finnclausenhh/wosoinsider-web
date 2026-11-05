@@ -19,7 +19,88 @@
 (function(){ var r = history.replaceState.bind(history);
   history.replaceState = function(s, t, u){ return r(s, t, u == null ? u : new URL(u, location.href).href); }; })();
 </script>
-<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>
+<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+/* Runde 11 (Finn 04.11.2026): Weitere Werte mit Umschalter, Netz, Steckbrief neu, Einsatzbalken im Kader */
+.ww-netz{width:100%;max-width:360px;justify-self:center;display:block;overflow:visible}
+.ww-netz .nl{font:600 10.5px var(--f-body,inherit);fill:var(--ink,#E8EEFF)}
+.ww-netz .nw{font:700 11px var(--f-body,inherit);fill:var(--ink)}
+.ww-netz .nv{font:600 9.5px var(--f-body,inherit)}
+.ww-nl{font-size:10.5px;color:var(--muted);text-align:center;margin:0 0 4px}
+.ww-nl i{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 8px}
+.ww-nl i.sie{background:rgba(143,176,255,.5);border:1.5px solid #8FB0FF;box-sizing:border-box}
+.ww-nl i.mw{border:1.5px dashed rgba(255,255,255,.5);box-sizing:border-box}
+.ww-sw{display:flex;gap:4px;background:var(--soft);border-radius:9px;padding:3px}
+.ww-sw button{flex:1;border:0;background:none;color:var(--muted);font:600 12px inherit;padding:6px 4px;border-radius:7px;cursor:pointer}
+.ww[data-v="a"] .ww-sw [data-v="a"],.ww[data-v="b"] .ww-sw [data-v="b"],.ww[data-v="c"] .ww-sw [data-v="c"]{background:var(--card);color:var(--ink,#fff)}
+.ww .wv{display:none}
+.ww[data-v="a"] .wa,.ww[data-v="b"] .wb,.ww[data-v="c"] .wc{display:grid;gap:8px}
+.sk,.pl{background:var(--soft);border-radius:10px;padding:9px 10px;display:grid;gap:5px}
+.sk-k{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:baseline}
+.sk-k span{font-size:12px;color:var(--muted)}
+.sk-k b{font-family:var(--f-display);font-weight:800;font-size:17px;text-align:right;white-space:nowrap}
+.sk-k em{font:500 11px var(--f-body,inherit);font-style:normal;color:var(--muted);margin-left:6px}
+.sk-l{position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin:5px 6px 2px}
+.sk-l i{position:absolute;top:50%;transform:translate(-50%,-50%)}
+.sk-l .mw{width:2px;height:14px;background:rgba(255,255,255,.55);border-radius:1px}
+.sk-l .ich{width:13px;height:13px;border-radius:50%;border:2px solid var(--card);box-sizing:content-box}
+.sk-u{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;font-size:10px;color:var(--muted);align-items:center}
+.sk-u small{font-size:11px;font-weight:600;text-align:center}
+.pl-l{position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#F5C26B,#8FB0FF 50%,#4ADE80);margin:4px 4px 0}
+.pl-l i{position:absolute;top:-4px;width:4px;height:16px;border-radius:2px;background:#fff;transform:translateX(-50%);box-shadow:0 0 0 2px var(--soft)}
+.pl small{font-size:11px;font-weight:600}
+.af-ww .rg{font:700 10.5px var(--f-mono);margin-top:3px}
+.sb3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.sb3 > div{background:var(--soft);border-radius:10px;padding:9px 8px;display:grid;gap:2px;align-content:start;min-width:0}
+.sb3 b{font-size:15px;font-weight:700;line-height:1.2}
+.sb3 .na b{font-size:13.5px;white-space:normal;overflow-wrap:anywhere;hyphens:auto}
+.sb3 .na .fl{font-size:18px;line-height:20px;margin:0 0 2px}
+.sb3 span{font-size:10.5px;color:var(--muted);line-height:1.3}
+.sb3 .fl{font-size:15px;margin-right:4px;color:initial}
+.sb-fu .lr{display:flex;gap:3px;margin-bottom:3px}
+.sb-fu .lr i{display:inline-flex;align-items:center;gap:3px;font:800 10px var(--f-mono);font-style:normal;color:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:2px 6px;line-height:13px}
+.sb-fu .lr i.an{background:#8FB0FF;border-color:#8FB0FF;color:#0B1220}
+.sb-gr{background:var(--soft);border-radius:10px;padding:10px;display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:8px;align-items:center}
+.sb-gr svg{width:150px;height:auto;display:block}
+.sb-gr .gt{display:grid;gap:3px;align-content:center}
+.sb-gr .gt > b{font-size:22px;font-weight:800;font-family:var(--f-display);line-height:1}
+.sb-gr .gs{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.sb-gr .lg{font-size:11px;color:var(--muted);white-space:nowrap}
+.sb-gr .lg i{display:inline-block;width:12px;height:0;border-top:2px solid rgba(255,255,255,.2);vertical-align:3px;margin-right:6px}
+.sb-gr .lg i.sie{border-top-color:#8FB0FF}
+.sb-gr .lg i.mw{border-top:2px dashed rgba(255,255,255,.55)}
+.sb-gr .tk{font:600 9.5px var(--f-mono);fill:rgba(255,255,255,.5)}
+.sb-gr .hl{font:700 11.5px var(--f-body,inherit)}
+.sb-gr p{margin:0;font-size:11.5px;color:var(--muted);text-align:center}
+.sb-gr p b{color:var(--ink,#fff)}
+.kd-e{display:grid;gap:4px;width:116px;justify-items:end}
+.kd-b{display:block;width:116px;height:6px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}
+.kd-b i{display:block;height:100%;border-radius:3px}
+.kd-e small{font:600 9.5px var(--f-mono);color:var(--muted);white-space:nowrap}
+.kd-e .pf-st{font-size:9px;padding:1px 4px}
+
+.kw > div{gap:2px;align-content:start}
+.kw .lb{font-size:11.5px;color:var(--ink);font-weight:600}
+.kw .su{font-size:11px;color:var(--muted)}
+.kw .pl-l{display:block;margin:7px 2px 3px;height:6px}
+.kw .pl-l i{top:-4px;height:14px;width:4px}
+.kw .rg{font:700 10.5px var(--f-mono)}
+.kw .ps{font-size:10.5px;color:var(--muted)}
+.pl-l{background:linear-gradient(90deg,#FF6B6B,#F5C26B 50%,#4ADE80)!important}
+.sb3 > div{gap:3px}
+.sb3 .kl{font:700 9.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sb3 .fu-v{display:flex;gap:2px;height:6px;border-radius:3px;overflow:hidden;margin:3px 0 2px}
+.sb3 .fu-v i{display:block;height:100%}
+.sb3 .na b{display:grid;gap:2px;hyphens:none;overflow-wrap:normal;font-size:14px}
+.sb3 .na .fl{font-size:20px;line-height:22px;margin:0}
+.kw .pl-l.neu{background:linear-gradient(90deg,#2A3B5E,#8FB0FF)!important}
+/* Spielstile (05.11.2026) */
+.stl{display:inline-flex;align-items:center;gap:1px;font:700 11px var(--f-mono);letter-spacing:.02em;color:#C9D3E2;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:3px 9px;white-space:nowrap}
+.stl.plus{color:#1A1405;background:linear-gradient(135deg,#F7D774,#E0A93B);border-color:transparent}
+.stl sup{font-size:9px;margin-left:1px}
+.stl.k{font-size:9.5px;padding:1px 6px}
+.stl-l{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stl-l > div{display:grid;gap:4px;justify-items:start;align-content:start}.stl-l small{font-size:11.5px;line-height:1.35;color:var(--muted)}
+.stl-z{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+</style><script>
 // Reichweitenmessung mit GoatCounter (ohne Cookies, ohne Skript von Dritten, ohne Gerätespeicher).
 // Sendet nur Pfad, Titel, Referrer und Kampagnen-Parameter (z. B. ?utm_source=instagram) als Zählpixel.
 // Zählt nur auf wosoinsider.de, nicht im Artifact, lokal oder in Vorschauen.
@@ -2830,8 +2911,9 @@ details.dzb[open]{padding-bottom:10px}
     const peers = ((SPN && SPN.spielerinnen) || []).filter(x => x.pos === s.pos && (x.spiele || []).reduce((a, e) => a + (e.min || 0), 0) >= 270 && (!filt || filt(x)));
     const w = f(s); if (w == null || peers.length < 8) return null;
     const vals = peers.map(f).filter(v => v != null); if (vals.length < 8) return null;
-    const p = Math.round(vals.filter(v => v < w).length / (vals.length - 1) * 100);
-    return {p: Math.max(0, Math.min(100, p)), n: vals.length};
+    const eq = vals.filter(v => Math.abs(v - w) < 1e-9).length, p = Math.round((vals.filter(v => v < w - 1e-9).length + (eq - 1) / 2) / (vals.length - 1) * 100);
+    const pl = 1 + vals.filter(v => v > w + 1e-9).length, mn = Math.min(...vals), mx = Math.max(...vals), mw = vals.reduce((a, b) => a + b, 0) / vals.length;
+    return {p: Math.max(0, Math.min(100, p)), n: vals.length, platz: pl, min: mn, max: mx, mw, w, eq};
   }
   function formkurve(s){
     const af = afSp(s.id); if (!af || !af.no) return "";
@@ -3156,7 +3238,10 @@ details.dzb[open]{padding-bottom:10px}
     BACK = von === "zurueck" ? "kaderzu" : von ? "statkader" : "suche"; KADER_K = k; KADER_VON = von;
     const L = SPN.spielerinnen.filter(s => s.k === k), ord = {TW:0, ABW:1, MF:2, ST:3};
     L.sort((a, b) => (ord[a.pos] ?? 9) - (ord[b.pos] ?? 9) || (parseInt(a.nr, 10) || 99) - (parseInt(b.nr, 10) || 99));
-    const zeile = s => { const st = stArt(s.status); return `<button class="pf-tr" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small></span>${st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : ""}</button>`; };
+    const kdMd = [...new Set(L.flatMap(x => (x.spiele || []).filter(e => e.erg).map(e => e.md)))].length || 1;
+    const einsatz = (s, STX) => { const sp = s.spiele || [], mi = sp.reduce((a, e) => a + (e.min || 0), 0), st11 = sp.filter(e => e.art === "S").length, q = Math.min(100, mi / (kdMd * 90) * 100);
+      return `<span class="kd-e" title="${mi} Minuten, ${st11} von ${kdMd} Spielen in der Startelf"><span class="kd-b"><i style="width:${Math.max(mi ? 4 : 0, q).toFixed(0)}%;background:${q >= 75 ? "#4ADE80" : q >= 35 ? "#8FB0FF" : "rgba(255,255,255,.3)"}"></i></span><small>${mi.toLocaleString("de-DE")}' · ${st11}/${kdMd} Startelf</small>${STX}</span>`; };
+    const zeile = s => { const st = stArt(s.status); return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) : ""}</small>${stilKader(s)}</span>${einsatz(s, st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : "")}</button>`; };
     $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>${stdFeld(k)}
       ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}<div id="kd-trainer"></div>${kaderExtras(k, L)}</div>`;
     trainerteam(k);
@@ -3273,6 +3358,51 @@ details.dzb[open]{padding-bottom:10px}
     }
     return wert != null ? "Einsatzwert " + wert + " %" : pr.grund || "";
   }
+  // Spielstile (Finn 05.11.2026): Titel aus Liga-Werten, Plus nur für Platz 1
+  let STILE = null;
+  const stCut = n => n >= 100 ? 10 : n >= 30 ? Math.max(3, Math.round(n * .1)) : n >= 10 ? 3 : 1;
+  const stMin = x => (x.spiele || []).reduce((a, e) => a + (e.min || 0), 0);
+  const stSum = (x, f) => (x.spiele || []).reduce((a, e) => a + f(e), 0);
+  const stGegen = e => { const [a, b] = String(e.erg || "").split(":").map(Number); return isNaN(a) ? null : (e.ha === "H" ? b : a); };
+  const stElf = x => { const t = ((AF && AF.elf) || []).filter(e => e.k === x.k && normS(nachN(e.n)) === normS(nachN(x.n))).reduce((a, e) => [a[0] + e.t, a[1] + e.v], [0, 0]);
+    Object.values((AF && AF.elf_vorsaison) || {}).forEach(l => l.forEach(e => { if (normS(e[0]) === normS(x.n)) { t[0] += e[1]; t[1] += e[2]; } })); return t; };
+  // [Name, Wert, Vergleichsfeld (pos | feld | tw), Mindestwert, Beschreibung]
+  const STIL_DEF = [
+    ["Torjägerin", x => stSum(x, e => (e.tore || []).length), "feld", 3, "Tore"],
+    ["Vorlagengeberin", x => stSum(x, e => e.vorl || 0), "feld", 3, "Vorlagen"],
+    ["Ideengeberin", x => { const a = afSp(x.id); return a && a.kp90 != null && stMin(x) >= 270 ? a.kp90 : null; }, "pos", .5, "Schlüsselpässe pro 90 Minuten"],
+    ["Dauerfeuer", x => (x.stat || {}).sch != null && stMin(x) >= 270 ? x.stat.sch / stMin(x) * 90 : null, "pos", 1, "Torschüsse pro 90 Minuten"],
+    ["Dribbelkünstlerin", x => { const d = (afSp(x.id) || {}).drib; return d && d[1] >= 10 ? d[0] / d[1] : null; }, "pos", 0, "erfolgreiche Dribblings"],
+    ["Zweikampfmonster", x => (x.stat || {}).zk_ges >= 20 ? x.stat.zk_w / x.stat.zk_ges : null, "pos", 0, "gewonnene Zweikämpfe"],
+    ["Passmaschine", x => (x.stat || {}).p_ges >= 100 ? x.stat.p_ok / x.stat.p_ges : null, "pos", 0, "angekommene Pässe"],
+    ["Fair Play", x => (x.stat || {}).fouls != null && stMin(x) >= 540 ? -x.stat.fouls / stMin(x) * 90 : null, "pos", -99, "wenigste Fouls pro 90 Minuten"],
+    ["Paradenkönigin", x => { const a = afSp(x.id); return a && a.parsp >= 3 ? a.par / a.parsp : null; }, "tw", 0, "Paraden pro Spiel"],
+    ["Weiße Weste", x => stSum(x, e => e.art === "S" && stGegen(e) === 0 ? 1 : 0), "tw", 2, "Spiele zu null"],
+    ["Elfmeterkillerin", x => { const e = AF && AF.elf_tw && AF.elf_tw[x.id]; return e && e[0] >= 4 ? e[1] / e[0] : null; }, "tw", .01, "nicht verwandelte Elfmeter seit " + (((AF && AF.elf_tw_info) || {}).saisons || [""])[0], {ohneMin: 1, mindestN: 5}]];
+  function stileAlle(){
+    if (STILE || !SPN) return STILE || {};
+    const L = SPN.spielerinnen || [], out = {}, add = (id, x) => (out[id] = out[id] || []).push(x);
+    STIL_DEF.forEach(([name, f, feld, minW, was, opt]) => { opt = opt || {};
+      const gruppen = feld === "feld" ? {feld: L.filter(x => x.pos !== "TW")} : feld === "tw" ? {tw: L.filter(x => x.pos === "TW")} : L.reduce((g, x) => { if (x.pos !== "TW") (g[x.pos] = g[x.pos] || []).push(x); return g; }, {});
+      Object.entries(gruppen).forEach(([gk, peers]) => {
+        const v = peers.filter(x => opt.ohneMin || stMin(x) >= 270).map(x => [x, f(x)]).filter(p => p[1] != null); if (v.length < (opt.mindestN || 8)) return;
+        const n = v.length, cut = stCut(n), P = feld === "feld" ? "Feldspielerinnen" : feld === "tw" ? "Torhüterinnen" : (PLURAL[gk] || "Spielerinnen");
+        v.forEach(([x, w]) => { if (w < minW) return; const platz = 1 + v.filter(p => p[1] > w + 1e-9).length, eq = v.filter(p => Math.abs(p[1] - w) < 1e-9).length;
+          if (platz > cut || eq > cut) return;
+          add(x.id, {t: name, plus: platz === 1 && eq === 1, info: platz === 1 && eq === 1 ? `Bestwert aller ${n} ${P}` : `Platz ${platz} von ${n} ${P}`, was}); }); }); });
+    L.forEach(x => { const [t, v] = stElf(x); if (t >= 3 && v === 0) add(x.id, {t: "Eiskalt vom Punkt", plus: t >= 8, info: `${t} von ${t} Elfmetern verwandelt (diese und letzte Saison)`, was: "Elfmeter"}); });
+    ((IN && IN.standards) || []).forEach(st => [["ecken", "Ecken"], ["fs", "Freistöße"]].forEach(([key, lbl]) => { const e = (st[key] || [])[0]; if (!e || Number(e[1]) < 3) return;
+      const x = L.find(y => y.k === st.k && normS(nachN(y.n)) === normS(nachN(e[0]))); if (x && !(out[x.id] || []).some(z => z.t === "Standardspezialistin")) add(x.id, {t: "Standardspezialistin", plus: false, info: `schießt bei ${kname(st.k)} die ${lbl}`, was: "Standards"}); }));
+    Object.values(out).forEach(l => l.sort((a, b) => b.plus - a.plus));
+    return STILE = out;
+  }
+  window.WI_STILE = () => stileAlle();
+  const stChip = (x, klein) => `<span class="stl${x.plus ? " plus" : ""}${klein ? " k" : ""}">${esc(x.t)}${x.plus ? "<sup>+</sup>" : ""}</span>`;
+  function stilBox(s){
+    const l = stileAlle()[s.id] || []; if (!l.length) return "";
+    return `<section class="pf-box">${kap("Spielstile")}<div class="stl-l">${l.map(x => `<div>${stChip(x)}<small>${esc(x.info)}${x.was && !/Elfmetern|schießt/.test(x.info) ? "<br>" + esc(x.was) : ""}</small></div>`).join("")}</div><p class="af-st">Titel aus den echten Liga-Werten. Mit Plus nur die Beste der Liga. Vergeben je nach Vergleichsfeld: an die besten 10 (ab 100 Spielerinnen), die besten 10 % (ab 30), die besten 3 (ab 10), sonst nur Platz 1. Gezählt wird ab 270 Minuten.</p></section>`;
+  }
+  const stilKader = s => { const l = (stileAlle()[s.id] || []).slice(0, 2); return l.length ? `<span class="stl-z">${l.map(x => stChip(x, true)).join("")}</span>` : ""; };
   function profilSeite(s){
     if (!s.einschaetzung) { const ve = verletzungEinsch(s); if (ve) s = Object.assign({}, s, {einschaetzung: ve}); }
     const nach = nachN(s.n), vorn = s.n.slice(0, s.n.length - nach.length).trim(), sp = s.spiele || [], st = s.status ? s.status.s : "fit";
@@ -3308,6 +3438,7 @@ details.dzb[open]{padding-bottom:10px}
     const l5 = sp.slice(-5), s5 = l5.filter(e => e.art === "S"), aus5 = s5.filter(e => (e.min || 0) < 85 && !e.rot).length, e5 = l5.filter(e => e.art === "E").length;
     const kbz = l5.length ? `<div class="pf-kbz"><div><b>${s5.length}/${l5.length}</b><span>in der Startelf (letzte ${l5.length} Ligaspiele)${aus5 ? `, davon ${aus5}x vorzeitig ausgewechselt` : s5.length ? ", immer durchgespielt" : ""}${e5 ? `, ${e5}x eingewechselt` : ""}</span></div></div>` : "";
     const elf = (afSp(s.id) || {}).elf, elfC = elf ? `<span class="pf-std el">Elfmeter <i>${elf[0]} von ${elf[0] + elf[1]} verwandelt</i></span>` : "";
+    h += stilBox(s);
     h += `<section class="pf-box pf-kb">${kap("Für Kickbase")}${pr ? `<p class="pf-w">${esc(warumSatz(s, pr))}</p>` : `<p class="pf-w">Für den nächsten Spieltag gibt es noch keine Prognose.</p>`}${(() => { const a = afSp(s.id), v = a && (a.no || []).filter(x => x[2] >= 60); if (!v || v.length < 4) return "";
         const n = v.map(x => x[1]), l3 = n.slice(-3).reduce((x, y) => x + y, 0) / 3, vor = n.length > 3 ? n.slice(0, -3).reduce((x, y) => x + y, 0) / (n.length - 3) : l3, d = l3 - vor;
         const g = d <= -.6 ? ["FORMTIEF", "#F59E0B"] : d >= .6 ? ["AUFWIND", "#4ADE80"] : ["STABIL", "#8FB0FF"], pg = programmVon(s.k);
@@ -3394,26 +3525,85 @@ details.dzb[open]{padding-bottom:10px}
     if (nw.length) h += `<section class="pf-box">${kap("News zu " + nach)}${(PR_NEWSALLE ? nw : nw.slice(0, 3)).map(m => `<button class="pf-nw" data-pfnews="${esc(m.id)}"><span>${esc(m.headline)}</span><small>${esc(kurz(dt(m.zeit)))}${(m.tags || []).length ? " · " + esc(m.tags.join(", ")) : ""}</small></button>`).join("")}${nw.length > 3 && !PR_NEWSALLE ? `<button class="pf-alle" data-pfnewsalle="1">Alle ${nw.length} Meldungen zu ${esc(nach)}</button>` : ""}</section>`;
     { const af = afSp(s.id) || {}, st = s.stat || {}, ww = [], minS = sp.reduce((a, e) => a + (e.min || 0), 0), nSp = st.spiele || sp.filter(e => e.art === "S" || e.art === "E").length || 1;
       const M = x => (x.spiele || []).reduce((a, e) => a + (e.min || 0), 0), Sx = x => x.stat || {};
-      if (st.sch && s.pos !== "TW") ww.push([st.sch, "Torschüsse", `${dez(st.sch / nSp)} pro Spiel`, ligaRang(s, x => Sx(x).sch != null && M(x) ? Sx(x).sch / M(x) * 90 : null)]);
-      if (af.kp != null && s.pos !== "TW") ww.push([af.kp, "Schlüsselpässe", `${dez(af.kp90)} pro 90 Minuten`, ligaRang(s, x => (afSp(x.id) || {}).kp90 ?? null)]);
-      if (st.zk_ges) ww.push([`${st.zk_w}/${st.zk_ges}`, "Zweikämpfe gewonnen", `${Math.round(st.zk_w / st.zk_ges * 100)} % · ${dez(st.zk_ges / nSp)} pro Spiel`, ligaRang(s, x => Sx(x).zk_ges >= 20 ? Sx(x).zk_w / Sx(x).zk_ges : null)]);
-      if (st.p_ges) ww.push([`${st.p_ok}/${st.p_ges}`, "Pässe angekommen", `${Math.round(st.p_ok / st.p_ges * 100)} % · ${dez(st.p_ges / nSp, 0)} pro Spiel`, ligaRang(s, x => Sx(x).p_ges >= 50 ? Sx(x).p_ok / Sx(x).p_ges : null)]);
-      if (st.bk) ww.push([dez(st.bk / nSp, 0), "Ballkontakte pro Spiel", `${st.bk} gesamt`, ligaRang(s, x => Sx(x).bk && M(x) ? Sx(x).bk / M(x) * 90 : null)]);
-      if (af.drib) ww.push([`${af.drib[0]}/${af.drib[1]}`, "Dribblings erfolgreich", `${Math.round(af.drib[0] / af.drib[1] * 100)} %`, null]);
-      if (af.parsp) ww.push([dez(af.par / af.parsp, 1), "Paraden pro Spiel", `${af.par} in ${af.parsp} Spielen`, ligaRang(s, x => (afSp(x.id) || {}).parsp >= 3 ? afSp(x.id).par / afSp(x.id).parsp : null)]);
-      const gelb = sp.filter(e => e.gelb && !e.gr).length; if (gelb || st.fouls) ww.push([gelb + (gelb >= 4 ? " ⚠" : ""), "Gelbe Karten", gelb >= 4 ? "bei der 5. ein Spiel Sperre" : st.fouls ? st.fouls + (st.fouls === 1 ? " Foul" : " Fouls") + `, ${st.gef || 0}x gefoult worden` : "", null]);
-      const pfarbe = p => p >= 75 ? "#4ADE80" : p >= 40 ? "#8FB0FF" : "#F5C26B";
-      if (ww.length) h += `<section class="pf-box">${kap("Weitere Werte")}<div class="af-ww">${ww.map(w => `<div><b>${w[0]}</b><span>${esc(w[1])}</span>${w[2] ? `<span class="su">${esc(w[2])}</span>` : ""}${w[3] ? `<div class="pz"><span class="bb"><i style="width:${Math.max(4, w[3].p)}%;background:${pfarbe(w[3].p)}"></i></span><small>${w[3].p >= 100 ? "Bestwert aller " + (PLURAL[s.pos] || "Spielerinnen") : w[3].p <= 0 ? "niedrigster Wert aller " + (PLURAL[s.pos] || "Spielerinnen") : w[3].p >= 50 ? "besser als " + w[3].p + " % der " + (PLURAL[s.pos] || "Spielerinnen") : "schlechter als " + (100 - w[3].p) + " % der " + (PLURAL[s.pos] || "Spielerinnen")}</small></div>` : ""}</div>`).join("")}</div><p class="af-st">Balken: Vergleich mit allen ${PLURAL[s.pos] || "Spielerinnen"} der Liga ab 270 Minuten. Schlüsselpässe, Dribblings und Paraden: API-Football, übrige Werte: Spielstatistik der Sportschau.</p></section>`;
+      const P = PLURAL[s.pos] || "Spielerinnen", d1 = v => dez(v, 1), pc = v => Math.round(v * 100) + " %";
+      // [Wert, Titel, Unterzeile, Rang, Kurzname fürs Netz, Format der Skala, Einheit der Skala]
+      if (st.sch && s.pos !== "TW") ww.push([st.sch, "Torschüsse", `${dez(st.sch / nSp)} pro Spiel`, ligaRang(s, x => Sx(x).sch != null && M(x) ? Sx(x).sch / M(x) * 90 : null), "Torschüsse", d1, "pro 90 Min.", dez(st.sch / nSp) + " pro Spiel"]);
+      if (af.kp != null && s.pos !== "TW") ww.push([af.kp, "Schlüsselpässe", `${dez(af.kp90)} pro 90 Minuten`, ligaRang(s, x => (afSp(x.id) || {}).kp90 ?? null), "Schlüsselpässe", d1, "pro 90 Min.", dez(af.kp90) + " pro 90 Min."]);
+      if (st.zk_ges) ww.push([`${st.zk_w}/${st.zk_ges}`, "Zweikämpfe gewonnen", `${st.zk_w} von ${st.zk_ges} · ${Math.round(st.zk_w / st.zk_ges * 100)} %`, ligaRang(s, x => Sx(x).zk_ges >= 10 ? Sx(x).zk_w / Sx(x).zk_ges : null), "Zweikämpfe", pc, "gewonnen", `${st.zk_w} von ${st.zk_ges} · ${Math.round(st.zk_w / st.zk_ges * 100)} %`]);
+      if (st.p_ges) ww.push([`${st.p_ok}/${st.p_ges}`, "Pässe angekommen", `${st.p_ok} von ${st.p_ges} · ${Math.round(st.p_ok / st.p_ges * 100)} %`, ligaRang(s, x => Sx(x).p_ges >= 50 ? Sx(x).p_ok / Sx(x).p_ges : null), "Passquote", pc, "angekommen", `${st.p_ok} von ${st.p_ges} · ${Math.round(st.p_ok / st.p_ges * 100)} %`]);
+      if (st.bk) ww.push([dez(st.bk / nSp, 0), "Ballkontakte pro Spiel", `${st.bk} gesamt`, ligaRang(s, x => Sx(x).bk && M(x) ? Sx(x).bk / M(x) * 90 : null), "Ballkontakte", v => dez(v, 0), "pro 90 Min.", dez(st.bk / nSp, 0) + " pro Spiel"]);
+      if (af.drib) ww.push([`${af.drib[0]}/${af.drib[1]}`, "Dribblings erfolgreich", `${af.drib[0]} von ${af.drib[1]} · ${Math.round(af.drib[0] / af.drib[1] * 100)} %`, af.drib[1] >= 5 ? ligaRang(s, x => { const d = (afSp(x.id) || {}).drib; return d && d[1] >= 5 ? d[0] / d[1] : null; }) : null, "Dribblings", pc, "erfolgreich", `${af.drib[0]} von ${af.drib[1]} · ${Math.round(af.drib[0] / af.drib[1] * 100)} %`]);
+      if (af.parsp) ww.push([dez(af.par / af.parsp, 1), "Paraden pro Spiel", `${af.par} in ${af.parsp} Spielen`, (r => r ? Object.assign({}, r, {neutral: 1}) : null)(ligaRang(s, x => (afSp(x.id) || {}).parsp >= 3 ? afSp(x.id).par / afSp(x.id).parsp : null)), "Paraden", d1, "pro Spiel", dez(af.par / af.parsp, 1) + " pro Spiel"]);
+      { const e = s.pos === "TW" && AF && AF.elf_tw && AF.elf_tw[s.id], li = AF && AF.elf_tw_info, lq = li && li.liga && li.liga[0] ? Math.round((li.liga[0] - li.liga[1]) / li.liga[0] * 100) : null;
+        const er = (() => { if (!e || e[0] < 4) return null; const v = Object.values(AF.elf_tw).filter(q => q[0] >= 4).map(q => q[1] / q[0]); if (v.length < 5) return null; const w = e[1] / e[0];
+          const eq = v.filter(x => Math.abs(x - w) < 1e-9).length; return {p: Math.round((v.filter(x => x < w - 1e-9).length + (eq - 1) / 2) / Math.max(1, v.length - 1) * 100), n: v.length, platz: 1 + v.filter(x => x > w + 1e-9).length, eq, w, min: Math.min(...v)}; })();
+        if (e && e[0]) ww.push([`${e[1]}/${e[0]}`, `Elfmeter nicht verwandelt (${Math.round(e[1] / e[0] * 100)} %)`, `${e[0]} gegen sie seit ${(li.saisons || [""])[0]}${e[2] ? `, ${e[2]} sicher gehalten` : ""}${lq != null ? ` · Liga trifft ${lq} %` : ""}`, er]); }
+      const gelb = sp.filter(e => e.gelb && !e.gr).length; if (gelb || st.fouls != null) { const fr = ligaRang(s, x => Sx(x).fouls != null && M(x) ? -Sx(x).fouls / M(x) * 90 : null);
+        ww.push([gelb + (gelb >= 4 ? " ⚠" : ""), gelb === 1 ? "Gelbe Karte" : "Gelbe Karten", gelb >= 4 ? "bei der 5. ein Spiel Sperre" : `${st.fouls || 0} ${st.fouls === 1 ? "Foul" : "Fouls"} · ${st.gef || 0}-mal gefoult`, fr ? Object.assign({}, fr, {fair: 1}) : null]); }
+      const pfarbe0 = p => p >= 67 ? "#4ADE80" : p >= 34 ? "#F5C26B" : "#FF6B6B";
+      const rFarbe = r => r.neutral ? "#8FB0FF" : r.platz === 1 ? "#4ADE80" : r.w <= r.min + 1e-9 ? "#FF6B6B" : pfarbe0(r.p), pfarbe = p => pfarbe0(p);
+      const rText = r => { const mit = r.eq > 1 ? `, gleichauf mit ${r.eq - 1}` : "";
+        if (r.neutral) return r.platz === 1 ? "die meisten Paraden" + mit : r.w <= r.min + 1e-9 ? "die wenigsten Paraden" + mit : r.p >= 50 ? "mehr als " + r.p + " %" : "weniger als " + (100 - r.p) + " %";
+        if (r.platz === 1) return (r.fair ? "die wenigsten Fouls" : "Bestwert") + mit;
+        if (r.w <= r.min + 1e-9) return (r.fair ? "die meisten Fouls" : "niedrigster Wert") + mit;
+        if (r.fair) return r.p >= 50 ? "foult seltener als " + r.p + " %" : "foult häufiger als " + (100 - r.p) + " %";
+        return r.p >= 50 ? "besser als " + r.p + " %" : "schlechter als " + (100 - r.p) + " %"; };
+      const satz = r => r.fair ? (r.p >= 50 ? "foult seltener als " + r.p + " % der " + P : "foult häufiger als " + (100 - r.p) + " % der " + P) : r.p >= 100 ? "Bestwert aller " + P : r.p <= 0 ? "niedrigster Wert aller " + P : r.p >= 50 ? "besser als " + r.p + " % der " + P : "schlechter als " + (100 - r.p) + " % der " + P;
+      const mitR = ww.filter(w => w[3] && !w[3].fair);
+      if (ww.length) {
+        // Netz: Perzentile gegen die eigene Position, gestrichelter Ring = Durchschnitt
+        let netz = "";
+        const nz = mitR.slice(0, 6);
+        if (nz.length >= 3) {
+          const C = 150, R = 62, n = nz.length, pt = (i, f) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return [C + Math.cos(a) * R * f, 112 + Math.sin(a) * R * f]; };
+          const ring = f => nz.map((_, i) => pt(i, f).map(v => v.toFixed(1)).join(",")).join(" ");
+          const sie = nz.map((w, i) => pt(i, Math.max(.06, w[3].p / 100)).map(v => v.toFixed(1)).join(",")).join(" ");
+          const lab = nz.map((w, i) => { const [x, y] = pt(i, 1.22), an = x < C - 8 ? "end" : x > C + 8 ? "start" : "middle";
+            const yy = y - 10 + (y > 150 ? 8 : y < 70 ? -10 : 0);
+            return `<text x="${x.toFixed(0)}" y="${yy.toFixed(0)}" text-anchor="${an}" class="nl">${esc(w[4])}</text><text x="${x.toFixed(0)}" y="${(yy + 12).toFixed(0)}" text-anchor="${an}" class="nw">${esc(w[7])}</text><text x="${x.toFixed(0)}" y="${(yy + 24).toFixed(0)}" text-anchor="${an}" class="nv" fill="${rFarbe(w[3])}">${esc(rText(w[3]))}</text>`; }).join("");
+          netz = `<svg class="ww-netz" viewBox="-10 2 320 222" role="img" aria-label="Spielerprofil im Vergleich zu allen ${esc(P)}">
+            ${[.25, .75, 1].map(f => `<polygon points="${ring(f)}" fill="none" stroke="rgba(255,255,255,.08)"/>`).join("")}
+            <polygon points="${ring(.5)}" fill="none" stroke="rgba(255,255,255,.35)" stroke-dasharray="3 3"/>
+            ${nz.map((_, i) => { const [x, y] = pt(i, 1); return `<line x1="${C}" y1="112" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.06)"/>`; }).join("")}
+            <polygon points="${sie}" fill="rgba(143,176,255,.28)" stroke="#8FB0FF" stroke-width="2"/>
+            ${lab}</svg><p class="ww-nl"><i class="sie"></i>sie <i class="mw"></i>Ø aller ${esc(P)}</p>`;
+        }
+        const kurz = r => r.fair ? (r.p >= 50 ? "foult seltener als " + r.p + " %" : "foult häufiger als " + (100 - r.p) + " %") : r.p >= 100 ? "Bestwert" : r.p <= 0 ? "niedrigster Wert" : r.p >= 50 ? "besser als " + r.p + " %" : "schlechter als " + (100 - r.p) + " %";
+        const kacheln = `<div class="af-ww kw">${ww.map(w => { const r = w[3];
+          return `<div><b>${w[0]}</b><span class="lb">${esc(w[1])}</span>${w[2] ? `<span class="su">${esc(w[2])}</span>` : ""}${r ? `<span class="pl-l${r.neutral ? " neu" : ""}"><i style="left:${Math.max(3, Math.min(97, r.platz === 1 && !r.neutral ? 100 : r.p))}%"></i></span><span class="rg" style="color:${rFarbe(r)}">Platz ${r.platz} von ${r.n}</span><span class="ps">${esc(rText(r))}</span>` : ""}</div>`; }).join("")}</div>`;
+        h += `<section class="pf-box">${kap("Weitere Werte")}${netz}${kacheln}<p class="af-st">Platz und Prozent: Vergleich mit allen ${esc(P)} der Liga ab 270 Minuten. Rot, gelb, grün zeigt, wo sie in der Liga steht.${ww.some(w => w[3] && w[3].neutral) ? " Paraden in Blau ohne Wertung: wenige Paraden heißen oft nur, dass die Abwehr wenig zulässt." : ""} Schlüsselpässe, Dribblings und Paraden: API-Football, übrige Werte: Spielstatistik der Sportschau.</p></section>`;
+      }
       const alleAF = Object.values((AF && AF.sp) || {}), grL = alleAF.map(x => x.gr).filter(Boolean), alL = alleAF.map(x => x.alter).filter(Boolean);
       const grP = ((SPN && SPN.spielerinnen) || []).filter(x => x.pos === s.pos).map(x => (afSp(x.id) || {}).gr).filter(Boolean);
       const mw = l => l.length ? l.reduce((a, b) => a + b, 0) / l.length : null, grLm = mw(grL), grPm = mw(grP);
       const grPct = af.gr && grL.length ? Math.round(grL.filter(g => g < af.gr).length / grL.length * 100) : null;
-      const fu = af.fuss, fl = flagge(s.nation);
-      const t1 = `<div><span class="tx"><b>${fu ? fu[0].toUpperCase() + fu.slice(1) : "–"}</b><span>Starker Fuß</span></span><span class="ic fu">${FUSS(fu === "links" || fu === "beidfüßig", "L")}${FUSS(fu === "rechts" || fu === "beidfüßig", "R")}</span></div>`;
-      const t2 = `<div><span class="tx"><b>${af.alter ? af.alter + " Jahre" : "–"}</b><span>${alL.length ? "Liga-Ø " + Math.round(mw(alL)) + " Jahre" : "Alter"}</span></span></div>`;
-      const t3 = `<div class="gr"><span class="tx"><b>${af.gr ? dez(af.gr / 100, 2) + " m" : "–"}</b><span>${grPct != null ? (grPct >= 50 ? `größer als ${grPct} % der Liga` : `kleiner als ${100 - grPct} % der Liga`) : "Größe"}${grPm ? `<br>Ø ${esc(PLURAL[s.pos] || "Position")} ${dez(grPm / 100, 2)} m` : ""}</span></span>${af.gr && grLm ? `<span class="ic si"><span>${SILH(Math.round(af.gr / 185 * 58), "#8FB0FF")}SIE</span><span>${SILH(Math.round(grLm / 185 * 58), "rgba(255,255,255,.2)")}Ø</span></span>` : ""}</div>`;
-      const t4 = `<div class="gr"><span class="tx"><b>${esc(s.nation || "–")}</b><span>Nation</span></span>${fl ? `<span class="ic fl">${fl}</span>` : ""}</div>`;
-      if (af.fuss || af.alter || af.gr) h += `<section class="pf-box">${kap("Steckbrief")}<div class="sb2">${t1}${t2}${t3}${t4}</div>${af.gr && grLm ? '<p class="af-st">Silhouetten: blau sie, grau der Liga-Schnitt. Größe und Alter: API-Football, Fuß: unsere Stammdaten.</p>' : ""}</section>`; }
+      const fu = af.fuss, fl = flagge(s.nation), fuL = alleAF.map(x => x.fuss).filter(Boolean);
+      const fuAnt = fu && fuL.length >= 20 ? Math.round(fuL.filter(x => x === fu).length / fuL.length * 100) : null;
+      const FUW = {rechts: "Rechts", links: "Links", "beidfüßig": "Beidfüßig"};
+      const fuV = ["rechts", "links", "beidfüßig"].map(f => [f, fuL.length ? fuL.filter(x => x === f).length / fuL.length * 100 : 0]);
+      const fuF = {rechts: "#8FB0FF", links: "#C9A7FF", "beidfüßig": "#4ADE80"};
+      const t1 = `<div class="sb-fu"><span class="kl">Starker Fuß</span><b>${fu ? FUW[fu] || esc(fu) : "unbekannt"}</b>${fuL.length >= 20 ? `<span class="fu-v" aria-hidden="true">${fuV.map(([f, q]) => `<i style="flex:${q.toFixed(1)};background:${f === fu ? fuF[f] : "rgba(255,255,255,.12)"}"></i>`).join("")}</span>` : ""}<span>${fuAnt != null ? `${fuAnt} % der Liga sind ${fu === "beidfüßig" ? "beidfüßig" : fu === "links" ? "Linksfüßerinnen" : "Rechtsfüßerinnen"}` : ""}</span></div>`;
+      const t2 = `<div><span class="kl">Alter</span><b>${af.alter ? af.alter + " Jahre" : "–"}</b><span>${alL.length ? "Liga-Durchschnitt " + Math.round(mw(alL)) + " Jahre" : ""}</span></div>`;
+      const t4 = `<div class="na"><span class="kl">Nationalität</span><b>${fl ? `<span class="fl">${fl}</span>` : ""}${esc(s.nation || "–")}</b></div>`;
+      // Größe: Messlatte 1,40 bis 1,90 m, zwei Silhouetten im gleichen Maßstab, Hilfslinien zur Latte
+      let t3 = "";
+      if (af.gr && grLm) {
+        const ref = grPm || grLm, refT = grPm ? ({TW: "Ø Torhüterinnen", ABW: "Ø Abwehr", MF: "Ø Mittelfeld", ST: "Ø Sturm"}[s.pos] || "Ø Position") : "Liga-Ø";
+        // Latte ab 1,00 m (unten unterbrochen), Silhouetten reichen vom Boden bis zur Größe
+        const Y0 = 196, k = 1.9, y = cm => Y0 - (cm - 100) * k;
+        const fig = (x, cm, farbe) => { const top = y(cm), hh = (cm - 100) * k / 100;
+          return `<g transform="translate(${x} ${top.toFixed(1)}) scale(${hh.toFixed(3)})" fill="${farbe}" stroke="${farbe}" stroke-linecap="round"><circle cx="20" cy="8" r="7" stroke="none"/><path d="M10 18q10-4 20 0l6 14-4 2-3-6 0 22H11l0-22-3 6-4-2z" stroke="none"/><line x1="7" y1="34" x2="5" y2="50" stroke-width="4.5"/><line x1="33" y1="34" x2="35" y2="50" stroke-width="4.5"/><path d="M11 49h18l1.5 13h-8.5l-2-6-2 6H9.5z" stroke="none"/><line x1="14.5" y1="63" x2="14" y2="94" stroke-width="6"/><line x1="25.5" y1="63" x2="26" y2="94" stroke-width="6"/><ellipse cx="13" cy="97" rx="4.5" ry="3" stroke="none"/><ellipse cx="27" cy="97" rx="4.5" ry="3" stroke="none"/></g>`; };
+        const ticks = [110, 120, 130, 140, 150, 160, 170, 180, 190].map(c => `<line x1="38" x2="44" y1="${y(c).toFixed(1)}" y2="${y(c).toFixed(1)}" stroke="rgba(255,255,255,.35)"/><text x="34" y="${(y(c) + 3.5).toFixed(1)}" text-anchor="end" class="tk">${dez(c / 100, 2)}</text>`).join("");
+        const hl = (cm, farbe, dash) => `<line x1="44" x2="186" y1="${y(cm).toFixed(1)}" y2="${y(cm).toFixed(1)}" stroke="${farbe}" stroke-width="1.2" ${dash ? 'stroke-dasharray="3 3"' : ""}/>`;
+        t3 = `<div class="sb-gr"><div class="gt"><b>${dez(af.gr / 100, 2)} m</b><span class="gs">${grPct != null ? (grPct >= 50 ? `größer als ${grPct} % der Liga` : `kleiner als ${100 - grPct} % der Liga`) : "Größe"}</span>
+          <span class="lg"><i class="sie"></i>sie ${dez(af.gr / 100, 2)} m</span><span class="lg"><i class="mw"></i>${esc(refT)} ${dez(ref / 100, 2)} m</span>${grPm ? `<span class="lg"><i></i>Liga-Ø ${dez(grLm / 100, 2)} m</span>` : ""}</div>
+          <svg viewBox="0 0 190 210" role="img" aria-label="Größe ${dez(af.gr / 100, 2)} Meter im Vergleich zu ${esc(refT)} ${dez(ref / 100, 2)} Meter">
+          <line x1="44" x2="44" y1="${y(190).toFixed(1)}" y2="${Y0}" stroke="rgba(255,255,255,.35)" stroke-width="2"/>${ticks}
+          <line x1="44" x2="186" y1="${Y0}" y2="${Y0}" stroke="rgba(255,255,255,.18)"/><path d="M38 ${Y0 - 6}l12-4M38 ${Y0 - 2}l12-4" stroke="rgba(255,255,255,.5)"/><text x="34" y="${Y0 + 3}" text-anchor="end" class="tk">1,00</text>
+          ${hl(ref, "rgba(255,255,255,.5)", true)}${hl(af.gr, "#8FB0FF", false)}
+          ${fig(72, af.gr, "#8FB0FF")}${fig(128, ref, "rgba(255,255,255,.3)")}</svg></div>`;
+      } else if (af.gr) t3 = `<div class="sb-gr"><p><b>${dez(af.gr / 100, 2)} m</b></p></div>`;
+      if (af.fuss || af.alter || af.gr) h += `<section class="pf-box">${kap("Steckbrief")}<div class="sb3"${fu ? "" : ' style="grid-template-columns:1fr 1fr"'}>${fu ? t1 : ""}${t2}${t4}</div>${t3}<p class="af-st">${af.gr && grLm ? "Messlatte ab 1,00 m, damit die Unterschiede sichtbar werden. " : ""}Größe und Alter: API-Football, Fuß: unsere Stammdaten.</p></section>`; }
     const f = FOTOS[s.n];
     h += `<div class="pf-fuss">${f && f.autor ? esc(nachweis(f).replace(/<[^>]+>/g, "")) + " · " : ""}Daten: Sportschau, Vereine, eigene Auswertung</div>`;
     $("#main").innerHTML = `<div class="det pf">${pfZurueck()}<button class="pf-teilen" data-teilen="${esc(s.id)}" aria-label="Profil teilen">${svg('<path d="M12 15V4M8 8l4-4 4 4"/><path d="M6 12v7h12v-7"/>')}</button>${h}</div>`;
