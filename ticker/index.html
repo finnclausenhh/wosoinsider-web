@@ -22,6 +22,12 @@
 <meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* Runde 11 (Finn 04.11.2026): Weitere Werte mit Umschalter, Netz, Steckbrief neu, Einsatzbalken im Kader */
 .ww-netz{width:100%;max-width:360px;justify-self:center;display:block;overflow:visible}
+.typ{display:grid;gap:3px;background:rgba(143,176,255,.08);border-radius:12px;padding:10px 12px;margin-bottom:4px}.typ-k{font:700 10px var(--f-mono);letter-spacing:1px;color:#8FB0FF}
+.typ b{font-family:var(--f-display);font-size:21px;font-weight:800;line-height:1.05}.typ span{font-size:13px;line-height:1.4;color:#C9D3E2}.typ-l{justify-self:start;background:none;border:0;padding:2px 0 0;color:#8FB0FF;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.bst-t{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 6px}.bst-t button{border:0;background:rgba(255,255,255,.07);color:#fff;font:inherit;font-size:12.5px;font-weight:600;border-radius:99px;padding:5px 11px;cursor:pointer}.bst-t button.an{background:#2F5BFF}
+.bst{display:grid;grid-template-columns:18px 34px minmax(0,1fr) auto;gap:2px 9px;align-items:center;width:100%;text-align:left;background:none;border:0;border-top:1px solid rgba(255,255,255,.06);padding:8px 0;color:inherit;font:inherit;cursor:pointer}
+.bst .pl{font-weight:800;color:#8FB0FF}.bst .nm b{display:block;font-size:13.5px}.bst .nm small{font-size:11px;color:var(--muted)}.bst .sc{font:800 20px var(--f-display)}.bst .st{grid-column:3/5;font-size:11px;color:#A9B4C6}
+
 .af-ww .ps .wenig{font-style:normal;font-size:10.5px;color:var(--muted);opacity:.8}
 .fk-lg{position:relative;height:18px;margin:-2px 0 2px}.fk-lg button{position:absolute;top:0;transform:translateX(-50%);background:none;border:0;padding:0;cursor:pointer;line-height:0}
 .fk-lg button.an{outline:1.5px solid #8FB0FF;outline-offset:2px;border-radius:50%}.fk-info{font-size:12px;color:#C9D3E2;min-height:16px;margin:2px 0 0}
@@ -3057,6 +3063,86 @@ details.dzb[open]{padding-bottom:10px}
     : /^(Flügel|Mittelfeld (links|rechts))/.test(t) ? "FL" : /Zehnerin|Offensives Mittelfeld|Zentrales Mittelfeld|^Mittelfeld$/.test(t) ? "ZM" : /^Sturm|Mittelstürmerin/.test(t) ? "ST" : null; };
   const GLAB = {TW: "Torhüterinnen", IV: "Innenverteidigerinnen", AV: "Außenverteidigerinnen", DM: "Sechserinnen", ZM: "zentralen Mittelfeldspielerinnen", FL: "Flügelspielerinnen", ST: "Stürmerinnen"};
   let ROH = 0; const ab = n => ROH ? 0 : n;
+  // ---------------- Spielertypen und Die Besten (Finn 05.11.2026)
+  const FGRP = x => { const t = String(((x.slots || [])[0] || [])[2] || ""), g = PGRP(x); if (!g) return null;
+    if (g === "AV") return /^Links|links$/.test(t) ? "LV" : "RV";
+    if (g === "FL") return /links/.test(t) ? "LM" : "RM";
+    if (g === "ZM") return /Zehnerin|Offensives/.test(t) ? "OM" : "ZM";
+    return g; };
+  const FLAB = {TW: ["Torhüterinnen", "Tor"], IV: ["Innenverteidigerinnen", "IV"], RV: ["Rechtsverteidigerinnen", "RV"], LV: ["Linksverteidigerinnen", "LV"], DM: ["Sechserinnen", "DM"],
+    ZM: ["zentralen Mittelfeldspielerinnen", "ZM"], OM: ["Zehnerinnen", "OM"], LM: ["linken Außen", "LM"], RM: ["rechten Außen", "RM"], ST: ["Stürmerinnen", "ST"]};
+  const TMIN = x => (x.spiele || []).reduce((a, e) => a + (e.min || 0), 0);
+  const TMET = {
+    abw: ["Abwehrarbeit", x => { const q = (afSp(x.id) || {}).abw; return q && q[3] ? (q[0] + q[1] + q[2]) / q[3] * 90 : null; }],
+    zk: ["Zweikämpfen", x => (x.stat || {}).zk_ges && TMIN(x) ? x.stat.zk_w / TMIN(x) * 90 : null],
+    pass: ["Pässen", x => (x.stat || {}).p_ges && TMIN(x) ? x.stat.p_ok / TMIN(x) * 90 : null],
+    bk: ["Ballkontakten", x => (x.stat || {}).bk && TMIN(x) ? x.stat.bk / TMIN(x) * 90 : null],
+    kp: ["Schlüsselpässen", x => (afSp(x.id) || {}).kp90 ?? null],
+    sch: ["Torschüssen", x => (x.stat || {}).sch != null && TMIN(x) ? x.stat.sch / TMIN(x) * 90 : null],
+    drib: ["Dribblings", x => { const d = (afSp(x.id) || {}).drib; return d && TMIN(x) ? d[0] / TMIN(x) * 90 : null; }],
+    tb: ["Torbeteiligungen", x => TMIN(x) ? (x.spiele || []).reduce((a, e) => a + (e.tore || []).length + (e.vorl || 0), 0) / TMIN(x) * 90 : null],
+    par: ["Paraden", x => { const a = afSp(x.id) || {}; return a.parsp ? a.par / a.parsp : null; }],
+    zn: ["Spielen zu null", x => { const st = (x.spiele || []).filter(e => e.art === "S"); if (!st.length) return null;
+      return st.filter(e => { const [a, b] = String(e.erg || "").split(":").map(Number); return !isNaN(a) && (e.ha === "H" ? b : a) === 0; }).length / st.length; }],
+    gr: ["Größe", x => (afSp(x.id) || {}).gr || null]};
+  const TSET = {TW: ["par", "zn", "pass", "bk"], IV: ["zk", "abw", "pass", "bk", "sch", "tb"], AV: ["abw", "zk", "kp", "drib", "pass", "tb"], DM: ["abw", "zk", "pass", "bk", "kp", "sch"],
+    ZM: ["kp", "pass", "bk", "sch", "tb", "abw"], FL: ["sch", "tb", "drib", "kp", "zk", "bk"], ST: ["sch", "tb", "drib", "kp", "zk", "bk"]};
+  let TCACHE = null;
+  function typDaten(){
+    if (TCACHE || !SPN) return TCACHE || {};
+    const L = (SPN.spielerinnen || []).filter(x => PGRP(x) && TMIN(x) >= 270), out = {};
+    const gruppen = {}; L.forEach(x => (gruppen[PGRP(x)] = gruppen[PGRP(x)] || []).push(x));
+    Object.entries(gruppen).forEach(([g, P]) => { if (P.length < 8) return;
+      const keys = TSET[g].concat(g === "IV" || g === "ST" ? ["gr"] : []), V = {};
+      keys.forEach(k => V[k] = P.map(TMET[k][1]).filter(v => v != null));
+      P.forEach(x => { const p = {};
+        keys.forEach(k => { const w = TMET[k][1](x), v = V[k]; if (w == null || v.length < 8) return; const eq = v.filter(y => Math.abs(y - w) < 1e-9).length;
+          p[k] = Math.round((v.filter(y => y < w - 1e-9).length + (eq - 1) / 2) / Math.max(1, v.length - 1) * 100); });
+        const ks = TSET[g].filter(k => p[k] != null); if (ks.length < Math.min(4, TSET[g].length)) return;
+        out[x.id] = {g, fg: FGRP(x), p, wert: Math.round(ks.reduce((a, k) => a + p[k], 0) / ks.length), typ: typBestimmen(g, p)}; }); });
+    return TCACHE = out;
+  }
+  function typBestimmen(g, p){
+    const m = (...k) => { const v = k.map(x => p[x]).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0; };
+    if (g === "TW") { const par = m("par"), auf = m("pass", "bk"), zn = m("zn"); return zn >= 65 && zn >= par ? ["sicherer Rückhalt", "viele Spiele zu null"] : auf >= par && auf >= 55 ? ["mitspielende Torhüterin", "viel am Ball, spielt mit"] : ["Paraden-Torhüterin", "hat viel zu halten und hält viel"]; }
+    if (g === "IV") { const bau = m("pass", "bk"), def = m("zk", "abw"), gr = p.gr;
+      return bau >= def + 10 ? ["Aufbauspielerin", "eröffnet das Spiel von hinten"] : def >= 60 && gr != null && gr >= 60 ? ["groß und zweikampfstark", "gewinnt viele Duelle"] : def > bau ? ["Zweikämpferin", "stark gegen den Ball"] : ["ausgewogene Innenverteidigerin", "solide im Aufbau und im Zweikampf"]; }
+    if (g === "AV") { const off = m("kp", "drib", "tb"), def = m("abw", "zk");
+      return Math.abs(off - def) < 12 ? ["ausgewogene Außenverteidigerin", "vorne und hinten gefragt"] : off > def ? ["offensive Außenverteidigerin", "schaltet sich viel nach vorne ein"] : ["defensive Außenverteidigerin", "sichert hinten ab"]; }
+    if (g === "DM") { const def = m("abw", "zk"), bau = m("pass", "bk"), off = m("kp", "sch");
+      return def >= 55 && off >= 55 ? ["Box-to-Box", "hinten und vorne dabei"] : bau >= def && bau >= off ? ["Ballverteilerin", "viele Ballkontakte und Pässe"] : def >= off ? ["defensive Sechserin", "räumt vor der Abwehr ab"] : ["offensive Sechserin", "sucht den Weg nach vorne"]; }
+    if (g === "ZM") { const kp = m("kp"), bau = m("pass", "bk"), tor = m("sch", "tb"), abw = m("abw");
+      return abw >= 55 && tor >= 55 ? ["Box-to-Box", "hinten und vorne dabei"] : kp >= Math.max(bau, tor) ? ["Spielmacherin", "bereitet Chancen vor"] : tor >= bau ? ["torgefährliche Mittelfeldspielerin", "sucht selbst den Abschluss"] : ["Ballverteilerin", "viele Ballkontakte und Pässe"]; }
+    if (g === "FL") { const dr = m("drib"), kp = m("kp"), tor = m("sch", "tb"), def = m("zk");
+      return dr >= Math.max(kp, tor) && dr >= 55 ? ["Dribblerin", "geht ins Eins-gegen-eins"] : kp >= tor && kp >= 55 ? ["Vorbereiterin", "spielt die letzten Pässe"] : tor >= 55 ? ["Torjägerin von außen", "zieht selbst ab"] : def >= 55 ? ["arbeitet nach hinten mit", "viele Zweikämpfe auf der Außenbahn"] : ["Außenspielerin", "ohne klaren Schwerpunkt"]; }
+    if (g === "ST") { const dr = m("drib"), kp = m("kp"), tor = m("sch", "tb"), gr = p.gr, wucht = m("zk", "bk");
+      return gr != null && gr >= 65 && dr < 50 && wucht >= 45 ? ["Zielspielerin", "groß, hält Bälle fest und verteilt"] : dr >= 65 && dr >= tor ? ["Dribblerin", "kommt über das Eins-gegen-eins"] : tor >= 60 ? ["Vollstreckerin", "lebt vom Abschluss"] : kp >= 60 ? ["mitspielende Stürmerin", "legt viel für andere auf"] : ["Mittelstürmerin", "ohne klaren Schwerpunkt"]; }
+    return ["", ""];
+  }
+  function typZeile(s){
+    const d = typDaten()[s.id]; if (!d || !d.typ[0]) return "";
+    const st = TSET[d.g].filter(k => d.p[k] != null).sort((a, b) => d.p[b] - d.p[a]), gut = st.filter(k => d.p[k] >= 60).slice(0, 2), sw = st.filter(k => d.p[k] < 35).slice(-1);
+    const L = Object.entries(typDaten()).filter(([, x]) => x.fg === d.fg).sort((a, b) => b[1].wert - a[1].wert), pl = 1 + L.findIndex(([id]) => id === s.id);
+    return `<div class="typ"><span class="typ-k">SPIELERTYP</span><b>${esc(d.typ[0][0].toUpperCase() + d.typ[0].slice(1))}</b><span>${esc(d.typ[1])}${gut.length ? `. Stark in ${gut.map(k => TMET[k][0]).join(" und ")}` : ""}${sw.length ? `, weniger in ${TMET[sw[0]][0]}` : ""}.</span>
+      <button class="typ-l" data-beste="${d.fg}">Platz ${pl} von ${L.length} ${esc(FLAB[d.fg][0])} · Gesamtwert ${d.wert} ›</button></div>`;
+  }
+  let BESTE = "DM";
+  function besteSektion(){
+    const T = typDaten(), pos = Object.keys(FLAB).filter(f => Object.values(T).some(x => x.fg === f)); if (!pos.length) return "";
+    if (!pos.includes(BESTE)) BESTE = pos[0];
+    const L = Object.entries(T).filter(([, x]) => x.fg === BESTE).sort((a, b) => b[1].wert - a[1].wert).slice(0, 10).map(([id, x]) => [spById(id), x]).filter(([s]) => s);
+    const g = (L[0] || [])[1] ? L[0][1].g : "DM";
+    return `<section class="stk" id="st-beste"><div class="stk-k"><h2>Die Besten</h2><small>Gesamtwert = Schnitt der Ränge pro 90 Minuten in ${TSET[g].map(k => TMET[k][0]).join(", ").replace(/, ([^,]*)$/, " und $1")}, ab 270 Minuten. 100 = überall Bestwert.</small></div>
+      <div class="bst-t">${pos.map(f => `<button data-beste="${f}"${f === BESTE ? ' class="an"' : ""}>${FLAB[f][1]}</button>`).join("")}</div>
+      ${L.map(([s, x], i) => { const st = TSET[x.g].filter(k => x.p[k] != null).sort((a, b) => x.p[b] - x.p[a]).slice(0, 2);
+        return `<button class="bst" data-profil="${esc(s.id)}"><span class="pl">${i + 1}</span>${pfFoto(s, 34, 34, 17)}<span class="nm"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc(x.typ[0])}</small></span><span class="sc" style="color:${x.wert >= 67 ? "#4ADE80" : x.wert >= 45 ? "#F5C26B" : "#FF8A8A"}">${x.wert}</span><span class="st">stark in ${st.map(k => TMET[k][0]).join(" und ")}</span></button>`; }).join("")}</section>`;
+  }
+  document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-beste]"); if (!b) return; e.preventDefault(); e.stopPropagation();
+    BESTE = b.dataset.beste;
+    if (VIEW_STAT === "statistik" && BACK === "stat") { const y = window.scrollY, el = document.getElementById("st-beste"); if (el) { el.outerHTML = besteSektion(); window.scrollTo(0, y); return; } }
+    const z = document.createElement("button"); z.dataset.statview = "statistik"; z.hidden = true; document.body.appendChild(z); z.click(); z.remove();
+    setTimeout(() => { const el = document.getElementById("st-beste"); if (el) el.scrollIntoView({block: "start"}); }, 50); }, true);
+
   function ligaRang(s, f, filt, grp){
     const peers = ((SPN && SPN.spielerinnen) || []).filter(x => (grp ? PGRP(x) === grp : x.pos === s.pos) && (x.spiele || []).reduce((a, e) => a + (e.min || 0), 0) >= 270 && (!filt || filt(x)));
     let w = f(s), wenig = (s.spiele || []).reduce((a, e) => a + (e.min || 0), 0) < 270 ? 1 : 0; if (w == null) { ROH = 1; try { w = f(s); } finally { ROH = 0; } wenig = 1; }
@@ -3134,15 +3220,27 @@ details.dzb[open]{padding-bottom:10px}
     if (ps.length < 2) return null;
     const g = p => kname(p.heim_k === s.k ? p.gast_k : p.heim_k), d1 = dt(ps[0].anstoss), mo = new Date(d1); mo.setDate(mo.getDate() + ((8 - mo.getDay()) % 7 || 7));
     const iso = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`, kd = d => `${d.getDate()}.${d.getMonth() + 1}.`, d0 = new Date(seit + "T12:00");
-    return {seit, stand: st.stand, satz: `Keine Verletzung gemeldet: ${kname(s.k)} schont sie gegen ${g(ps[0])}. Wir erwarten sie ab Montag wieder im Training und gegen ${g(ps[1])} zurück im Kader.`,
+    const stamm = (s.spiele || []).slice(-5).filter(e => e.art === "S").length >= 4;
+    return {seit, stand: st.stand, satz: `Keine Verletzung gemeldet: ${kname(s.k)} schont sie gegen ${g(ps[0])}. Wir erwarten sie ab Montag wieder im Training und gegen ${g(ps[1])} zurück ${stamm ? "in der Startelf" : "im Kader"}.`,
       phasen: [{d: kd(d1), iso: iso(d1), t: "fehlt gegen " + g(ps[0]), typ: "verletzung"},
-        {d: kd(mo), iso: iso(mo), t: "Training", typ: "reha", prog: true}, {d: kd(dt(ps[1].anstoss)), iso: iso(dt(ps[1].anstoss)), t: "Kader gegen " + g(ps[1]), typ: "kader", prog: true}],
+        {d: kd(mo), iso: iso(mo), t: "Training", typ: "reha", prog: true}, {d: kd(dt(ps[1].anstoss)), iso: iso(dt(ps[1].anstoss)), t: (stamm ? "Startelf gegen " : "Kader gegen ") + g(ps[1]), typ: stamm ? "startelf" : "kader", prog: true}],
       vergleich: "Eigene Einschätzung nach dem Spielplan, keine Meldung des Vereins zur Rückkehr."};
+  }
+  function offenEinsch(s){
+    const st = s.status || {}, seit = st.stand; if (!seit || !SP) return null;
+    const ps = alleSpiele().filter(p => (p.heim_k === s.k || p.gast_k === s.k) && p.status !== "abgesagt" && terminiert(p) && String(p.anstoss).slice(0, 10) >= seit).sort((a, b) => dt(a.anstoss) - dt(b.anstoss));
+    if (!ps.length) return null;
+    const g = p => kname(p.heim_k === s.k ? p.gast_k : p.heim_k), iso = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`, kd = d => `${d.getDate()}.${d.getMonth() + 1}.`;
+    const d0 = new Date(seit + "T12:00"), d1 = dt(ps[0].anstoss), d2 = ps[1] ? dt(ps[1].anstoss) : new Date(d1.getTime() + 7 * 864e5);
+    return {seit, stand: st.stand, satz: `Der Verein nennt keinen Rückkehrtermin. Gegen ${g(ps[0])} fehlt sie, danach entscheidet sich die Rückkehr von Woche zu Woche. Wir melden, sobald sie wieder trainiert.`,
+      phasen: (d1 - d0 < 3 * 864e5 ? [] : [{d: kd(d0), iso: seit, t: String(st.grund || "Ausfall").split(",")[0], typ: "verletzung"}]).concat([{d: kd(d1), iso: iso(d1), t: "fehlt gegen " + g(ps[0]), typ: "verletzung"},
+        {d: kd(d2), iso: iso(d2), t: "Rückkehr offen" + (ps[1] ? ", frühestens gegen " + g(ps[1]) : ""), typ: "kader", prog: true}]),
+      vergleich: "Ohne Diagnose und Termin gibt es keinen typischen Verlauf. Die Punkte nach heute sind nur der Spielplan."};
   }
   function verletzungEinsch(s){
     const st = s.status || {}; if (st.s !== "raus" || !st.grund) return null;
     { const b = belastungEinsch(s); if (b) return b; }
-    const t = VERL_TYP.find(x => x[0].test(st.grund)); if (!t) return null;
+    const t = VERL_TYP.find(x => x[0].test(st.grund)); if (!t) return offenEinsch(s);
     const v = (s.verlauf || []).slice().reverse().find(x => x.status === "raus"); let seit = (v && v.stand) || st.stand; if (!seit) return null;
     { const dm = new Date(seit + "T12:00"), txt = normS([st.grund, v && v.grund].concat(N.filter(m => m.spielerin === s.n).flatMap(m => [m.headline].concat(m.text || []))).join(" "));
       const GEN = new Set(["fc", "sv", "vfl", "vfb", "tsg", "rb", "sc", "fsv", "bayer", "1899", "04", "05"]);
@@ -3272,7 +3370,8 @@ details.dzb[open]{padding-bottom:10px}
     } else {
       const W = ligaWerte(L.spiele);
       let h = `<div class="det sv">${zur}<h1 class="disp">Statistik</h1><div class="dat">Nur Liga, nach dem ${L.md}. Spieltag</div>
-        <div class="st-chips">${STKAT.map(([k, t]) => `<button data-stsprung="${k}">${t}</button>`).join("")}${(AF && AF.elf || []).length ? `<button data-stsprung="elf">Elfmeter</button>` : ""}</div>`;
+        <div class="st-chips"><button data-stsprung="beste">Die Besten</button>${STKAT.map(([k, t]) => `<button data-stsprung="${k}">${t}</button>`).join("")}${(AF && AF.elf || []).length ? `<button data-stsprung="elf">Elfmeter</button>` : ""}</div>`;
+      h += besteSektion();
       for (const [k, t, e] of STKAT) {
         const l = W.filter(v => v[k] > 0).sort((a, b) => b[k] - a[k] || a.minuten - b.minuten || a.s.n.localeCompare(b.s.n, "de"));
         if (k === "fair") {
@@ -3800,7 +3899,7 @@ details.dzb[open]{padding-bottom:10px}
         const kurz = r => r.fair ? (r.p >= 50 ? "foult seltener als " + r.p + " %" : "foult häufiger als " + (100 - r.p) + " %") : r.p >= 100 ? "Bestwert" : r.p <= 0 ? "niedrigster Wert" : r.p >= 50 ? "besser als " + r.p + " %" : "schlechter als " + (100 - r.p) + " %";
         const kacheln = `<div class="af-ww kw">${ww.map(w => { const r = w[3];
           return `<div><b>${w[0]}</b><span class="lb">${esc(w[1])}</span>${w[2] ? `<span class="su">${esc(w[2])}</span>` : ""}${r ? `<span class="pl-l${r.neutral ? " neu" : ""}"><i style="left:${Math.max(3, Math.min(97, r.platz === 1 && !r.neutral ? 100 : r.p))}%"></i></span><span class="rg" style="color:${rFarbe(r)}">Platz ${r.platz} von ${r.n}</span><span class="ps">${esc(rText(r).replace(/ \(wie \d+ andere\)$/, ""))}${r.eq > 1 ? `<br><i class="wenig">gleichauf mit ${r.eq - 1} ${r.eq === 2 ? "anderen" : "anderen"}</i>` : ""}${r.wenig ? '<br><i class="wenig">wenig Spielzeit, Wert schwankt noch</i>' : ""}</span>` : ""}</div>`; }).join("")}</div>`;
-        h += `<section class="pf-box">${kap("Weitere Werte")}${netz}${kacheln}<p class="af-st">Platz und Prozent: Vergleich mit allen ${esc(P)} der Liga ab 270 Minuten, gezählt pro 90 Minuten, denn Kickbase wertet jede Aktion. Rot, gelb, grün zeigt, wo sie in der Liga steht. Schlüsselpässe, Dribblings, Abwehrarbeit und Paraden: API-Football, übrige Werte: Spielstatistik der Sportschau.</p></section>`;
+        h += `<section class="pf-box">${kap("Weitere Werte")}${typZeile(s)}${netz}${kacheln}<p class="af-st">Platz und Prozent: Vergleich mit allen ${esc(P)} der Liga ab 270 Minuten, gezählt pro 90 Minuten, denn Kickbase wertet jede Aktion. Rot, gelb, grün zeigt, wo sie in der Liga steht. Schlüsselpässe, Dribblings, Abwehrarbeit und Paraden: API-Football, übrige Werte: Spielstatistik der Sportschau.</p></section>`;
       }
       const alleAF = Object.values((AF && AF.sp) || {}), grL = alleAF.map(x => x.gr).filter(Boolean), alL = alleAF.map(x => x.alter).filter(Boolean);
       const EPOS = x => { const t = String(((x.slots || [])[0] || [])[2] || "").replace(/ (links|rechts)$/, "");
