@@ -11,7 +11,7 @@ JS = r'''
     if (g === "FL") return /links/.test(t) ? "LM" : "RM";
     if (g === "ZM") return /Zehnerin|Offensives/.test(t) ? "OM" : "ZM";
     return g; };
-  const FLAB = {TW: ["Torhüterinnen", "Tor"], IV: ["Innenverteidigerinnen", "IV"], RV: ["Rechtsverteidigerinnen", "RV"], LV: ["Linksverteidigerinnen", "LV"], DM: ["Sechserinnen", "DM"],
+  const FLAB = {TW: ["Torhüterinnen", "TW"], IV: ["Innenverteidigerinnen", "IV"], RV: ["Rechtsverteidigerinnen", "RV"], LV: ["Linksverteidigerinnen", "LV"], DM: ["Sechserinnen", "DM"],
     ZM: ["zentralen Mittelfeldspielerinnen", "ZM"], OM: ["Zehnerinnen", "OM"], LM: ["linken Außen", "LM"], RM: ["rechten Außen", "RM"], ST: ["Stürmerinnen", "ST"]};
   const TMIN = x => (x.spiele || []).reduce((a, e) => a + (e.min || 0), 0);
   const TMET = {
@@ -61,6 +61,10 @@ JS = r'''
       return gr != null && gr >= 65 && dr < 50 && wucht >= 45 ? ["Zielspielerin", "groß, hält Bälle fest und verteilt"] : dr >= 65 && dr >= tor ? ["Dribblerin", "kommt über das Eins-gegen-eins"] : tor >= 60 ? ["Vollstreckerin", "lebt vom Abschluss"] : kp >= 60 ? ["mitspielende Stürmerin", "legt viel für andere auf"] : ["Mittelstürmerin", "ohne klaren Schwerpunkt"]; }
     return ["", ""];
   }
+  // Kurzform für Listen (Finn 05.11.2026: Umbrüche wie bei Kaut vermeiden)
+  const typKurz = t => ({"ausgewogene Außenverteidigerin": "ausgewogen", "offensive Außenverteidigerin": "offensiv", "defensive Außenverteidigerin": "defensiv",
+    "ausgewogene Innenverteidigerin": "ausgewogen", "groß und zweikampfstark": "groß, zweikampfstark", "torgefährliche Mittelfeldspielerin": "torgefährlich",
+    "arbeitet nach hinten mit": "defensiv stark", "mitspielende Torhüterin": "mitspielend", "mitspielende Stürmerin": "mitspielend"})[t] || t;
   function typZeile(s){
     const d = typDaten()[s.id]; if (!d || !d.typ[0]) { const mi = TMIN(s); return PGRP(s) && s.pos && mi < 270 ? `<div class="typ"><span class="typ-k">SPIELERTYP</span><span>Den Typ bestimmen wir ab 270 Minuten, sie hat erst ${mi}.</span></div>` : ""; }
     const st = TSET[d.g].filter(k => d.p[k] != null).sort((a, b) => d.p[b] - d.p[a]), gut = st.filter(k => d.p[k] >= 60).slice(0, 2), sw = st.filter(k => d.p[k] < 35).slice(-1);
@@ -77,7 +81,7 @@ JS = r'''
     return `<section class="stk" id="st-beste"><div class="stk-k"><h2>Die Besten</h2><small>Gesamtwert = Schnitt der Ränge pro 90 Minuten in ${TSET[g].map(k => TMET[k][0]).join(", ").replace(/, ([^,]*)$/, " und $1")}, ab 270 Minuten. 100 = überall Bestwert.</small></div>
       <div class="bst-t">${pos.map(f => `<button data-beste="${f}"${f === BESTE ? ' class="an"' : ""}>${FLAB[f][1]}</button>`).join("")}</div>
       ${L.map(([s, x], i) => { const st = TSET[x.g].filter(k => x.p[k] != null).sort((a, b) => x.p[b] - x.p[a]).slice(0, 2);
-        return `<button class="bst" data-profil="${esc(s.id)}"><span class="pl">${i + 1}</span>${pfFoto(s, 34, 34, 17)}<span class="nm"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc(x.typ[0])}</small></span><span class="sc" style="color:${x.wert >= 67 ? "#4ADE80" : x.wert >= 45 ? "#F5C26B" : "#FF8A8A"}">${x.wert}</span><span class="st">stark in ${st.map(k => TMET[k][0]).join(" und ")}</span></button>`; }).join("")}</section>`;
+        return `<button class="bst" data-profil="${esc(s.id)}"><span class="pl">${i + 1}</span>${pfFoto(s, 34, 34, 17)}<span class="nm"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc(typKurz(x.typ[0]))}</small></span><span class="sc" style="color:${x.wert >= 67 ? "#4ADE80" : x.wert >= 45 ? "#F5C26B" : "#FF8A8A"}">${x.wert}</span><span class="st">stark in ${st.map(k => TMET[k][0]).join(" und ")}</span></button>`; }).join("")}</section>`;
   }
   document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-beste]"); if (!b) return; e.preventDefault(); e.stopPropagation();
     BESTE = b.dataset.beste;
