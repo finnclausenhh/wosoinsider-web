@@ -700,7 +700,7 @@ button.chip.pfc{cursor:pointer}
 .vg-linie{position:absolute;left:0;right:0;top:30px;border-top:2px dashed rgba(169,180,198,.4)}
 .vg-fertig{position:absolute;left:0;top:29px;height:4px;border-radius:2px;background:linear-gradient(90deg,#E24A4A,#E0962B)}
 .vg-band{position:absolute;top:21px;height:22px;background:rgba(46,184,114,.14);border-radius:4px}
-.vg-band i{position:absolute;bottom:24px;left:0;font:600 9.5px var(--f-mono);font-style:normal;color:#6EE7A8;white-space:nowrap}
+.vg-band i{position:absolute;bottom:24px;right:0;font:600 9.5px var(--f-mono);font-style:normal;color:#6EE7A8;white-space:nowrap}
 .vg-p{position:absolute;top:31px;width:12px;height:12px;margin:-6px;border-radius:50%;background:var(--c);z-index:2}
 .vg-p.prog{background:var(--soft);border:2px dashed var(--c)}
 .vg-d{position:absolute;top:44px;font:600 10.5px var(--f-mono);white-space:nowrap}.vg-d.prog{color:#B5CBFF}
@@ -945,8 +945,8 @@ details.dzb[open]{padding-bottom:10px}
 .eins{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:800;letter-spacing:.3px;color:#4ADE80;white-space:nowrap}
 .eins svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .eins-z{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);margin-top:6px;justify-content:center}
-.pf-km .eins{margin-left:6px;vertical-align:-1px}
-.pf-km .eins svg{width:15px;height:15px}
+.pf-km .gg{display:flex;align-items:center;gap:4px;min-width:0}.pf-km .eins{margin-left:4px;flex:none}
+.pf-km .eins svg{width:14px;height:14px}.art-sv{margin-top:4px}
 .tipz{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border-radius:14px;padding:10px 10px 10px 12px;background:#1A2A52;border:1.5px solid #2F5BFF;color:var(--ink);font:inherit;cursor:pointer}
 .tipz-i{width:40px;height:40px;flex:none;border-radius:10px;background:#2F5BFF;display:grid;place-items:center}
 .tipz-i svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -1530,7 +1530,7 @@ details.dzb[open]{padding-bottom:10px}
   // Einsehbar, Prognose-Bilanz, Tippspiel "Spielt sie?" (Vorschau, Tipps nur auf dem Gerät), Gefragt diese Woche.
   const AUGE = '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>';
   const POKAL = '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>';
-  const einsTag = nur => `<span class="eins" title="Offizielle Startelf steht fest, bevor Kickbase die Aufstellung sperrt">${svg(AUGE)}EINSEHBAR</span>`;
+  const einsTag = nur => `<span class="eins" title="Die offizielle Aufstellung erscheint, solange du deine Kickbase-Aufstellung noch ändern kannst">${svg(AUGE)}EINSEHBAR</span>`;
   const BILANZ_AB = 14, STUFEN_AB = 42, SCHLUSS_MIN = 90;
   let G_LADEN = null, TQ = null, KZ = null, SS = null;
   let TIPPS = {}; try { TIPPS = JSON.parse(localStorage.getItem("woso-tipps") || "{}") || {}; } catch (e) {}
@@ -2058,6 +2058,15 @@ details.dzb[open]{padding-bottom:10px}
           <span class="fv-t"><span class="fv-l" style="left:${Math.min(a, b)}%;width:${Math.abs(a - b).toFixed(1)}%;background:${f}"></span><i class="v" style="left:${a}%"></i><i class="l" style="left:${b}%;background:${f}"></i></span>${x.top != null ? `<span class="fv-tf"><span><em>Top</em>${Number(x.top).toFixed(1).replace(".", ",")}</span><span><em>Flop</em>${Number(x.flop).toFixed(1).replace(".", ",")}</span></span>` : "<span></span>"}</button>`; }).join("")}
       ${g.hinweis ? `<p class="fv-h">${esc(g.hinweis)}</p>` : ""}</section>`;
   }
+  // Status-Verlauf in der Verletzungs-Meldung (Finn 05.11.2026), wie im Profil: Grafik und Einschätzung
+  function artVerlauf(m){
+    if (!SPN || !istSpielerin(m) || !m.spielerin) return "";
+    let s = findeSP(KURZ[m.verein], m.spielerin) || (SPN.spielerinnen || []).find(x => x.n === m.spielerin && x.k === KURZ[m.verein]); if (!s) return "";
+    if (!(s.status && ["raus", "gesperrt"].includes(s.status.s))) return "";
+    if (!s.einschaetzung) { const ve = verletzungEinsch(s); if (ve) s = Object.assign({}, s, {einschaetzung: ve}); }
+    const g = verlaufGrafik(s), e = s.einschaetzung; if (!g) return "";
+    return `<section class="pf-box art-sv">${kap("Status-Verlauf")}${g}${e && e.satz ? `<div class="pf-einsch"><b class="k">UNSERE EINSCHÄTZUNG</b>${esc(e.satz)}${e.vergleich ? `<p class="pf-vgl">${esc(e.vergleich)}</p>` : ""}</div>` : ""}</section>`;
+  }
   function article(id){
     const m = N.find(x => x.id === id); if (!m) return list();
     if (!SPN && (m.spiel_aufstellung || m.aufstellung)) ladeSPN().then(() => { SPIDX = null; if (VIEW === "meldungen" && decodeURIComponent(location.hash.slice(1)) === id) { const y = window.scrollY; article(id); window.scrollTo(0, y); } }).catch(() => {});
@@ -2081,7 +2090,7 @@ details.dzb[open]{padding-bottom:10px}
       ? (!freigabe(fi) && quelleURL(fi) ? `<a href="${esc(quelleURL(fi))}" target="_blank" rel="noopener">${nachweis(fi)}, Wikimedia Commons</a>` : nachweis(fi))
       : fc && fc.autor ? (fc.url ? `<a href="${esc(fc.url)}" target="_blank" rel="noopener">Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}, Wikimedia Commons</a>` : `Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}`) : "";
     ARTIKEL = id; const um = umfrageZu(m.id), tsA = tsArtikel(m);
-    $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${tsA ? tsA : um ? umfrageBlock(um) : ""}${kbBox(m.kickbase)}<div id="pf-karte">${auf || sc ? "" : profilKarte(m)}</div>
+    $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${tsA ? tsA : um ? umfrageBlock(um) : ""}<div id="art-sv">${auf || sc ? "" : artVerlauf(m)}</div>${kbBox(m.kickbase)}<div id="pf-karte">${auf || sc ? "" : profilKarte(m)}</div>
       <div id="kom" data-beitrag="${esc(m.id)}"></div>
       <div class="nachw">
       ${m.instagram ? `<a href="${esc(m.instagram)}" target="_blank" rel="noopener" style="font-size:14px">Instagram-Profil von ${esc(m.spielerin)}</a>` : ""}
@@ -2090,7 +2099,7 @@ details.dzb[open]{padding-bottom:10px}
       <p class="nq-mehr" hidden><button data-legal="so-entsteht">So entsteht WOSOINSIDER ›</button></p>
       </div>
     </article>`;
-    if (!auf && !sc && !SPN && istSpielerin(m)) ladeSPN().then(() => { const el = $("#pf-karte"); if (el && ARTIKEL === id) el.innerHTML = profilKarte(m); }).catch(() => {});
+    if (!auf && !sc && !SPN && istSpielerin(m)) ladeSPN().then(() => { const el = $("#pf-karte"); if (el && ARTIKEL === id) el.innerHTML = profilKarte(m); const sv = $("#art-sv"); if (sv && ARTIKEL === id) sv.innerHTML = artVerlauf(m); }).catch(() => {});
     // Kommentare: nur in der öffentlichen Webversion (Skripte setzt ticker_bau.py ein)
     if (window.WIKOM) window.WIKOM.mount(m.id);
     window.scrollTo(0, 0);
@@ -2132,7 +2141,7 @@ details.dzb[open]{padding-bottom:10px}
       <span class="pr-t h"><span data-kname="${esc(KNAME[p.heim_k] || "")}" title="${esc(p.heim)}">${esc(KNAME[p.heim_k] || p.heim)}</span><span class="kd-l" data-kader="${esc(p.heim_k)}">${logo(p.heim_k, 30)}</span></span>${mitte(p)}<span class="pr-t"><span class="kd-l" data-kader="${esc(p.gast_k)}">${logo(p.gast_k, 30)}</span><span data-kname="${esc(KNAME[p.gast_k] || "")}" title="${esc(p.gast)}">${esc(KNAME[p.gast_k] || p.gast)}</span></span></div>
       ${p.status !== "beendet" ? (() => { const v = AF && (AF.vorschau || []).some(x => x.id === p.id), a = [p.heim_aufstellung, p.gast_aufstellung].filter(Boolean), off = a.some(x => x.typ === "offiziell");
         return v || a.length ? `<div class="af-hin"><span class="${off ? "o" : "v"}">${off ? "OFFIZIELLE AUFSTELLUNG" : "VORSCHAU"}</span></div>` : ""; })() : ""}
-      ${p.status !== "beendet" && einsehbar(p) ? `<div class="eins-z">${einsTag()}<span>Startelf steht fest, bevor Kickbase sperrt</span></div>` : ""}${bs.length ? (klein ? `<div class="belh klein"><span class="kap">ENGLISCHE WOCHE</span></div>` : `<div class="belh"><span class="kap">ENGLISCHE WOCHE</span>${bs.map(([n, b]) => `<span><b>${esc(n)}</b> ${esc(b.text)}</span>`).join("")}</div>`) : ""}</button>`;
+      ${p.status !== "beendet" && einsehbar(p) ? `<div class="eins-z">${einsTag()}<span>Offizielle Aufstellung kommt, bevor Kickbase schließt</span></div>` : ""}${bs.length ? (klein ? `<div class="belh klein"><span class="kap">ENGLISCHE WOCHE</span></div>` : `<div class="belh"><span class="kap">ENGLISCHE WOCHE</span>${bs.map(([n, b]) => `<span><b>${esc(n)}</b> ${esc(b.text)}</span>`).join("")}</div>`) : ""}</button>`;
   }
   const alleSpiele = () => { const g = new Set(); return (SP.spieltage || []).flatMap(t => t.partien.concat(t.nachholspiele || [])).filter(p => !g.has(p.id) && g.add(p.id)); };
   function zeitraum(t){
@@ -2876,7 +2885,7 @@ details.dzb[open]{padding-bottom:10px}
     return "";
   }
 
-  const VERL_TYP = [[/kreuzband/i, "Kreuzbandriss", 180, 300], [/achilles/i, "Achillessehnenriss", 180, 300], [/meniskus/i, "Meniskusverletzung", 42, 120],
+  const VERL_TYP = [[/kreuzband/i, "Kreuzbandriss", 246, 334, 292], [/achilles/i, "Achillessehnenriss", 180, 300], [/meniskus/i, "Meniskusverletzung", 42, 120],
     [/syndesmose/i, "Syndesmoseverletzung", 42, 84], [/(außen|innen)?band(riss|verletzung)|bänderriss|bänder/i, "Bänderriss", 21, 56], [/bruch|fraktur/i, "Knochenbruch", 42, 84],
     [/muskelbündel/i, "Muskelbündelriss", 28, 56], [/muskelfaser|faserriss/i, "Muskelfaserriss", 14, 35], [/zerrung/i, "Zerrung", 7, 14], [/gehirnersch|kopfverletzung/i, "Gehirnerschütterung", 7, 21]];
   function verletzungEinsch(s){
@@ -2884,6 +2893,17 @@ details.dzb[open]{padding-bottom:10px}
     const t = VERL_TYP.find(x => x[0].test(st.grund)); if (!t) return null;
     const v = (s.verlauf || []).slice().reverse().find(x => x.status === "raus"), seit = (v && v.stand) || st.stand; if (!seit) return null;
     const d0 = new Date(seit + "T12:00"), plus = n => new Date(d0.getTime() + n * 864e5), iso = d => d.toISOString().slice(0, 10), kd = d => `${d.getDate()}.${d.getMonth() + 1}.`;
+    if (t[2] >= 150) {  // lange Ausfälle (Finn 05.11.2026): Etappen und Rückkehr als Monat, kein Tagesdatum
+      const MON = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+      const mk = d => MON[d.getMonth()].slice(0, 3) + (d.getFullYear() !== d0.getFullYear() ? " " + String(d.getFullYear()).slice(2) : "");
+      const med = t[4] || Math.round((t[2] + t[3]) / 2), r = plus(med), saison = r.getMonth() >= 5 && r.getMonth() <= 8;
+      const ET = [[90, "Lauftraining", "reha"], [150, "Training mit Ball", "reha"], [220, "Mannschaftstraining", "kader"]];
+      return {seit, typisch: [t[2], t[3]], stand: st.stand,
+        satz: `Ein ${t[1]} kostet Spielerinnen im europäischen Spitzenfußball im Mittel ${med} Tage, ${med / 30 % 1 > .5 ? "knapp " + Math.ceil(med / 30) : "gut " + Math.floor(med / 30)} Monate. Damit wäre sie etwa im ${MON[r.getMonth()]} ${r.getFullYear()} zurück${saison ? ", also zur neuen Saison" : ""}.${st.rueckkehr ? " Laut Bericht: " + st.rueckkehr + "." : ""}`,
+        phasen: [{d: kd(d0), iso: seit, t: t[1], typ: "verletzung"}].concat(ET.map(([n, l, ty]) => ({d: mk(plus(n)), iso: iso(plus(n)), t: l, typ: ty, prog: true})), [{d: mk(r), iso: iso(r), t: "zurück im Spiel", typ: "startelf", prog: true}]),
+        vergleich: t[4] ? `UEFA Women's Elite Club Injury Study (Hallén u. a., 2024): Kreuzbandriss im Mittel ${t[4]} Tage Ausfall, die meisten ${t[2]} bis ${t[3]} Tage. Die Zwischenschritte sind übliche Reha-Etappen, keine Meldungen zu ihr.`
+          : "Erfahrungswerte aus typischen Verläufen dieser Verletzung, keine ärztliche Prognose. Die Zwischenschritte sind übliche Reha-Etappen, keine Meldungen zu ihr."};
+    }
     const lang = n => n >= 150 ? `${Math.round(n / 30)} Monate` : `${Math.round(n / 7)} Wochen`, a = plus(t[2]), b = plus(t[3]);
     return {seit, typisch: [t[2], t[3]], stand: st.stand, satz: `Bei einem ${t[1]} fehlen Spielerinnen meist ${t[2] >= 150 ? Math.round(t[2] / 30) + " bis " + Math.round(t[3] / 30) + " Monate" : Math.round(t[2] / 7) + " bis " + Math.round(t[3] / 7) + " Wochen"}. Frühestens um den ${kd(a)} wieder im Kader, realistisch ${b.getMonth() >= 5 && b.getMonth() <= 7 ? "zur neuen Saison" : "um den " + kd(b)}.${st.rueckkehr ? " Laut Bericht: " + st.rueckkehr + "." : ""}`,
       phasen: [{d: kd(d0), iso: seit, t: t[1], typ: "verletzung"}, {d: kd(a), iso: iso(a), t: "frühestens wieder im Kader", typ: "kader", prog: true}, {d: kd(b), iso: iso(b), t: "realistisch zurück", typ: "startelf", prog: true}],
@@ -2893,7 +2913,7 @@ details.dzb[open]{padding-bottom:10px}
     const e = s.einschaetzung, sl = (s.verlauf || []).slice(-1)[0];
     if (!e || !e.seit || !(e.phasen || []).some(x => x.iso)) return "";
     const t0 = new Date(e.seit + "T12:00"), heute = new Date(), tag = d => Math.round((d - t0) / 864e5);
-    const ph = e.phasen.filter(x => x.iso), ende = Math.max(tag(new Date(ph[ph.length - 1].iso + "T12:00")), tag(heute) + 4, 1);
+    const ph = e.phasen.filter(x => x.iso), ende = Math.max(tag(new Date(ph[ph.length - 1].iso + "T12:00")), tag(heute) + 4, e.typisch ? e.typisch[1] : 0, 1);
     const pos = d => Math.min(100, Math.max(0, tag(d) / ende * 100));
     const ht = tag(heute), farbe = {verletzung: "#E24A4A", reha: "#E0962B", kader: "#6E9BFF", startelf: "#2EB872"};
     const ausr = i => i === 0 ? "translateX(-6px)" : i === ph.length - 1 ? "translateX(calc(-100% + 6px))" : "translateX(-50%)";
@@ -3286,7 +3306,7 @@ details.dzb[open]{padding-bottom:10px}
         const g = d <= -.6 ? ["FORMTIEF", "#F59E0B"] : d >= .6 ? ["AUFWIND", "#4ADE80"] : ["STABIL", "#8FB0FF"], pg = programmVon(s.k);
         return `<div class="pf-fm"><span class="l"><b style="color:${g[1]}">${g[0]}</b><span>Note <span class="mu">${dez(vor)}</span> → <b style="color:${g[1]}">${dez(l3)}</b> in den letzten 3</span>${pg && pg.ns && pg.ns !== "mittel" ? `<span style="font:700 10px var(--f-mono);color:${pg.ns === "schwer" ? "#FF8A8A" : "#4ADE80"}">${pg.ns === "schwer" ? "SCHWERES" : "LEICHTES"} PROGRAMM (Ø PLATZ ${Math.round(pg.nr)})</span>` : ""}</span>${spark(n.slice(-6), g[1])}</div>`; })()}
       ${std || elfC ? kap("Standards") + `<div class="pf-stds">${std}${elfC}</div>` : ""}
-      ${komH ? `<div class="kap">Nächste Spiele${dicht >= 3 ? ` <span class="pf-warn">${dicht} Spiele in 8 Tagen</span>` : ""}</div>${komH}${komH.includes('class="eins"') ? `<div class="pf-eins-leg">${einsTag(true)}<span>Startelf steht fest, bevor Kickbase sperrt (erstes Spiel des Spieltags)</span></div>` : ""}` : ""}</section>`;
+      ${komH ? `<div class="kap">Nächste Spiele${dicht >= 3 ? ` <span class="pf-warn">${dicht} Spiele in 8 Tagen</span>` : ""}</div>${komH}` : ""}</section>`;
     // Ihre Position im Vereinssystem (Finn 01.11.: feste Plätze der Formation, gespielte ausgemalt)
     const sys = ((SPN && SPN.vereine && SPN.vereine[s.k]) || {}).system;
     if (s.slots && s.slots.length && sys) {
