@@ -3687,7 +3687,7 @@ details.dzb[open]{padding-bottom:10px}
           const sie = nz.map((w, i) => pt(i, Math.max(.06, w[3].p / 100)).map(v => v.toFixed(1)).join(",")).join(" ");
           const lab = nz.map((w, i) => { const [x, y] = pt(i, 1.22), an = x < C - 8 ? "end" : x > C + 8 ? "start" : "middle";
             const yy = y - 10 + (y > 150 ? 8 : y < 70 ? -10 : 0);
-            return `<text x="${x.toFixed(0)}" y="${yy.toFixed(0)}" text-anchor="${an}" class="nl">${esc(w[4])}</text><text x="${x.toFixed(0)}" y="${(yy + 12).toFixed(0)}" text-anchor="${an}" class="nw">${esc(w[7])}</text><text x="${x.toFixed(0)}" y="${(yy + 24).toFixed(0)}" text-anchor="${an}" class="nv" fill="${rFarbe(w[3])}">${esc(rText(w[3]))}</text>`; }).join("");
+            return `<text x="${x.toFixed(0)}" y="${yy.toFixed(0)}" text-anchor="${an}" class="nl">${esc(w[4])}</text><text x="${x.toFixed(0)}" y="${(yy + 12).toFixed(0)}" text-anchor="${an}" class="nw">${esc(w[7])}</text><text x="${x.toFixed(0)}" y="${(yy + 24).toFixed(0)}" text-anchor="${an}" class="nv" fill="${rFarbe(w[3])}">${esc(rText(w[3]).replace(/, gleichauf mit \d+$/, ""))}</text>`; }).join("");
           netz = `<svg class="ww-netz" viewBox="-28 2 356 222" role="img" aria-label="Spielerprofil im Vergleich zu allen ${esc(P)}">
             ${[.25, .75, 1].map(f => `<polygon points="${ring(f)}" fill="none" stroke="rgba(255,255,255,.08)"/>`).join("")}
             <polygon points="${ring(.5)}" fill="none" stroke="rgba(255,255,255,.35)" stroke-dasharray="3 3"/>
