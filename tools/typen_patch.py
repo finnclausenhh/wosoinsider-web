@@ -62,7 +62,7 @@ JS = r'''
     return ["", ""];
   }
   function typZeile(s){
-    const d = typDaten()[s.id]; if (!d || !d.typ[0]) return "";
+    const d = typDaten()[s.id]; if (!d || !d.typ[0]) { const mi = TMIN(s); return PGRP(s) && s.pos && mi < 270 ? `<div class="typ"><span class="typ-k">SPIELERTYP</span><span>Den Typ bestimmen wir ab 270 Minuten, sie hat erst ${mi}.</span></div>` : ""; }
     const st = TSET[d.g].filter(k => d.p[k] != null).sort((a, b) => d.p[b] - d.p[a]), gut = st.filter(k => d.p[k] >= 60).slice(0, 2), sw = st.filter(k => d.p[k] < 35).slice(-1);
     const L = Object.entries(typDaten()).filter(([, x]) => x.fg === d.fg).sort((a, b) => b[1].wert - a[1].wert), pl = 1 + L.findIndex(([id]) => id === s.id);
     return `<div class="typ"><span class="typ-k">SPIELERTYP</span><b>${esc(d.typ[0][0].toUpperCase() + d.typ[0].slice(1))}</b><span>${esc(d.typ[1])}${gut.length ? `. Stark in ${gut.map(k => TMET[k][0]).join(" und ")}` : ""}${sw.length ? `, weniger in ${TMET[sw[0]][0]}` : ""}.</span>
