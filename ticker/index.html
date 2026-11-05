@@ -1046,6 +1046,7 @@ details.dzb[open]{padding-bottom:10px}
 .pf-km .gg{display:flex;align-items:center;gap:4px;min-width:0}.pf-km .eins{margin-left:4px;flex:none}
 .pf-km .eins svg{width:14px;height:14px}.art-sv{margin-top:4px}
 .eo{background:var(--card,#16223A);border:1px solid rgba(110,155,255,.22);border-radius:14px;padding:14px;display:grid;gap:10px;margin-top:10px}
+.eo-kb{margin:0;font-size:14.5px;line-height:1.5}
 .eo-z{display:grid;gap:2px}.eo-z b{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#8FB0FF}.eo-z span{font-size:14px;line-height:1.45}
 .eo-n{background:none;border:0;padding:0;color:inherit;font:inherit;font-weight:700;text-decoration:underline dashed rgba(255,255,255,.35);text-underline-offset:3px;cursor:pointer}
 .tipz{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border-radius:14px;padding:10px 10px 10px 12px;background:#1A2A52;border:1.5px solid #2F5BFF;color:var(--ink);font:inherit;cursor:pointer}
@@ -2264,8 +2265,9 @@ details.dzb[open]{padding-bottom:10px}
     if (aus) {
       const ers = (s.ersatz || []).map(r => mates.find(x => normS(nachN(x.n)) === normS(nachN(r.n)))).filter(Boolean).filter(fit);
       kon = (ers.length ? ers : mates.filter(fit).filter(x => q5(x) < 4).sort((x, y) => (RANG[pst(y)] ?? -1) - (RANG[pst(x)] ?? -1) || q5(y) - q5(x))).slice(0, 2);
-      if (kon.length) z.push(["Wer spielt für sie?", kon.map(x => { const r = (s.ersatz || []).find(e => normS(nachN(e.n)) === normS(nachN(x.n)));
-        return `Chance für ${btn(x)}${r && r.s ? `, stand schon ${r.s}x für sie in der Startelf` : ""}${pst(x) && STUFE[pst(x)] ? `, Prognose: ${STUFE[pst(x)][2]}` : ""}.`; }).join(" "), 1]);
+      if (kon.length) z.push(["Wer spielt für sie?", kon.map((x, i) => { const r = (s.ersatz || []).find(e => normS(nachN(e.n)) === normS(nachN(x.n))), pr = pst(x) && STUFE[pst(x)] ? STUFE[pst(x)][2].toLowerCase() : "";
+        return i === 0 ? `Wir rechnen mit ${btn(x)}${r && r.s ? `, sie stand schon ${r.s === 1 ? "einmal" : r.s + "-mal"} für ${esc(nachN(s.n))} in der Startelf` : ""}${pr ? `. Unsere Prognose für sie: ${pr}` : ""}.`
+          : `Auch ${btn(x)} ist möglich${pr ? `, Prognose ${pr}` : ""}.`; }).join(" "), 1]);
     } else {
       kon = mates.filter(fit).filter(x => ((x.spiele || []).slice(-1)[0] || {}).art === "S").sort((x, y) => q5(y) - q5(x)).slice(0, 2);
       if (kon.length) z.push(["Wen kann sie verdrängen?", kon.map(x => `${btn(x)}: ${q5(x)} der letzten ${Math.min(5, (x.spiele || []).length)} Ligaspiele in der Startelf.`).join(" "), 1]);
@@ -2279,7 +2281,7 @@ details.dzb[open]{padding-bottom:10px}
     const p = alleSpiele().filter(q => (q.heim_k === k || q.gast_k === k) && q.status !== "beendet" && q.status !== "abgesagt").sort((x, y) => (dt(x.anstoss) || Infinity) - (dt(y.anstoss) || Infinity))[0];
     if (p && terminiert(p)) z.push(["Aufstellung", einsehbar(p) ? "Die offizielle Aufstellung kommt, bevor Kickbase schließt. Wer unsicher ist, kann abwarten." : "Kickbase schließt vor der offiziellen Aufstellung. Hier zählt unsere Prognose."]);
     if (z.length < 2) return "";
-    return `<section class="eo">${kap("Unsere Einordnung für Kickbase")}${z.map(([t, x, html]) => `<div class="eo-z"><b>${esc(t)}</b><span>${html ? x : esc(x)}</span></div>`).join("")}</section>`;
+    return `<section class="eo">${kap("Für Kickbase")}${m.kickbase ? `<p class="eo-kb">${esc(m.kickbase)}</p>` : ""}${z.map(([t, x, html]) => `<div class="eo-z"><b>${esc(t)}</b><span>${html ? x : esc(x)}</span></div>`).join("")}</section>`;
   }
   function artVerlauf(m){
     if (!SPN || !istSpielerin(m) || !m.spielerin) return "";
@@ -2312,7 +2314,7 @@ details.dzb[open]{padding-bottom:10px}
       ? (!freigabe(fi) && quelleURL(fi) ? `<a href="${esc(quelleURL(fi))}" target="_blank" rel="noopener">${nachweis(fi)}, Wikimedia Commons</a>` : nachweis(fi))
       : fc && fc.autor ? (fc.url ? `<a href="${esc(fc.url)}" target="_blank" rel="noopener">Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}, Wikimedia Commons</a>` : `Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}`) : "";
     ARTIKEL = id; const um = umfrageZu(m.id), tsA = tsArtikel(m);
-    $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${tsA ? tsA : um ? umfrageBlock(um) : ""}<div id="art-sv">${auf || sc ? "" : artVerlauf(m)}</div>${kbBox(m.kickbase)}<div id="art-eo">${auf || sc ? "" : einordnung(m)}</div><div id="pf-karte">${auf || sc ? "" : profilKarte(m)}</div>
+    $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${tsA ? tsA : um ? umfrageBlock(um) : ""}<div id="art-sv">${auf || sc ? "" : artVerlauf(m)}</div><div id="art-eo">${(auf || sc ? "" : einordnung(m)) || kbBox(m.kickbase)}</div><div id="pf-karte">${auf || sc ? "" : profilKarte(m)}</div>
       <div id="kom" data-beitrag="${esc(m.id)}"></div>
       <div class="nachw">
       ${m.instagram ? `<a href="${esc(m.instagram)}" target="_blank" rel="noopener" style="font-size:14px">Instagram-Profil von ${esc(m.spielerin)}</a>` : ""}
@@ -2321,7 +2323,7 @@ details.dzb[open]{padding-bottom:10px}
       <p class="nq-mehr" hidden><button data-legal="so-entsteht">So entsteht WOSOINSIDER ›</button></p>
       </div>
     </article>`;
-    if (!auf && !sc && !SPN && istSpielerin(m)) ladeSPN().then(() => { const el = $("#pf-karte"); if (el && ARTIKEL === id) el.innerHTML = profilKarte(m); const eo = $("#art-eo"); if (eo && ARTIKEL === id) eo.innerHTML = einordnung(m); const sv = $("#art-sv"); if (sv && ARTIKEL === id) sv.innerHTML = artVerlauf(m); }).catch(() => {});
+    if (!auf && !sc && !SPN && istSpielerin(m)) ladeSPN().then(() => { const el = $("#pf-karte"); if (el && ARTIKEL === id) el.innerHTML = profilKarte(m); const eo = $("#art-eo"); if (eo && ARTIKEL === id) eo.innerHTML = einordnung(m) || kbBox(m.kickbase); const sv = $("#art-sv"); if (sv && ARTIKEL === id) sv.innerHTML = artVerlauf(m); }).catch(() => {});
     // Kommentare: nur in der öffentlichen Webversion (Skripte setzt ticker_bau.py ein)
     if (window.WIKOM) window.WIKOM.mount(m.id);
     window.scrollTo(0, 0);
@@ -3125,8 +3127,21 @@ details.dzb[open]{padding-bottom:10px}
   const VERL_TYP = [[/kreuzband/i, "Kreuzbandriss", 246, 334, 292], [/achilles/i, "Achillessehnenriss", 180, 300], [/meniskus/i, "Meniskusverletzung", 42, 120],
     [/syndesmose/i, "Syndesmoseverletzung", 42, 84], [/(außen|innen)?band(riss|verletzung)|bänderriss|bänder/i, "Bänderriss", 21, 56], [/bruch|fraktur/i, "Knochenbruch", 42, 84],
     [/muskelbündel/i, "Muskelbündelriss", 28, 56], [/muskelfaser|faserriss/i, "Muskelfaserriss", 14, 35], [/zerrung/i, "Zerrung", 7, 14], [/gehirnersch|kopfverletzung/i, "Gehirnerschütterung", 7, 21]];
+  function belastungEinsch(s){
+    const st = s.status || {}; if (st.s !== "raus" || !/belastung|schonung|geschont|pause/i.test(st.grund || "") || !SP) return null;
+    const seit = st.stand; if (!seit) return null;
+    const ps = alleSpiele().filter(p => (p.heim_k === s.k || p.gast_k === s.k) && p.status !== "abgesagt" && terminiert(p) && String(p.anstoss).slice(0, 10) >= seit).sort((a, b) => dt(a.anstoss) - dt(b.anstoss));
+    if (ps.length < 2) return null;
+    const g = p => kname(p.heim_k === s.k ? p.gast_k : p.heim_k), d1 = dt(ps[0].anstoss), mo = new Date(d1); mo.setDate(mo.getDate() + ((8 - mo.getDay()) % 7 || 7));
+    const iso = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`, kd = d => `${d.getDate()}.${d.getMonth() + 1}.`, d0 = new Date(seit + "T12:00");
+    return {seit, stand: st.stand, satz: `Keine Verletzung gemeldet: ${kname(s.k)} schont sie gegen ${g(ps[0])}. Wir erwarten sie ab Montag wieder im Training und gegen ${g(ps[1])} zurück im Kader.`,
+      phasen: [{d: kd(d0), iso: seit, t: "Belastungssteuerung", typ: "verletzung"}, {d: kd(d1), iso: iso(d1), t: "fehlt gegen " + g(ps[0]), typ: "verletzung"},
+        {d: kd(mo), iso: iso(mo), t: "Training", typ: "reha", prog: true}, {d: kd(dt(ps[1].anstoss)), iso: iso(dt(ps[1].anstoss)), t: "Kader gegen " + g(ps[1]), typ: "kader", prog: true}],
+      vergleich: "Eigene Einschätzung nach dem Spielplan, keine Meldung des Vereins zur Rückkehr."};
+  }
   function verletzungEinsch(s){
     const st = s.status || {}; if (st.s !== "raus" || !st.grund) return null;
+    { const b = belastungEinsch(s); if (b) return b; }
     const t = VERL_TYP.find(x => x[0].test(st.grund)); if (!t) return null;
     const v = (s.verlauf || []).slice().reverse().find(x => x.status === "raus"); let seit = (v && v.stand) || st.stand; if (!seit) return null;
     { const dm = new Date(seit + "T12:00"), txt = normS([st.grund, v && v.grund].concat(N.filter(m => m.spielerin === s.n).flatMap(m => [m.headline].concat(m.text || []))).join(" "));
@@ -3731,12 +3746,12 @@ details.dzb[open]{padding-bottom:10px}
       // [Wert, Titel, Unterzeile, Rang, Kurzname fürs Netz, Format der Skala, Einheit der Skala]
       if (st.sch && s.pos !== "TW") ww.push([st.sch, "Torschüsse", `${dez(st.sch / nSp)} pro Spiel`, LR(s, x => Sx(x).sch != null && M(x) ? Sx(x).sch / M(x) * 90 : null), "Torschüsse", d1, "pro 90 Min.", dez(st.sch / nSp) + " pro Spiel"]);
       if (af.kp != null && s.pos !== "TW") ww.push([af.kp, "Schlüsselpässe", `${dez(af.kp90)} pro 90 Minuten`, LR(s, x => (afSp(x.id) || {}).kp90 ?? null), "Schlüsselpässe", d1, "pro 90 Min.", dez(af.kp90) + " pro 90 Min."]);
-      if (st.zk_ges) ww.push([`${st.zk_w}/${st.zk_ges}`, "Zweikämpfe gewonnen", `${st.zk_w} von ${st.zk_ges} · ${Math.round(st.zk_w / st.zk_ges * 100)} %`, LR(s, x => Sx(x).zk_ges >= ab(10) && M(x) ? Sx(x).zk_w / M(x) * 90 : null), "Zweikämpfe", pc, "gewonnen", `${dez(st.zk_w / Math.max(1, M(s)) * 90, 1)} gewonnen pro 90`]);
+      if (st.zk_ges) ww.push([`${st.zk_w}/${st.zk_ges}`, "Zweikämpfe gewonnen", `${st.zk_w} von ${st.zk_ges} · ${Math.round(st.zk_w / st.zk_ges * 100)} %`, LR(s, x => Sx(x).zk_ges >= ab(10) && M(x) ? Sx(x).zk_w / M(x) * 90 : null), "Zweikämpfe", pc, "gewonnen", `${st.zk_w} gewonnen · ${dez(st.zk_w / Math.max(1, M(s)) * 90, 1)}/90`]);
       if (af.abw && af.abw[3] >= 90 && (s.pos === "ABW" || s.pos === "MF")) { const [tk, ic, bl, mn] = af.abw, sum = tk + ic + bl, w = sum / mn * 90;
-        ww.push([sum, "Abwehraktionen", `${dez(w, 1)} pro 90 · ${tk} ${tk === 1 ? "Tackling" : "Tacklings"} · ${ic} abgefangen${bl ? ` · ${bl} ${bl === 1 ? "Block" : "Blocks"}` : ""}`, LR(s, x => { const q = (afSp(x.id) || {}).abw; return q && q[3] >= ab(270) ? (q[0] + q[1] + q[2]) / q[3] * 90 : null; }), "Abwehrarbeit", d1, "pro 90 Min.", dez(w, 1) + " pro 90 Min."]); }
-      if (st.p_ges) ww.push([`${st.p_ok}/${st.p_ges}`, "Pässe angekommen", `${st.p_ok} von ${st.p_ges} · ${Math.round(st.p_ok / st.p_ges * 100)} %`, LR(s, x => Sx(x).p_ges >= ab(50) && M(x) ? Sx(x).p_ok / M(x) * 90 : null), "Pässe", pc, "angekommen", `${dez(st.p_ok / Math.max(1, M(s)) * 90, 0)} angekommen pro 90`]);
+        ww.push([sum, "Abwehraktionen", `${dez(w, 1)} pro 90 · ${tk} ${tk === 1 ? "Tackling" : "Tacklings"} · ${ic} abgefangen${bl ? ` · ${bl} ${bl === 1 ? "Block" : "Blocks"}` : ""}`, LR(s, x => { const q = (afSp(x.id) || {}).abw; return q && q[3] >= ab(270) ? (q[0] + q[1] + q[2]) / q[3] * 90 : null; }), "Abwehrarbeit", d1, "pro 90 Min.", sum + " · " + dez(w, 1) + "/90"]); }
+      if (st.p_ges) ww.push([`${st.p_ok}/${st.p_ges}`, "Pässe angekommen", `${st.p_ok} von ${st.p_ges} · ${Math.round(st.p_ok / st.p_ges * 100)} %`, LR(s, x => Sx(x).p_ges >= ab(50) && M(x) ? Sx(x).p_ok / M(x) * 90 : null), "Pässe", pc, "angekommen", `${st.p_ok} angekommen · ${dez(st.p_ok / Math.max(1, M(s)) * 90, 0)}/90`]);
       if (st.bk) ww.push([dez(st.bk / nSp, 0), "Ballkontakte pro Spiel", `${st.bk} gesamt`, LR(s, x => Sx(x).bk && M(x) ? Sx(x).bk / M(x) * 90 : null), "Ballkontakte", v => dez(v, 0), "pro 90 Min.", dez(st.bk / nSp, 0) + " pro Spiel"]);
-      if (af.drib) ww.push([`${af.drib[0]}/${af.drib[1]}`, "Dribblings erfolgreich", `${af.drib[0]} von ${af.drib[1]} · ${Math.round(af.drib[0] / af.drib[1] * 100)} %`, LR(s, x => { const d = (afSp(x.id) || {}).drib; return d && d[1] >= ab(5) && M(x) ? d[0] / M(x) * 90 : null; }), "Dribblings", pc, "erfolgreich", `${dez(af.drib[0] / Math.max(1, M(s)) * 90, 1)} erfolgreich pro 90`]);
+      if (af.drib) ww.push([`${af.drib[0]}/${af.drib[1]}`, "Dribblings erfolgreich", `${af.drib[0]} von ${af.drib[1]} · ${Math.round(af.drib[0] / af.drib[1] * 100)} %`, LR(s, x => { const d = (afSp(x.id) || {}).drib; return d && d[1] >= ab(5) && M(x) ? d[0] / M(x) * 90 : null; }), "Dribblings", pc, "erfolgreich", `${af.drib[0]} erfolgreich · ${dez(af.drib[0] / Math.max(1, M(s)) * 90, 1)}/90`]);
       if (af.parsp) ww.push([dez(af.par / af.parsp, 1), "Paraden pro Spiel", `${af.par} in ${af.parsp} Spielen`, LR(s, x => (afSp(x.id) || {}).parsp >= ab(3) ? afSp(x.id).par / afSp(x.id).parsp : null), "Paraden", d1, "pro Spiel", dez(af.par / af.parsp, 1) + " pro Spiel"]);
       { const e = s.pos === "TW" && AF && AF.elf_tw && AF.elf_tw[s.id], li = AF && AF.elf_tw_info, lq = li && li.liga && li.liga[0] ? Math.round((li.liga[0] - li.liga[1]) / li.liga[0] * 100) : null;
         const er = (() => { if (!e || e[0] < 1) return null; const v = Object.values(AF.elf_tw).filter(q => q[0] >= 1).map(q => q[2] || 0); if (v.length < 5) return null; const w = e[2] || 0;
