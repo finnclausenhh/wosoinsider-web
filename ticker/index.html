@@ -22,6 +22,7 @@
 <meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
 /* Runde 11 (Finn 04.11.2026): Weitere Werte mit Umschalter, Netz, Steckbrief neu, Einsatzbalken im Kader */
 .ww-netz{width:100%;max-width:360px;justify-self:center;display:block;overflow:visible}
+.kd-ty{color:#C9D3E2}
 .typ{display:grid;gap:3px;background:rgba(143,176,255,.08);border-radius:12px;padding:10px 12px;margin-bottom:4px}.typ-k{font:700 10px var(--f-mono);letter-spacing:1px;color:#8FB0FF}
 .typ b{font-family:var(--f-display);font-size:21px;font-weight:800;line-height:1.05}.typ span{font-size:13px;line-height:1.4;color:#C9D3E2}.typ-l{justify-self:start;background:none;border:0;padding:2px 0 0;color:#8FB0FF;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
 .bst-t{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 6px}.bst-t button{border:0;background:rgba(255,255,255,.07);color:#fff;font:inherit;font-size:12.5px;font-weight:600;border-radius:99px;padding:5px 11px;cursor:pointer}.bst-t button.an{background:#2F5BFF}
@@ -2251,6 +2252,20 @@ details.dzb[open]{padding-bottom:10px}
     const s = findeSP(KURZ[m.verein], m.spielerin) || (SPN.spielerinnen || []).find(x => x.n === m.spielerin); if (!s || !topIds().has(s.id)) return t;
     return ["TOP"].concat(t);
   }
+  // Analyse (Finn 05.11.2026): spielt die Ersatzspielerin anders, wer fängt Tore und Vorlagen auf?
+  function typAnalyse(s, kon){
+    const tA = typVon(s), x = kon[0], tB = typVon(x); if (!tA || !x || !tB || tA === tB) return "";
+    const d = typDaten()[s.id], off = d && ((d.p.tb ?? 0) >= 65 || (d.p.kp ?? 0) >= 65 || (d.p.sch ?? 0) >= 65);
+    let t = ` ${esc(nachN(x.n))} spielt anders als ${esc(nachN(s.n))}: ${esc(nachN(s.n))} ist ${esc(typNom(tA))}, ${esc(nachN(x.n))} ${esc(typNom(tB))}.`;
+    if (off) {
+      const tb = y => (y.spiele || []).reduce((a, e) => a + (e.tore || []).length + (e.vorl || 0), 0);
+      const L = (SPN.spielerinnen || []).filter(y => y.k === s.k && y.id !== s.id && y.id !== x.id && y.pos !== "TW" && !(y.status && ["raus", "gesperrt"].includes(y.status.s)) && ((y.spiele || []).slice(-1)[0] || {}).art === "S")
+        .sort((a, b) => tb(b) - tb(a)).filter(y => tb(y) >= 2).slice(0, 2);
+      const eig = tb(s);
+      if (L.length) t += ` ${esc(nachN(s.n))}s ${eig} ${eig === 1 ? "Torbeteiligung muss" : "Torbeteiligungen müssen"} dann andere liefern, am ehesten ${L.map(y => `<button class="eo-n" data-profil="${esc(y.id)}">${esc(nachN(y.n))}</button> (${tb(y)})`).join(" und ")}.`;
+    }
+    return t;
+  }
   function einordnung(m){
     if (!SPN || !istSpielerin(m) || !m.spielerin) return "";
     const k = KURZ[m.verein], s = findeSP(k, m.spielerin) || (SPN.spielerinnen || []).find(x => x.n === m.spielerin && x.k === k); if (!s) return "";
@@ -2272,8 +2287,9 @@ details.dzb[open]{padding-bottom:10px}
       const ers = (s.ersatz || []).map(r => mates.find(x => normS(nachN(x.n)) === normS(nachN(r.n)))).filter(Boolean).filter(fit);
       kon = (ers.length ? ers : mates.filter(fit).filter(x => q5(x) < 4 && ((x.spiele || []).slice(-1)[0] || {}).art !== "S").sort((x, y) => (RANG[pst(y)] ?? -1) - (RANG[pst(x)] ?? -1) || q5(y) - q5(x))).slice(0, 2);
       if (kon.length) z.push(["Wer spielt für sie?", kon.map((x, i) => { const r = (s.ersatz || []).find(e => normS(nachN(e.n)) === normS(nachN(x.n))), pr = pst(x) && STUFE[pst(x)] ? STUFE[pst(x)][2].toLowerCase() : "";
-        return i === 0 ? `Wir rechnen mit ${btn(x)}${r && r.s ? `, sie stand schon ${r.s === 1 ? "einmal" : r.s + "-mal"} für ${esc(nachN(s.n))} in der Startelf` : ""}${pr ? `. Unsere Prognose für sie: ${pr}` : ""}.`
-          : `Auch ${btn(x)} ist möglich${pr ? `, Prognose ${pr}` : ""}.`; }).join(" "), 1]);
+        const ty = typVon(x);
+        return i === 0 ? `Wir rechnen mit ${btn(x)}${ty ? `, ${esc(typDat(ty))}` : ""}${r && r.s ? `. Sie stand schon ${r.s === 1 ? "einmal" : r.s + "-mal"} für ${esc(nachN(s.n))} in der Startelf` : ""}${pr ? `. Unsere Prognose für sie: ${pr}` : ""}.`
+          : `Alternative wäre ${btn(x)}${ty ? `, ${esc(typNom(ty))}` : ""}${pr ? `, Prognose ${pr}` : ""}.`; }).join(" ") + typAnalyse(s, kon), 1]);
     } else {
       kon = mates.filter(fit).filter(x => ((x.spiele || []).slice(-1)[0] || {}).art === "S").sort((x, y) => q5(y) - q5(x)).slice(0, 2);
       if (kon.length) z.push(["Wen kann sie verdrängen?", kon.map(x => `${btn(x)}: ${q5(x)} der letzten ${Math.min(5, (x.spiele || []).length)} Ligaspiele in der Startelf.`).join(" "), 1]);
@@ -3123,6 +3139,14 @@ details.dzb[open]{padding-bottom:10px}
   const typKurz = t => ({"ausgewogene Außenverteidigerin": "ausgewogen", "offensive Außenverteidigerin": "offensiv", "defensive Außenverteidigerin": "defensiv",
     "ausgewogene Innenverteidigerin": "ausgewogen", "groß und zweikampfstark": "groß, zweikampfstark", "torgefährliche Mittelfeldspielerin": "torgefährlich",
     "arbeitet nach hinten mit": "defensiv stark", "mitspielende Torhüterin": "mitspielend", "mitspielende Stürmerin": "mitspielend"})[t] || t;
+  const TYPFORM = {"defensive Sechserin": ["eine defensive Sechserin", "einer defensiven Sechserin"], "offensive Sechserin": ["eine offensive Sechserin", "einer offensiven Sechserin"],
+    "Box-to-Box": ["eine Box-to-Box-Spielerin", "einer Box-to-Box-Spielerin"], "ausgewogene Außenverteidigerin": ["eine ausgewogene Außenverteidigerin", "einer ausgewogenen Außenverteidigerin"],
+    "offensive Außenverteidigerin": ["eine offensive Außenverteidigerin", "einer offensiven Außenverteidigerin"], "defensive Außenverteidigerin": ["eine defensive Außenverteidigerin", "einer defensiven Außenverteidigerin"],
+    "ausgewogene Innenverteidigerin": ["eine ausgewogene Innenverteidigerin", "einer ausgewogenen Innenverteidigerin"], "groß und zweikampfstark": ["groß und zweikampfstark", "einer großen, zweikampfstarken Innenverteidigerin"],
+    "torgefährliche Mittelfeldspielerin": ["eine torgefährliche Mittelfeldspielerin", "einer torgefährlichen Mittelfeldspielerin"], "arbeitet nach hinten mit": ["eine defensiv starke Außenspielerin", "einer defensiv starken Außenspielerin"],
+    "mitspielende Torhüterin": ["eine mitspielende Torhüterin", "einer mitspielenden Torhüterin"], "sicherer Rückhalt": ["ein sicherer Rückhalt", "einem sicheren Rückhalt"], "mitspielende Stürmerin": ["eine mitspielende Stürmerin", "einer mitspielenden Stürmerin"]};
+  const typNom = t => (TYPFORM[t] || ["eine " + t])[0], typDat = t => (TYPFORM[t] || [null, "einer " + t])[1];
+  const typVon = s => { const d = s && typDaten()[s.id]; return d && d.typ[0] ? d.typ[0] : null; };
   function typZeile(s){
     const d = typDaten()[s.id]; if (!d || !d.typ[0]) { const mi = TMIN(s); return PGRP(s) && s.pos && mi < 270 ? `<div class="typ"><span class="typ-k">SPIELERTYP</span><span>Den Typ bestimmen wir ab 270 Minuten, sie hat erst ${mi}.</span></div>` : ""; }
     const st = TSET[d.g].filter(k => d.p[k] != null).sort((a, b) => d.p[b] - d.p[a]), gut = st.filter(k => d.p[k] >= 60).slice(0, 2), sw = st.filter(k => d.p[k] < 35).slice(-1);
@@ -3536,7 +3560,7 @@ details.dzb[open]{padding-bottom:10px}
     const einsatz = (s, STX) => { const sp = s.spiele || [], mi = sp.reduce((a, e) => a + (e.min || 0), 0), st11 = sp.filter(e => e.art === "S").length, q = Math.min(100, mi / (kdMd * 90) * 100);
       return `<span class="kd-e" title="${mi} Minuten, ${st11} von ${kdMd} Spielen in der Startelf"><span class="kd-b"><i style="width:${Math.max(mi ? 4 : 0, q).toFixed(0)}%;background:${q >= 75 ? "#4ADE80" : q >= 35 ? "#8FB0FF" : "rgba(255,255,255,.3)"}"></i></span><small>${mi.toLocaleString("de-DE")}' · ${st11}/${kdMd} Startelf</small>${STX}</span>`; };
     const ROL = kaderRollen(L, kdMd);
-    const zeile = s => { const st = stArt(s.status), r = ROLLE[ROL[s.id]]; return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) + " · " : ""}<span class="kd-r" style="color:${r[1]}">${r[0]}</span></small>${istTalent(s) ? '<span class="kd-t">TALENT</span>' : ""}${stilKader(s)}</span>${einsatz(s, st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : "")}</button>`; };
+    const zeile = s => { const st = stArt(s.status), r = ROLLE[ROL[s.id]]; return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) + " · " : ""}<span class="kd-r" style="color:${r[1]}">${r[0]}</span>${typVon(s) ? ` · <span class="kd-ty">${esc(typKurz(typVon(s)))}</span>` : ""}</small>${istTalent(s) ? '<span class="kd-t">TALENT</span>' : ""}${stilKader(s)}</span>${einsatz(s, st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : "")}</button>`; };
     $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>${kap("Kader")}
       ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}<div class="kd-leg"><span><b style="color:#4ADE80">Stammelf</b> die 11 mit den meisten Startelf-Spielen</span><span><b style="color:#8FB0FF">Rotation</b> mehrfach in der Startelf</span><span><b style="color:#F5C26B">Joker</b> meist eingewechselt</span><span><b>Ergänzung</b> wenige Einsätze</span><span><b style="color:#C9A7FF">TALENT</b> bis 19 Jahre</span></div><div id="kd-trainer"></div>${kaderExtras(k, L)}${stdFeld(k)}</div>`;
     trainerteam(k);
