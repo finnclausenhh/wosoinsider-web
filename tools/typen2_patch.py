@@ -14,8 +14,8 @@ def patch(s):
   const typVon = s => { const d = s && typDaten()[s.id]; return d && d.typ[0] ? d.typ[0] : null; };
   function typZeile(s){""")
     # Kader: Typ-Chip neben der Rolle
-    s = rep(s, """class="kd-r" style="color:${r[1]}">${r[0]}</span></small>""", """class="kd-r" style="color:${r[1]}">${r[0]}</span>${typVon(s) ? ` · <span class="kd-ty">${esc(typKurz(typVon(s)))}</span>` : ""}</small>""")
-    s = rep(s, """.typ{display:grid;""", """.kd-ty{color:#C9D3E2}
+    s = rep(s, """class="kd-r" style="color:${r[1]}">${r[0]}</span></small>""", """class="kd-r" style="color:${r[1]}">${r[0]}</span></small>${typVon(s) ? `<small class="kd-ty">${esc(typVon(s)[0].toUpperCase() + typVon(s).slice(1))}</small>` : ""}""")
+    s = rep(s, """.typ{display:grid;""", """.kd-ty{display:block;color:#C9D3E2;font-size:12px;margin-top:1px}
 .typ{display:grid;""")
     # Einordnung: Typ der Ersatzspielerin, Alternative, Analyse bei anderem Typ
     s = rep(s, """        return i === 0 ? `Wir rechnen mit ${btn(x)}${r && r.s ? `, sie stand schon ${r.s === 1 ? "einmal" : r.s + "-mal"} für ${esc(nachN(s.n))} in der Startelf` : ""}${pr ? `. Unsere Prognose für sie: ${pr}` : ""}.`
