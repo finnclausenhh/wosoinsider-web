@@ -26,8 +26,8 @@ def patch(s):
     if (ps.length < 2) return null;
     const g = p => kname(p.heim_k === s.k ? p.gast_k : p.heim_k), d1 = dt(ps[0].anstoss), mo = new Date(d1); mo.setDate(mo.getDate() + ((8 - mo.getDay()) % 7 || 7));
     const iso = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`, kd = d => `${d.getDate()}.${d.getMonth() + 1}.`, d0 = new Date(seit + "T12:00");
-    return {seit, stand: st.stand, satz: `Keine Verletzung gemeldet: ${kname(s.k)} schont sie gegen ${g(ps[0])}. Wir erwarten sie ab Montag wieder im Training und gegen ${g(ps[1])} zurück im Kader.`,
-      phasen: [{d: kd(d0), iso: seit, t: "Belastungssteuerung", typ: "verletzung"}, {d: kd(d1), iso: iso(d1), t: "fehlt gegen " + g(ps[0]), typ: "verletzung"},
+    return {seit: iso(d1), stand: st.stand, satz: `Keine Verletzung gemeldet: ${kname(s.k)} schont sie gegen ${g(ps[0])}. Wir erwarten sie ab Montag wieder im Training und gegen ${g(ps[1])} zurück im Kader.`,
+      phasen: [{d: kd(d1), iso: iso(d1), t: "fehlt gegen " + g(ps[0]), typ: "verletzung"},
         {d: kd(mo), iso: iso(mo), t: "Training", typ: "reha", prog: true}, {d: kd(dt(ps[1].anstoss)), iso: iso(dt(ps[1].anstoss)), t: "Kader gegen " + g(ps[1]), typ: "kader", prog: true}],
       vergleich: "Eigene Einschätzung nach dem Spielplan, keine Meldung des Vereins zur Rückkehr."};
   }
