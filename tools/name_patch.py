@@ -5,7 +5,8 @@ def rep(s, a, b):
 def patch(s):
     a = '''    const ak = document.querySelector(".pfw-r .an"); if (ak) ak.parentElement.scrollLeft = ak.offsetLeft - ak.parentElement.clientWidth / 2 + ak.offsetWidth / 2;'''
     s = rep(s, a, a + '''
-    const nh = document.querySelector(".pf-kt h1"); if (nh) { let fs = 34; nh.style.fontSize = ""; while (nh.scrollWidth > nh.clientWidth + 1 && fs > 22) { fs -= 2; nh.style.fontSize = fs + "px"; } }''')
+    const nh = document.querySelector(".pf-kt h1"); if (nh) { let fs = 34; nh.style.fontSize = ""; const rg = document.createRange(), frei = () => nh.clientWidth - parseFloat(getComputedStyle(nh).paddingRight), breit = () => { rg.selectNodeContents(nh); return Math.max(...[...rg.getClientRects()].map(r => r.width)); };
+      while (breit() > frei() + 1 && fs > 22) { fs -= 2; nh.style.fontSize = fs + "px"; } }''')
     return s
 for f in sys.argv[1:]:
     s = open(f, encoding="utf-8").read(); t = patch(s); open(f, "w", encoding="utf-8").write(t); print("ok", f)
