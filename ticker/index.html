@@ -3741,6 +3741,7 @@ details.dzb[open]{padding-bottom:10px}
     h += pfWeiter(s);
     $("#main").innerHTML = `<div class="det pf">${pfZurueck()}<button class="pf-teilen" data-teilen="${esc(s.id)}" aria-label="Profil teilen">${svg('<path d="M12 15V4M8 8l4-4 4 4"/><path d="M6 12v7h12v-7"/>')}</button>${h}</div>`;
     const ak = document.querySelector(".pfw-r .an"); if (ak) ak.parentElement.scrollLeft = ak.offsetLeft - ak.parentElement.clientWidth / 2 + ak.offsetWidth / 2;
+    const nh = document.querySelector(".pf-kt h1"); if (nh) { let fs = 34; nh.style.fontSize = ""; while (nh.scrollWidth > nh.clientWidth + 1 && fs > 22) { fs -= 2; nh.style.fontSize = fs + "px"; } }
     document.querySelectorAll(".pf-sae").forEach(z => z.addEventListener("click", () => {
       const e = alle[+z.dataset.sae], det = $("#pf-det"), an = z.getAttribute("aria-pressed") === "true";
       document.querySelectorAll(".pf-sae").forEach(x => x.setAttribute("aria-pressed", "false"));
