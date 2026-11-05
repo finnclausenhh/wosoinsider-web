@@ -3163,15 +3163,17 @@ details.dzb[open]{padding-bottom:10px}
     sch: ["Torschüssen", x => (x.stat || {}).sch != null && TMIN(x) ? x.stat.sch / TMIN(x) * 90 : null],
     drib: ["Dribblings", x => { const d = (afSp(x.id) || {}).drib; return d && TMIN(x) ? d[0] / TMIN(x) * 90 : null; }],
     tb: ["Torbeteiligungen", x => TMIN(x) ? (x.spiele || []).reduce((a, e) => a + (e.tore || []).length + (e.vorl || 0), 0) / TMIN(x) * 90 : null],
+    hq: ["Haltequote", x => { const a = afSp(x.id) || {}, st = (x.spiele || []).filter(e => e.art === "S" && String(e.erg || "").includes(":")); if (!a.parsp || !st.length) return null;
+      const ga = st.reduce((n, e) => { const [h, g] = String(e.erg).split(":").map(Number); return n + ((e.ha === "H" ? g : h) || 0); }, 0) / st.length, sv = a.par / a.parsp; return sv + ga ? sv / (sv + ga) : null; }],
     par: ["Paraden", x => { const a = afSp(x.id) || {}; return a.parsp ? a.par / a.parsp : null; }],
     zn: ["Spielen zu null", x => { const st = (x.spiele || []).filter(e => e.art === "S"); if (!st.length) return null;
       return st.filter(e => { const [a, b] = String(e.erg || "").split(":").map(Number); return !isNaN(a) && (e.ha === "H" ? b : a) === 0; }).length / st.length; }],
     gr: ["Größe", x => (afSp(x.id) || {}).gr || null]};
-  const TSET = {TW: ["par", "zn", "pass", "bk"], IV: ["zk", "abw", "pass", "bk", "sch", "tb"], AV: ["abw", "zk", "kp", "drib", "pass", "tb"], DM: ["abw", "zk", "pass", "bk", "kp", "sch"],
+  const TSET = {TW: ["par", "hq", "zn", "pass", "bk"], IV: ["zk", "abw", "pass", "bk", "sch", "tb"], AV: ["abw", "zk", "kp", "drib", "pass", "tb"], DM: ["abw", "zk", "pass", "bk", "kp", "sch"],
     ZM: ["kp", "pass", "bk", "sch", "tb", "abw"], FL: ["sch", "tb", "drib", "kp", "zk", "bk"], ST: ["sch", "tb", "drib", "kp", "zk", "bk"]};
   let TCACHE = null;
   const NOTE46 = x => { const v = ((afSp(x.id) || {}).no || []).filter(n => n[2] >= 46); return v.length >= 3 ? v.reduce((a, n) => a + n[1], 0) / v.length : null; };
-  const EIN = x => { const l = (x.spiele || []).filter(e => e.erg && String(e.erg).includes(":") && e.art !== "X"); return l.length ? Math.round(TMIN(x) / (l.length * 90) * 100) : null; };
+  const EIN = x => { const l = (x.spiele || []).filter(e => e.erg && String(e.erg).includes(":")); return l.length ? Math.round(TMIN(x) / (l.length * 90) * 100) : null; };
   const BTAB = {TW: ["Torhüterinnen", ["TW"]], ABW: ["Abwehr", ["IV", "AV"]], MF: ["Mittelfeld", ["DM", "ZM"]], ST: ["Sturm", ["FL", "ST"]]};
   const tabVon = g => Object.keys(BTAB).find(t => BTAB[t][1].includes(g));
   const PGRPfg = f => ({RV: "AV", LV: "AV", OM: "ZM", LM: "FL", RM: "FL"})[f] || f;
@@ -3261,15 +3263,15 @@ details.dzb[open]{padding-bottom:10px}
     return `<div class="typ"><span class="typ-k">SPIELERTYP</span><b data-typerk="${esc(d.typ[0])}" style="cursor:pointer">${esc(d.typ[0][0].toUpperCase() + d.typ[0].slice(1))} <small style="font:600 11px var(--f-body,inherit);color:#8FB0FF">ⓘ</small></b><span>${esc(d.typ[1])}${gut.length ? `. Stark in ${gut.map(k => TMET[k][0]).join(" und ")}` : ""}${sw.length ? `, weniger in ${TMET[sw[0]][0]}` : ""}.</span>
       <button class="typ-l" data-beste="${tb}">Platz ${pl} von ${L.length} im Reiter ${esc(BTAB[tb][0])} · Gesamtwert ${d.wert} ›</button></div>`;
   }
-  let BESTE = "MF";
+  let BESTE = "ALLE";
   function besteSektion(){
     const T = typDaten(), pos = Object.keys(BTAB).filter(t => Object.values(T).some(x => tabVon(x.g) === t)); if (!pos.length) return ""; pos.push("ALLE");
-    if (!pos.includes(BESTE)) BESTE = pos.includes(tabVon(BESTE)) ? tabVon(BESTE) : pos.includes(tabVon(PGRPfg(BESTE))) ? tabVon(PGRPfg(BESTE)) : pos[0];
+    pos.unshift(pos.pop()); if (!pos.includes(BESTE)) BESTE = pos.includes(tabVon(BESTE)) ? tabVon(BESTE) : pos.includes(tabVon(PGRPfg(BESTE))) ? tabVon(PGRPfg(BESTE)) : pos[0];
     const L = Object.entries(T).filter(([, x]) => BESTE === "ALLE" || tabVon(x.g) === BESTE).sort((a, b) => b[1].wert - a[1].wert).slice(0, 10).map(([id, x]) => [spById(id), x]).filter(([s]) => s);
     return `<section class="stk" id="st-beste"><div class="stk-k"><h2>Die Besten</h2></div>
       <div class="bst-t">${pos.map(f => `<button data-beste="${f}"${f === BESTE ? ' class="an"' : ""}>${f === "ALLE" ? "Alle" : BTAB[f][0] === "Torhüterinnen" ? "Tor" : BTAB[f][0]}</button>`).join("")}</div>
       ${L.map(([s, x], i) => { const st = TSET[x.g].filter(k => x.p[k] != null).sort((a, b) => x.p[b] - x.p[a]).slice(0, 2);
-        return `<button class="bst" data-profil="${esc(s.id)}"><span class="bpl">${i + 1}</span>${pfFoto(s, 46, 46, 23)}<span class="nm"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc(FLAB[x.fg] ? FLAB[x.fg][1] : "")} · <span data-typerk="${esc(x.typ[0])}" style="text-decoration:underline dotted rgba(255,255,255,.3);text-underline-offset:3px">${esc(typKurz(x.typ[0]))}</span></small></span><span class="sc" style="color:${x.wert >= 67 ? "#4ADE80" : x.wert >= 45 ? "#F5C26B" : "#FF8A8A"}">${x.wert}${NOTE46(s) != null ? `<small class="bnt">Note ${dez(NOTE46(s))}</small>` : ""}</span><span class="st">stark in ${st.map(k => TMET[k][0]).join(" und ")}${x.ein != null ? `<i class="bein" style="color:${x.ein >= 75 ? "#4ADE80" : x.ein >= 45 ? "#F5C26B" : "#FF8A8A"}">${x.ein} % Spielzeit</i>` : ""}</span></button>`; }).join("")}<p class="bst-erkl">Gesamtwert: 40 % Statistik pro 90 Minuten und 40 % Note von API-Football, jeweils im Vergleich mit der eigenen Rolle, dazu 20 % Spielzeit. Spielzeit zählt nur Spiele, in denen sie im Kader stand: Wer verletzt fehlt, verliert nichts, wer geschont wird, schon. Ab 270 Minuten.${BESTE === "ALLE" ? " Unter Alle stehen alle Positionen zusammen, jede mit ihrem Wert aus der eigenen Rolle." : ""}</p></section>`;
+        return `<button class="bst" data-profil="${esc(s.id)}"><span class="bpl">${i + 1}</span>${pfFoto(s, 46, 46, 23)}<span class="nm"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc(FLAB[x.fg] ? FLAB[x.fg][1] : "")} · <span data-typerk="${esc(x.typ[0])}" style="text-decoration:underline dotted rgba(255,255,255,.3);text-underline-offset:3px">${esc(typKurz(x.typ[0]))}</span></small></span><span class="sc" style="color:${x.wert >= 67 ? "#4ADE80" : x.wert >= 45 ? "#F5C26B" : "#FF8A8A"}">${x.wert}${NOTE46(s) != null ? `<small class="bnt">Note ${dez(NOTE46(s))}</small>` : ""}</span><span class="st">stark in ${st.map(k => TMET[k][0]).join(" und ")}${x.ein != null ? `<i class="bein" style="color:${x.ein >= 75 ? "#4ADE80" : x.ein >= 45 ? "#F5C26B" : "#FF8A8A"}">${x.ein} % Spielzeit</i>` : ""}</span></button>`; }).join("")}<p class="bst-erkl">Gesamtwert: 40 % Statistik pro 90 Minuten und 40 % Note von API-Football, jeweils im Vergleich mit der eigenen Rolle, dazu 20 % Spielzeit, also der Anteil aller Ligaminuten ihres Teams. Ausfälle zählen mit, denn nur wer spielt, holt Punkte. Torhüterinnen zählen Paraden und Haltequote, damit eine Torhüterin mit wenig Arbeit nicht nur verliert. Ab 270 Minuten.${BESTE === "ALLE" ? " Unter Alle stehen alle Positionen zusammen, jede mit ihrem Wert aus der eigenen Rolle." : ""}</p></section>`;
   }
   document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-beste]"); if (!b) return; e.preventDefault(); e.stopPropagation();
     BESTE = b.dataset.beste;
