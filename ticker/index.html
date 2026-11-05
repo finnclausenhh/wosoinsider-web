@@ -2891,7 +2891,14 @@ details.dzb[open]{padding-bottom:10px}
   function verletzungEinsch(s){
     const st = s.status || {}; if (st.s !== "raus" || !st.grund) return null;
     const t = VERL_TYP.find(x => x[0].test(st.grund)); if (!t) return null;
-    const v = (s.verlauf || []).slice().reverse().find(x => x.status === "raus"), seit = (v && v.stand) || st.stand; if (!seit) return null;
+    const v = (s.verlauf || []).slice().reverse().find(x => x.status === "raus"); let seit = (v && v.stand) || st.stand; if (!seit) return null;
+    { const dm = new Date(seit + "T12:00"), txt = normS([st.grund, v && v.grund].concat(N.filter(m => m.spielerin === s.n).flatMap(m => [m.headline].concat(m.text || []))).join(" "));
+      const GEN = new Set(["fc", "sv", "vfl", "vfb", "tsg", "rb", "sc", "fsv", "bayer", "1899", "04", "05"]);
+      const treffer = e => String(e.gegner || "").split(/[\s.]+/).map(normS).filter(w => w.length >= 4 && !GEN.has(w)).some(w => txt.includes(w));
+      const sp = (s.spiele || []).concat(s.pokal || []).map(e => ({...e, d: String(e.datum || "").slice(0, 10)}))
+        .filter(e => e.d && (e.art === "S" || e.art === "E") && (dm - new Date(e.d + "T12:00")) / 864e5 >= 0 && (dm - new Date(e.d + "T12:00")) / 864e5 <= 7 && treffer(e))
+        .sort((a, b) => b.d.localeCompare(a.d));
+      if (sp.length && /spiel|partie|gegen/.test(txt)) seit = sp[0].d; }
     const d0 = new Date(seit + "T12:00"), plus = n => new Date(d0.getTime() + n * 864e5), iso = d => d.toISOString().slice(0, 10), kd = d => `${d.getDate()}.${d.getMonth() + 1}.`;
     if (t[2] >= 150) {  // lange Ausfälle (Finn 05.11.2026): Etappen und Rückkehr als Monat, kein Tagesdatum
       const MON = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
