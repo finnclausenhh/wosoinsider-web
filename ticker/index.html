@@ -1045,6 +1045,9 @@ details.dzb[open]{padding-bottom:10px}
 .eins-z{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);margin-top:6px;justify-content:center}
 .pf-km .gg{display:flex;align-items:center;gap:4px;min-width:0}.pf-km .eins{margin-left:4px;flex:none}
 .pf-km .eins svg{width:14px;height:14px}.art-sv{margin-top:4px}
+.eo{background:var(--card,#16223A);border:1px solid rgba(110,155,255,.22);border-radius:14px;padding:14px;display:grid;gap:10px;margin-top:10px}
+.eo-z{display:grid;gap:2px}.eo-z b{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#8FB0FF}.eo-z span{font-size:14px;line-height:1.45}
+.eo-n{background:none;border:0;padding:0;color:inherit;font:inherit;font-weight:700;text-decoration:underline dashed rgba(255,255,255,.35);text-underline-offset:3px;cursor:pointer}
 .tipz{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border-radius:14px;padding:10px 10px 10px 12px;background:#1A2A52;border:1.5px solid #2F5BFF;color:var(--ink);font:inherit;cursor:pointer}
 .tipz-i{width:40px;height:40px;flex:none;border-radius:10px;background:#2F5BFF;display:grid;place-items:center}
 .tipz-i svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -1327,7 +1330,8 @@ details.dzb[open]{padding-bottom:10px}
 .sf-lb{position:absolute;font:700 8.5px var(--f-mono);letter-spacing:.8px;color:rgba(255,255,255,.45)}
 .sf-m{left:50%;transform:translateX(-50%)}
 .sf-leg{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted);margin-top:6px}.sf-leg span{display:flex;gap:4px;align-items:center}.sf-leg i{width:7px;height:7px;border-radius:50%;display:inline-block}
-.sf-h{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:start;font-size:12.5px;line-height:1.4;color:#F5D08A;background:rgba(245,176,65,.1);border-radius:10px;padding:8px 10px;margin:8px 0 4px}
+.sf-h .sf-hl{display:block;margin-top:4px;padding:0;background:none;border:0;font-weight:600}
+.sf-h{display:grid;grid-template-columns:14px 1fr;gap:8px;align-items:start;font-size:12.5px;line-height:1.4;color:#F5D08A;background:rgba(245,176,65,.1);border-radius:10px;padding:8px 10px;margin:8px 0 4px}
 .sf-vl{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.sf-v{display:flex;gap:8px;align-items:center;background:var(--card);border-radius:10px;padding:8px 10px;font-size:13.5px;font-weight:600;color:inherit;text-align:left}
 .bb.sch{position:relative}.bb.sch i{position:absolute;left:0;top:0;bottom:0;background:#2F5BFF}.bb.sch i.t{background:#C7D6FF}
 .sf-el{display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;align-items:start;background:var(--card);border-radius:10px;padding:9px 12px;margin-top:8px;font-size:12.5px}.sf-el .k{font:700 9.5px var(--f-mono);letter-spacing:.7px;color:#8FB0FF;padding-top:2px}.sf-el span{display:grid;gap:2px}.sf-el small{font-size:10.5px;color:var(--muted)}.sf-el b{font-weight:600}.sf-el em{font-style:normal;display:block}.sf-el em small{display:inline}
@@ -1477,7 +1481,7 @@ details.dzb[open]{padding-bottom:10px}
     const a = m.aufstellung, auf = a && (a.startelf || []).length;
     const rechts = auf ? `<span class="nk-r" role="img" aria-label="${esc(m.verein)} gegen ${esc(a.gegner)}"><span class="kd-l" data-kader="${esc(KURZ[m.verein])}">${logo(KURZ[m.verein], 20)}</span><span class="kd-l" data-kader="${esc(KURZ[a.gegner])}">${logo(KURZ[a.gegner], 20)}</span></span>` : plakette(meldungsStatus(m));
     return `<button class="nk" data-id="${esc(m.id)}">${bild(m, 84, 84)}<div class="nk-b">
-      <div class="nk-top"><div class="tags">${(m.tags || []).map(tag).join("")}${auf ? tag("AUFSTELLUNG") : ""}</div>${rechts}</div>
+      <div class="nk-top"><div class="tags">${tagsVon(m).map(tag).join("")}${auf ? tag("AUFSTELLUNG") : ""}</div>${rechts}</div>
       ${auf ? `<p class="elf">${startelfZeile(a.startelf)}</p>` : `<h2>${esc(m.kurz || m.headline)}</h2>`}
       <div class="meta" data-lang="${esc(metaZeile(m, auf))}" data-kurz="${esc(metaZeile(m, auf, 1))}" data-nur="${esc(metaZeile(m, auf, 2))}">${esc(metaZeile(m, auf))}</div></div></button>`;
   }
@@ -2224,12 +2228,65 @@ details.dzb[open]{padding-bottom:10px}
       ${g.hinweis ? `<p class="fv-h">${esc(g.hinweis)}</p>` : ""}</section>`;
   }
   // Status-Verlauf in der Verletzungs-Meldung (Finn 05.11.2026), wie im Profil: Grafik und Einschätzung
+
+  // ---------------- Unsere Einordnung für Kickbase (Finn 05.11.2026)
+  let TOPIDS = null;
+  function topIds(){
+    if (TOPIDS || !SPN || !AF || !AF.sp) return TOPIDS || new Set();
+    const L = SPN.spielerinnen || [], no = L.map(s => [s.id, (AF.sp[s.id] || {})]).filter(([, a]) => a.avg && (a.no || []).filter(n => n[2] >= 60).length >= 4).sort((a, b) => b[1].avg - a[1].avg).slice(0, 20).map(x => x[0]);
+    const tb = s => (s.spiele || []).reduce((a, e) => a + (e.tore || []).length + (e.vorl || 0), 0);
+    const tbl = L.filter(s => s.pos !== "TW").sort((a, b) => tb(b) - tb(a)).slice(0, 10).filter(s => tb(s) >= 3).map(s => s.id);
+    return TOPIDS = new Set(no.concat(tbl));
+  }
+  const ausfallNews = m => ["verletzt", "gesperrt"].includes(m.status) || (m.tags || []).some(t => ["VERLETZUNG", "SPERRE", "ROTATION"].includes(t)) && m.status !== "fit";
+  function tagsVon(m){
+    const t = (m.tags || []).slice(); if (t.includes("TOP") || !istSpielerin(m) || !m.spielerin || !SPN || !ausfallNews(m)) return t;
+    const s = findeSP(KURZ[m.verein], m.spielerin) || (SPN.spielerinnen || []).find(x => x.n === m.spielerin); if (!s || !topIds().has(s.id)) return t;
+    return ["TOP"].concat(t);
+  }
+  function einordnung(m){
+    if (!SPN || !istSpielerin(m) || !m.spielerin) return "";
+    const k = KURZ[m.verein], s = findeSP(k, m.spielerin) || (SPN.spielerinnen || []).find(x => x.n === m.spielerin && x.k === k); if (!s) return "";
+    const sl = (s.verlauf || []).slice(-1)[0] || {}, zurueck = (m.tags || []).includes("RÜCKKEHR") || sl.status === "zurueck" || /zurück|wieder (fit|einsatzfähig|im Kader)/i.test(m.headline || "");
+    const aus = !zurueck && (ausfallNews(m) || (s.status && ["raus", "gesperrt"].includes(s.status.s)));
+    if (!aus && !zurueck) return "";
+    const z = [], M = x => (x.spiele || []).reduce((a, e) => a + (e.min || 0), 0), l5 = (s.spiele || []).slice(-5), st5 = l5.filter(e => e.art === "S").length;
+    // 1. Wie wichtig
+    const a = (AF && AF.sp && AF.sp[s.id]) || {}, rangN = (() => { if (!a.avg || !AF.sp) return null; const v = Object.values(AF.sp).filter(x => x.avg && (x.no || []).filter(n => n[2] >= 60).length >= 4).map(x => x.avg); return v.length >= 30 && (a.no || []).filter(n => n[2] >= 60).length >= 4 ? 1 + v.filter(x => x > a.avg).length : null; })();
+    const tb = (s.spiele || []).reduce((x, e) => x + (e.tore || []).length + (e.vorl || 0), 0);
+    if (l5.length) z.push(["Wie wichtig", `${st5 >= 4 ? "Stammspielerin" : st5 >= 2 ? "Rotation" : "Ergänzung"}: ${st5} der letzten ${l5.length} Ligaspiele in der Startelf${a.avg ? `, Notenschnitt ${dez(a.avg)}${rangN && rangN <= 30 ? ` (Platz ${rangN} der Liga)` : ""}` : ""}${s.pos !== "TW" && tb ? `, ${tb} ${tb === 1 ? "Torbeteiligung" : "Torbeteiligungen"}` : ""}.`]);
+    // 2. Wer spielt für sie / wen kann sie verdrängen
+    const gr = PGRP(s), mates = (SPN.spielerinnen || []).filter(x => x.k === k && x.id !== s.id && !x.trainer && (gr ? PGRP(x) === gr : x.pos === s.pos));
+    const fit = x => !(x.status && ["raus", "gesperrt"].includes(x.status.s)), q5 = x => (x.spiele || []).slice(-5).filter(e => e.art === "S").length;
+    const RANG = {sicher: 4, erwartet: 3, unsicher: 2, unwahrscheinlich: 1, ausgeschlossen: 0}, pst = x => (x.prognose || {}).st;
+    const nm = x => nachN(x.n), btn = x => `<button class="eo-n" data-profil="${esc(x.id)}">${esc(nm(x))}</button>`;
+    let kon = [];
+    if (aus) {
+      const ers = (s.ersatz || []).map(r => mates.find(x => normS(nachN(x.n)) === normS(nachN(r.n)))).filter(Boolean).filter(fit);
+      kon = (ers.length ? ers : mates.filter(fit).filter(x => q5(x) < 4).sort((x, y) => (RANG[pst(y)] ?? -1) - (RANG[pst(x)] ?? -1) || q5(y) - q5(x))).slice(0, 2);
+      if (kon.length) z.push(["Wer spielt für sie?", kon.map(x => { const r = (s.ersatz || []).find(e => normS(nachN(e.n)) === normS(nachN(x.n)));
+        return `Chance für ${btn(x)}${r && r.s ? `, stand schon ${r.s}x für sie in der Startelf` : ""}${pst(x) && STUFE[pst(x)] ? `, Prognose: ${STUFE[pst(x)][2]}` : ""}.`; }).join(" "), 1]);
+    } else {
+      kon = mates.filter(fit).filter(x => ((x.spiele || []).slice(-1)[0] || {}).art === "S").sort((x, y) => q5(y) - q5(x)).slice(0, 2);
+      if (kon.length) z.push(["Wen kann sie verdrängen?", kon.map(x => `${btn(x)}: ${q5(x)} der letzten ${Math.min(5, (x.spiele || []).length)} Ligaspiele in der Startelf.`).join(" "), 1]);
+    }
+    // 3. Belastung der Konkurrenz: Pflichtspiele in den letzten 8 Tagen
+    const jetzt = Date.now(), last = x => (x.spiele || []).map(e => [e.datum, e.min || 0, e.art]).map(e => e.concat([1])).concat((x.pokal || []).map(e => [e.datum, e.min || 0, e.art, e.min != null ? 1 : 0]))
+      .filter(e => e[0] && (e[2] === "S" || e[2] === "E") && jetzt - dt(String(e[0]).slice(0, 10) + "T12:00") <= 8 * 864e5 && jetzt >= dt(String(e[0]).slice(0, 10) + "T12:00"));
+    const bel = kon.map(x => [x, last(x)]).filter(([, l]) => l.length >= 2);
+    if (bel.length) z.push(["Belastung", bel.map(([x, l]) => `${esc(nm(x))}: ${l.length} Pflichtspiele in 8 Tagen${l.every(e => e[3]) ? `, ${l.reduce((a, e) => a + e[1], 0)} Minuten` : ""}.`).join(" ") + (aus ? "" : " Eine Pause ist möglich."), 1]);
+    // 4. Einsehbar
+    const p = alleSpiele().filter(q => (q.heim_k === k || q.gast_k === k) && q.status !== "beendet" && q.status !== "abgesagt").sort((x, y) => (dt(x.anstoss) || Infinity) - (dt(y.anstoss) || Infinity))[0];
+    if (p && terminiert(p)) z.push(["Aufstellung", einsehbar(p) ? "Die offizielle Aufstellung kommt, bevor Kickbase schließt. Wer unsicher ist, kann abwarten." : "Kickbase schließt vor der offiziellen Aufstellung. Hier zählt unsere Prognose."]);
+    if (z.length < 2) return "";
+    return `<section class="eo">${kap("Unsere Einordnung für Kickbase")}${z.map(([t, x, html]) => `<div class="eo-z"><b>${esc(t)}</b><span>${html ? x : esc(x)}</span></div>`).join("")}</section>`;
+  }
   function artVerlauf(m){
     if (!SPN || !istSpielerin(m) || !m.spielerin) return "";
     let s = findeSP(KURZ[m.verein], m.spielerin) || (SPN.spielerinnen || []).find(x => x.n === m.spielerin && x.k === KURZ[m.verein]); if (!s) return "";
     if (!(s.status && ["raus", "gesperrt"].includes(s.status.s))) return "";
     if (!s.einschaetzung) { const ve = verletzungEinsch(s); if (ve) s = Object.assign({}, s, {einschaetzung: ve}); }
-    const g = verlaufGrafik(s), e = s.einschaetzung; if (!g) return "";
+    const e = s.einschaetzung, g = verlaufGrafik(s) || (s.verlauf || []).length && `<div class="pf-tl">${s.verlauf.slice().reverse().slice(0, 4).map(v => `<div class="ev"><i style="background:${STFARBE[stArt({s: v.status, grund: v.grund})] || STFARBE[v.status] || "#8A95A8"}"></i><div><div class="dt">${esc(kurz(dt(v.stand)))}${v.quelle ? " · " + esc(String(v.quelle).split(",")[0]) : ""}</div><b style="display:block">${esc(v.grund || "")}</b>${v.rueckkehr && v.rueckkehr !== "offen" ? `<small style="display:block">${esc(v.rueckkehr)}</small>` : v.rueckkehr === "offen" ? '<small style="display:block">Rückkehr offen</small>' : ""}</div></div>`).join("")}</div>`; if (!g) return "";
     return `<section class="pf-box art-sv">${kap("Status-Verlauf")}${g}${e && e.satz ? `<div class="pf-einsch"><b class="k">UNSERE EINSCHÄTZUNG</b>${esc(e.satz)}${e.vergleich ? `<p class="pf-vgl">${esc(e.vergleich)}</p>` : ""}</div>` : ""}</section>`;
   }
   function article(id){
@@ -2244,7 +2301,7 @@ details.dzb[open]{padding-bottom:10px}
       ? `<div style="display:grid;gap:8px"><div class="tags">${(m.tags || []).map(tag).join("")}${tag("AUFSTELLUNG")}</div>
           <div style="display:flex;gap:8px;align-items:center"><button class="kd-btn" data-kader="${esc(KURZ[m.verein])}" aria-label="Kader ${esc(m.verein)}">${logo(KURZ[m.verein], 30)}</button><h1 class="disp" style="font-size:26px">${esc(m.headline)}</h1></div>
           <div class="dat">${esc(lang(m.zeit))}</div></div>${aufBlock(a, KURZ[m.verein])}${(m.text || []).length ? `<div class="body">${m.text.map(p => `<p>${esc(p)}</p>`).join("")}</div>` : ""}`
-      : `<div style="display:grid;gap:12px"><div class="mk">${istSpielerin(m) && m.spielerin ? `<button class="mk-foto" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}" aria-label="Profil von ${esc(m.spielerin)}">${bild(m, 96)}</button>` : bild(m, 96)}<div class="mk-m"><div class="tags">${(m.tags || []).map(tag).join("")}</div>
+      : `<div style="display:grid;gap:12px"><div class="mk">${istSpielerin(m) && m.spielerin ? `<button class="mk-foto" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}" aria-label="Profil von ${esc(m.spielerin)}">${bild(m, 96)}</button>` : bild(m, 96)}<div class="mk-m"><div class="tags">${tagsVon(m).map(tag).join("")}</div>
           <div class="wer">${m.pos === "Spielansetzung" ? esc(m.spielerin && m.spielerin !== "Spielansetzung" ? m.spielerin : [m.verein, m.aufstellung && m.aufstellung.gegner].filter(Boolean).join(" gegen ")) : istSpielerin(m) && m.spielerin ? `<button class="wer-btn" data-profilname="${esc(KURZ[m.verein] + "|" + m.spielerin)}">${esc(m.spielerin)}</button>` : esc(m.spielerin)}</div><div class="dat" style="font-size:14px">${esc(m.pos === "Spielansetzung" ? ((m.tags || []).includes("SPIELBERICHT") ? "Spielbericht" : (m.aufstellung ? "Aufstellung" : "Vorbericht")) : [m.verein, m.pos].filter(Boolean).join(" · "))}</div></div>
           ${st ? `<div class="mk-st">${plakette(meldungsStatus(m), 28)}<span>${st[2]}</span></div>` : ""}</div>
           <h1 class="disp" style="font-size:30px">${esc(m.headline)}</h1><div class="dat">${esc(lang(m.zeit))}</div></div>
@@ -2255,7 +2312,7 @@ details.dzb[open]{padding-bottom:10px}
       ? (!freigabe(fi) && quelleURL(fi) ? `<a href="${esc(quelleURL(fi))}" target="_blank" rel="noopener">${nachweis(fi)}, Wikimedia Commons</a>` : nachweis(fi))
       : fc && fc.autor ? (fc.url ? `<a href="${esc(fc.url)}" target="_blank" rel="noopener">Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}, Wikimedia Commons</a>` : `Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}`) : "";
     ARTIKEL = id; const um = umfrageZu(m.id), tsA = tsArtikel(m);
-    $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${tsA ? tsA : um ? umfrageBlock(um) : ""}<div id="art-sv">${auf || sc ? "" : artVerlauf(m)}</div>${kbBox(m.kickbase)}<div id="pf-karte">${auf || sc ? "" : profilKarte(m)}</div>
+    $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${tsA ? tsA : um ? umfrageBlock(um) : ""}<div id="art-sv">${auf || sc ? "" : artVerlauf(m)}</div>${kbBox(m.kickbase)}<div id="art-eo">${auf || sc ? "" : einordnung(m)}</div><div id="pf-karte">${auf || sc ? "" : profilKarte(m)}</div>
       <div id="kom" data-beitrag="${esc(m.id)}"></div>
       <div class="nachw">
       ${m.instagram ? `<a href="${esc(m.instagram)}" target="_blank" rel="noopener" style="font-size:14px">Instagram-Profil von ${esc(m.spielerin)}</a>` : ""}
@@ -2264,7 +2321,7 @@ details.dzb[open]{padding-bottom:10px}
       <p class="nq-mehr" hidden><button data-legal="so-entsteht">So entsteht WOSOINSIDER ›</button></p>
       </div>
     </article>`;
-    if (!auf && !sc && !SPN && istSpielerin(m)) ladeSPN().then(() => { const el = $("#pf-karte"); if (el && ARTIKEL === id) el.innerHTML = profilKarte(m); const sv = $("#art-sv"); if (sv && ARTIKEL === id) sv.innerHTML = artVerlauf(m); }).catch(() => {});
+    if (!auf && !sc && !SPN && istSpielerin(m)) ladeSPN().then(() => { const el = $("#pf-karte"); if (el && ARTIKEL === id) el.innerHTML = profilKarte(m); const eo = $("#art-eo"); if (eo && ARTIKEL === id) eo.innerHTML = einordnung(m); const sv = $("#art-sv"); if (sv && ARTIKEL === id) sv.innerHTML = artVerlauf(m); }).catch(() => {});
     // Kommentare: nur in der öffentlichen Webversion (Skripte setzt ticker_bau.py ein)
     if (window.WIKOM) window.WIKOM.mount(m.id);
     window.scrollTo(0, 0);
@@ -2674,9 +2731,13 @@ details.dzb[open]{padding-bottom:10px}
     const w = (IN.swaps || []).filter(s => zeigen(s.k)), r = (IN.standards || []).filter(s => STDALLE || zeigen(s.k));
     return `<section class="sek">${sektion("03", "Standards", "Standards", "Wer Ecken, Freistöße und Elfmeter schießt. Wechsel bei den Schützinnen kommen als Meldung.")}
 
-      <div style="display:grid;gap:4px;padding-top:8px"><h3 class="disp" style="font-size:21px">Wer schießt die Standards?</h3>
+      ${afStandards()}</section>`;
+  }
+  function schuetzenSektion(){
+    if (!(IN.standards || []).length) return "";
+    return `<section class="sek"><div style="display:grid;gap:4px;padding-top:8px"><h3 class="disp" style="font-size:21px">Wer schießt die Standards?</h3>
         <p class="af-st" style="font-size:12px">Je Verein als Spielfeld auf der Vereinsseite: Ecke links und rechts, Freistoß, Elfmeter mit Quote.</p></div>
-      <div class="sf-vl">${(IN.standards || []).map(s => `<button class="sf-v" data-kader="${esc(s.k)}">${logo(s.k, 26)}<span>${esc(kname(s.k))}</span></button>`).join("")}</div>${afStandards()}</section>`;
+      <div class="sf-vl">${(IN.standards || []).map(s => `<button class="sf-v" data-kader="${esc(s.k)}">${logo(s.k, 26)}<span>${esc(kname(s.k))}</span></button>`).join("")}</div></section>`;
   }
   function afStandards(){
     if (!AF || !AF.ecken) return "";
@@ -2763,7 +2824,7 @@ details.dzb[open]{padding-bottom:10px}
     const ph = IN.punkt_hinweis, pm = ph && N.find(m => m.id === ph.id), A = IN.analyse && (!SEL.size || !IN.analyse.verein || SEL.has(IN.analyse.verein)) ? IN.analyse : null;
     $("#main").innerHTML = vereinsZeile() + `<div class="iv">
       ${pm ? `<button class="phl" data-punkt="${esc(ph.id)}"><b>Keine Zeit?</b> ${esc(ph.text)} ›</button>` : ""}
-      ${IN.ausgabe ? hero(IN.ausgabe) : ""}${bilanzSektion()}${formSektion()}${standardSektion()}${spieleSektion()}${IN.kalender ? kalenderSektion(IN.kalender) : ""}
+      ${IN.ausgabe ? hero(IN.ausgabe) : ""}${bilanzSektion()}${formSektion()}${standardSektion()}${spieleSektion()}${IN.kalender ? kalenderSektion(IN.kalender) : ""}${schuetzenSektion()}
       ${A && A.news_zeit && dt(A.news_zeit) <= new Date() ? `<button class="af-innews" data-anaart="1"><span><b>Analyse der Woche</b><br><span class="mu">${esc(A.titel || "")}: steht jetzt in den News</span></span><span>›</span></button>` : A ? `<section class="sek" id="analyse">${sektion("06", "Analyse")}${analyseKopf(A, String(A.tag || "Analyse der Woche").toUpperCase())}${analyseInhalt(A)}</section>` : ""}
       <p class="dbasis">Datenbasis: Statistik, Aufstellungen und Liveticker der Sportschau, Termine von DFB und UEFA, Sperren aus der DFB-Sperrenliste. Inside enthält Einschätzungen der Redaktion von WOSOINSIDER und wird mit KI erstellt.</p></div>`;
     railAnbinden();
@@ -3327,8 +3388,13 @@ details.dzb[open]{padding-bottom:10px}
       const ers = (x.alt || []).find(drin), key = normS(nachN(x.n)); (fehlt[key] = fehlt[key] || {n: x.n, z: []}).z.push([lbl, ers]); });
     const zeilen = Object.values(fehlt).map(f => {
       const nachE = {}; f.z.forEach(([l, e]) => (nachE[e || ""] = nachE[e || ""] || []).push(l));
-      const teile = Object.entries(nachE).map(([e, ls]) => `${ls.join(" und ")}: ${e ? `voraussichtlich <b>${esc(e)}</b>` : "Ersatz unklar"}`);
-      return `<div class="sf-h">${svg(P.warn, "")}<span><b>${esc(f.n)}</b> nicht in der Startelf. ${teile.join(". ")}.</span><button class="lk" data-kader="${esc(k)}">Standards</button></div>`; });
+      const e3 = ((AF && AF.elf3 && AF.elf3[k]) || []).filter(x => drin(x[0]) && !sfGl(x[0], f.n)), seit = (AF && AF.elf3_seit) || "";
+      const teile = Object.entries(nachE).map(([e, ls]) => {
+        if (e) return `${ls.join(" und ")}: voraussichtlich <b>${esc(e)}</b>`;
+        const nurElf = ls.length === 1 && ls[0] === "Elfmeter", rest = ls.filter(l => l !== "Elfmeter");
+        const elfT = e3.length ? `Elfmeter: zuletzt ${e3.slice(0, 2).map(x => `<b>${esc(nachN(x[0]))}</b> ${x[1]} von ${x[1] + x[2]} verwandelt`).join(", ")} seit ${seit}` : `Elfmeter: in der Startelf hat seit ${seit} keine einen Ligaelfmeter geschossen`;
+        return ls.includes("Elfmeter") ? (nurElf ? elfT : `${rest.join(" und ")}: Ersatz unklar. ${elfT}`) : `${ls.join(" und ")}: Ersatz unklar`; });
+      return `<div class="sf-h">${svg(P.warn, "")}<span><b>${esc(f.n)}</b> nicht in der Startelf. ${teile.join(". ")}.<button class="lk sf-hl" data-kader="${esc(k)}">Alle Standards ›</button></span></div>`; });
     return zeilen.join("");
   }
   // Rollen im Kader (Finn 05.11.2026)
@@ -3353,8 +3419,8 @@ details.dzb[open]{padding-bottom:10px}
       return `<span class="kd-e" title="${mi} Minuten, ${st11} von ${kdMd} Spielen in der Startelf"><span class="kd-b"><i style="width:${Math.max(mi ? 4 : 0, q).toFixed(0)}%;background:${q >= 75 ? "#4ADE80" : q >= 35 ? "#8FB0FF" : "rgba(255,255,255,.3)"}"></i></span><small>${mi.toLocaleString("de-DE")}' · ${st11}/${kdMd} Startelf</small>${STX}</span>`; };
     const ROL = kaderRollen(L, kdMd);
     const zeile = s => { const st = stArt(s.status), r = ROLLE[ROL[s.id]]; return `<button class="pf-tr kd" data-profil="${esc(s.id)}">${pfFoto(s, 44, 44, 8)}<span class="pf-tx"><b>${esc(s.n)}</b><small>${s.nr ? "Nr. " + esc(s.nr) + " · " : ""}<span class="kd-r" style="color:${r[1]}">${r[0]}</span></small>${istTalent(s) ? '<span class="kd-t">TALENT</span>' : ""}${stilKader(s)}</span>${einsatz(s, st !== "fit" ? `<i class="pf-st" style="color:${STFARBE[st]};border-color:${STFARBE[st]}">${STWORT[st] || esc(st)}</i>` : "")}</button>`; };
-    $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>${stdFeld(k)}${kap("Kader")}<div class="kd-leg"><span><b style="color:#4ADE80">Stammelf</b> die 11 mit den meisten Startelf-Spielen</span><span><b style="color:#8FB0FF">Rotation</b> mehrfach in der Startelf</span><span><b style="color:#F5C26B">Joker</b> meist eingewechselt</span><span><b>Ergänzung</b> wenige Einsätze</span><span><b style="color:#C9A7FF">TALENT</b> bis 19 Jahre</span></div>
-      ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}<div id="kd-trainer"></div>${kaderExtras(k, L)}</div>`;
+    $("#main").innerHTML = `<div class="det pf-such"><button class="back" ${von === "zurueck" ? 'data-kaderzu="1"' : von ? `data-statview="${von}"` : 'data-suchezu="2"'}>‹ Zurück</button><div class="pf-vk">${logo(k, 30)}<h1 class="disp">${esc(Object.keys(KURZ).find(v => KURZ[v] === k) || kname(k))}</h1></div>${kap("Kader")}
+      ${["TW", "ABW", "MF", "ST"].map(p => { const l = L.filter(s => s.pos === p); return l.length ? kap({TW:"Tor", ABW:"Abwehr", MF:"Mittelfeld", ST:"Sturm"}[p]) + `<div class="pf-liste">${l.map(zeile).join("")}</div>` : ""; }).join("")}<div class="kd-leg"><span><b style="color:#4ADE80">Stammelf</b> die 11 mit den meisten Startelf-Spielen</span><span><b style="color:#8FB0FF">Rotation</b> mehrfach in der Startelf</span><span><b style="color:#F5C26B">Joker</b> meist eingewechselt</span><span><b>Ergänzung</b> wenige Einsätze</span><span><b style="color:#C9A7FF">TALENT</b> bis 19 Jahre</span></div><div id="kd-trainer"></div>${kaderExtras(k, L)}${stdFeld(k)}</div>`;
     trainerteam(k);
     window.scrollTo(0, 0);
   }
