@@ -48,7 +48,7 @@ JS = r'''
     const m = (...k) => { const v = k.map(x => p[x]).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0; };
     if (g === "TW") { const par = m("par"), auf = m("pass", "bk"), zn = m("zn"); return zn >= 65 && zn >= par ? ["sicherer Rückhalt", "viele Spiele zu null"] : auf >= par && auf >= 55 ? ["mitspielende Torhüterin", "viel am Ball, spielt mit"] : ["Paraden-Torhüterin", "hat viel zu halten und hält viel"]; }
     if (g === "IV") { const bau = m("pass", "bk"), def = m("zk", "abw"), gr = p.gr;
-      return bau >= def + 10 ? ["Aufbauspielerin", "eröffnet das Spiel von hinten"] : def >= 60 && gr != null && gr >= 60 ? ["groß und zweikampfstark", "gewinnt viele Duelle"] : def > bau ? ["Zweikämpferin", "stark gegen den Ball"] : ["ausgewogene Innenverteidigerin", "solide im Aufbau und im Zweikampf"]; }
+      return bau >= 65 && def >= 65 ? ["komplette Innenverteidigerin", "stark im Aufbau und im Zweikampf"] : bau >= def + 10 ? ["Aufbauspielerin", "eröffnet das Spiel von hinten"] : def >= 60 && gr != null && gr >= 60 ? ["groß und zweikampfstark", "gewinnt viele Duelle"] : def > bau ? ["Zweikämpferin", "stark gegen den Ball"] : ["ausgewogene Innenverteidigerin", "solide im Aufbau und im Zweikampf"]; }
     if (g === "AV") { const off = m("kp", "drib", "tb"), def = m("abw", "zk");
       return Math.abs(off - def) < 12 ? ["ausgewogene Außenverteidigerin", "vorne und hinten gefragt"] : off > def ? ["offensive Außenverteidigerin", "schaltet sich viel nach vorne ein"] : ["defensive Außenverteidigerin", "sichert hinten ab"]; }
     if (g === "DM") { const def = m("abw", "zk"), bau = m("pass", "bk"), off = m("kp", "sch");
@@ -63,7 +63,7 @@ JS = r'''
   }
   // Kurzform für Listen (Finn 05.11.2026: Umbrüche wie bei Kaut vermeiden)
   const typKurz = t => ({"ausgewogene Außenverteidigerin": "ausgewogen", "offensive Außenverteidigerin": "offensiv", "defensive Außenverteidigerin": "defensiv",
-    "ausgewogene Innenverteidigerin": "ausgewogen", "groß und zweikampfstark": "groß, zweikampfstark", "torgefährliche Mittelfeldspielerin": "torgefährlich",
+    "ausgewogene Innenverteidigerin": "ausgewogen", "komplette Innenverteidigerin": "komplett", "groß und zweikampfstark": "groß, zweikampfstark", "torgefährliche Mittelfeldspielerin": "torgefährlich",
     "arbeitet nach hinten mit": "defensiv stark", "mitspielende Torhüterin": "mitspielend", "mitspielende Stürmerin": "mitspielend"})[t] || t;
   function typZeile(s){
     const d = typDaten()[s.id]; if (!d || !d.typ[0]) { const mi = TMIN(s); return PGRP(s) && s.pos && mi < 270 ? `<div class="typ"><span class="typ-k">SPIELERTYP</span><span>Den Typ bestimmen wir ab 270 Minuten, sie hat erst ${mi}.</span></div>` : ""; }

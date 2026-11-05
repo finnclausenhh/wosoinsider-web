@@ -3122,7 +3122,7 @@ details.dzb[open]{padding-bottom:10px}
     const m = (...k) => { const v = k.map(x => p[x]).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0; };
     if (g === "TW") { const par = m("par"), auf = m("pass", "bk"), zn = m("zn"); return zn >= 65 && zn >= par ? ["sicherer Rückhalt", "viele Spiele zu null"] : auf >= par && auf >= 55 ? ["mitspielende Torhüterin", "viel am Ball, spielt mit"] : ["Paraden-Torhüterin", "hat viel zu halten und hält viel"]; }
     if (g === "IV") { const bau = m("pass", "bk"), def = m("zk", "abw"), gr = p.gr;
-      return bau >= def + 10 ? ["Aufbauspielerin", "eröffnet das Spiel von hinten"] : def >= 60 && gr != null && gr >= 60 ? ["groß und zweikampfstark", "gewinnt viele Duelle"] : def > bau ? ["Zweikämpferin", "stark gegen den Ball"] : ["ausgewogene Innenverteidigerin", "solide im Aufbau und im Zweikampf"]; }
+      return bau >= 65 && def >= 65 ? ["komplette Innenverteidigerin", "stark im Aufbau und im Zweikampf"] : bau >= def + 10 ? ["Aufbauspielerin", "eröffnet das Spiel von hinten"] : def >= 60 && gr != null && gr >= 60 ? ["groß und zweikampfstark", "gewinnt viele Duelle"] : def > bau ? ["Zweikämpferin", "stark gegen den Ball"] : ["ausgewogene Innenverteidigerin", "solide im Aufbau und im Zweikampf"]; }
     if (g === "AV") { const off = m("kp", "drib", "tb"), def = m("abw", "zk");
       return Math.abs(off - def) < 12 ? ["ausgewogene Außenverteidigerin", "vorne und hinten gefragt"] : off > def ? ["offensive Außenverteidigerin", "schaltet sich viel nach vorne ein"] : ["defensive Außenverteidigerin", "sichert hinten ab"]; }
     if (g === "DM") { const def = m("abw", "zk"), bau = m("pass", "bk"), off = m("kp", "sch");
@@ -3137,12 +3137,12 @@ details.dzb[open]{padding-bottom:10px}
   }
   // Kurzform für Listen (Finn 05.11.2026: Umbrüche wie bei Kaut vermeiden)
   const typKurz = t => ({"ausgewogene Außenverteidigerin": "ausgewogen", "offensive Außenverteidigerin": "offensiv", "defensive Außenverteidigerin": "defensiv",
-    "ausgewogene Innenverteidigerin": "ausgewogen", "groß und zweikampfstark": "groß, zweikampfstark", "torgefährliche Mittelfeldspielerin": "torgefährlich",
+    "ausgewogene Innenverteidigerin": "ausgewogen", "komplette Innenverteidigerin": "komplett", "groß und zweikampfstark": "groß, zweikampfstark", "torgefährliche Mittelfeldspielerin": "torgefährlich",
     "arbeitet nach hinten mit": "defensiv stark", "mitspielende Torhüterin": "mitspielend", "mitspielende Stürmerin": "mitspielend"})[t] || t;
   const TYPFORM = {"defensive Sechserin": ["eine defensive Sechserin", "einer defensiven Sechserin"], "offensive Sechserin": ["eine offensive Sechserin", "einer offensiven Sechserin"],
     "Box-to-Box": ["eine Box-to-Box-Spielerin", "einer Box-to-Box-Spielerin"], "ausgewogene Außenverteidigerin": ["eine ausgewogene Außenverteidigerin", "einer ausgewogenen Außenverteidigerin"],
     "offensive Außenverteidigerin": ["eine offensive Außenverteidigerin", "einer offensiven Außenverteidigerin"], "defensive Außenverteidigerin": ["eine defensive Außenverteidigerin", "einer defensiven Außenverteidigerin"],
-    "ausgewogene Innenverteidigerin": ["eine ausgewogene Innenverteidigerin", "einer ausgewogenen Innenverteidigerin"], "groß und zweikampfstark": ["groß und zweikampfstark", "einer großen, zweikampfstarken Innenverteidigerin"],
+    "ausgewogene Innenverteidigerin": ["eine ausgewogene Innenverteidigerin", "einer ausgewogenen Innenverteidigerin"], "komplette Innenverteidigerin": ["eine komplette Innenverteidigerin", "einer kompletten Innenverteidigerin"], "groß und zweikampfstark": ["groß und zweikampfstark", "einer großen, zweikampfstarken Innenverteidigerin"],
     "torgefährliche Mittelfeldspielerin": ["eine torgefährliche Mittelfeldspielerin", "einer torgefährlichen Mittelfeldspielerin"], "arbeitet nach hinten mit": ["eine defensiv starke Außenspielerin", "einer defensiv starken Außenspielerin"],
     "mitspielende Torhüterin": ["eine mitspielende Torhüterin", "einer mitspielenden Torhüterin"], "sicherer Rückhalt": ["ein sicherer Rückhalt", "einem sicheren Rückhalt"], "mitspielende Stürmerin": ["eine mitspielende Stürmerin", "einer mitspielenden Stürmerin"]};
   const typNom = t => (TYPFORM[t] || ["eine " + t])[0], typDat = t => (TYPFORM[t] || [null, "einer " + t])[1];
