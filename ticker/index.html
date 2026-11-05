@@ -26,7 +26,7 @@
 .typ b{font-family:var(--f-display);font-size:21px;font-weight:800;line-height:1.05}.typ span{font-size:13px;line-height:1.4;color:#C9D3E2}.typ-l{justify-self:start;background:none;border:0;padding:2px 0 0;color:#8FB0FF;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
 .bst-t{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 6px}.bst-t button{border:0;background:rgba(255,255,255,.07);color:#fff;font:inherit;font-size:12.5px;font-weight:600;border-radius:99px;padding:5px 11px;cursor:pointer}.bst-t button.an{background:#2F5BFF}
 .bst{display:grid;grid-template-columns:18px 34px minmax(0,1fr) auto;gap:2px 9px;align-items:center;width:100%;text-align:left;background:none;border:0;border-top:1px solid rgba(255,255,255,.06);padding:8px 0;color:inherit;font:inherit;cursor:pointer}
-.bst .pl{font-weight:800;color:#8FB0FF}.bst .nm b{display:block;font-size:13.5px}.bst .nm small{font-size:11px;color:var(--muted)}.bst .sc{font:800 20px var(--f-display)}.bst .st{grid-column:3/5;font-size:11px;color:#A9B4C6}
+.bst .bpl{font-weight:800;color:#8FB0FF;text-align:center}.bst .nm b{display:block;font-size:13.5px}.bst .nm small{font-size:11px;color:var(--muted)}.bst .sc{font:800 20px var(--f-display)}.bst .st{grid-column:3/5;font-size:11px;color:#A9B4C6}
 
 .af-ww .ps .wenig{font-style:normal;font-size:10.5px;color:var(--muted);opacity:.8}
 .fk-lg{position:relative;height:18px;margin:-2px 0 2px}.fk-lg button{position:absolute;top:0;transform:translateX(-50%);background:none;border:0;padding:0;cursor:pointer;line-height:0}
@@ -3139,7 +3139,7 @@ details.dzb[open]{padding-bottom:10px}
     return `<section class="stk" id="st-beste"><div class="stk-k"><h2>Die Besten</h2><small>Gesamtwert = Schnitt der Ränge pro 90 Minuten in ${TSET[g].map(k => TMET[k][0]).join(", ").replace(/, ([^,]*)$/, " und $1")}, ab 270 Minuten. 100 = überall Bestwert.</small></div>
       <div class="bst-t">${pos.map(f => `<button data-beste="${f}"${f === BESTE ? ' class="an"' : ""}>${FLAB[f][1]}</button>`).join("")}</div>
       ${L.map(([s, x], i) => { const st = TSET[x.g].filter(k => x.p[k] != null).sort((a, b) => x.p[b] - x.p[a]).slice(0, 2);
-        return `<button class="bst" data-profil="${esc(s.id)}"><span class="pl">${i + 1}</span>${pfFoto(s, 34, 34, 17)}<span class="nm"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc(typKurz(x.typ[0]))}</small></span><span class="sc" style="color:${x.wert >= 67 ? "#4ADE80" : x.wert >= 45 ? "#F5C26B" : "#FF8A8A"}">${x.wert}</span><span class="st">stark in ${st.map(k => TMET[k][0]).join(" und ")}</span></button>`; }).join("")}</section>`;
+        return `<button class="bst" data-profil="${esc(s.id)}"><span class="bpl">${i + 1}</span>${pfFoto(s, 34, 34, 17)}<span class="nm"><b>${esc(s.n)}</b><small>${esc(kname(s.k))} · ${esc(typKurz(x.typ[0]))}</small></span><span class="sc" style="color:${x.wert >= 67 ? "#4ADE80" : x.wert >= 45 ? "#F5C26B" : "#FF8A8A"}">${x.wert}</span><span class="st">stark in ${st.map(k => TMET[k][0]).join(" und ")}</span></button>`; }).join("")}</section>`;
   }
   document.addEventListener("click", e => { const b = e.target.closest && e.target.closest("[data-beste]"); if (!b) return; e.preventDefault(); e.stopPropagation();
     BESTE = b.dataset.beste;
