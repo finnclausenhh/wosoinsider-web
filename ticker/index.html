@@ -100,6 +100,8 @@
 .stl.k{font-size:9.5px;padding:1px 6px}
 .stl-l{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stl-l > div{display:grid;gap:4px;justify-items:start;align-content:start}.stl-l small{font-size:11.5px;line-height:1.35;color:var(--muted)}
 .stl-z{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.stl[data-stl]{cursor:pointer}.stl.sel{box-shadow:0 0 0 2px #0E1726,0 0 0 3.5px #8FB0FF}
+.stl-i{display:block;margin:-2px 0 6px 56px;font-size:11.5px;line-height:1.35;color:#C9D3E2;background:rgba(143,176,255,.1);border-radius:8px;padding:6px 8px;white-space:normal}
 
 /* Rollen im Kader (05.11.2026) */
 .kd-r{font-weight:600}.kd-t{font:700 9.5px var(--f-mono);letter-spacing:.04em;color:#C9A7FF;border:1px solid rgba(201,167,255,.5);border-radius:5px;padding:0 4px;justify-self:start;width:max-content;margin-top:3px}
@@ -1149,6 +1151,19 @@ details.dzb[open]{padding-bottom:10px}
 .fd-z.fd-k{border-top:0;font-size:11px;font-weight:700;color:var(--muted)}
 .fd-z .c{text-align:center;font-weight:700}.fd-z .ok{color:#4ADE80}.fd-z .no{color:#FF8A8A}
 .fd-h{font-size:11.5px;color:var(--muted);margin:6px 0 0}
+.trc{display:grid!important;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;background:var(--bg,#0E1726);overflow:hidden;position:relative;flex:none}
+.trc img{width:100%;height:100%;object-fit:cover;object-position:50% 8%;display:block;background:#2A3B5E}
+.trc-m{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:var(--d);height:var(--d);border-radius:50%;background:var(--bg,#0E1726);border:2px solid var(--line,rgba(255,255,255,.14));display:grid;place-content:center;justify-items:center;line-height:1}
+.trc-m b{font-family:var(--f-display);font-weight:800;font-size:calc(var(--d) * .42);color:#fff}
+.trc-m small{font-size:calc(var(--d) * .14);font-weight:800;letter-spacing:.4px;color:#8FB0FF;margin-top:1px}
+.trb{display:grid;gap:12px;width:100%;text-align:left;margin:0 0 10px;border-radius:16px;padding:16px;background:linear-gradient(135deg,#1B2B57,#13203C 60%);border:1px solid rgba(110,155,255,.35);color:#fff;font:inherit;box-sizing:border-box}
+.trb-k{display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:1.2px;font-weight:800;color:#8FB0FF}
+.trb-k i{font-style:normal;letter-spacing:0;font-size:11px;font-weight:700;color:#F5C518;background:rgba(245,197,24,.12);padding:3px 8px;border-radius:20px}
+.trb-m{display:flex;align-items:center;gap:12px}.trb-m b{font-family:var(--f-display);font-weight:800;font-size:23px;line-height:1.02}
+.trb-f{display:flex;flex:none}.trb-f img{width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:50% 8%;border:2px solid #14213F;background:#2A3B5E}.trb-f img+img{margin-left:-12px}
+.trb-p{display:flex;gap:4px}.trb-p i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.14)}.trb-p i.an{background:#2F5BFF}
+.trb-u{display:flex;justify-content:space-between;align-items:center;gap:10px}.trb-u small{font-size:12px;color:#A9B4C6}
+.trb-u em{font-style:normal;font-size:13px;font-weight:700;color:#fff;background:#2F5BFF;border-radius:8px;padding:6px 11px;white-space:nowrap}
 .fd-b{display:grid!important;place-content:center;justify-items:center;gap:2px;background:#24345A;flex:none}
 .fd-b b{font-family:var(--f-display);font-weight:800;font-size:28px;line-height:1;color:var(--ink)}
 .fd-b small{font-size:8.5px;font-weight:700;letter-spacing:.4px;color:var(--muted)}
@@ -1846,7 +1861,7 @@ details.dzb[open]{padding-bottom:10px}
     const ohne = r.fragen.filter(q => !N.some(m => m.typ !== "tipprunde" && (tsFrageZu(m) || {}).q === q));
     if (!ohne.length) return;
     N.push({id, typ: "tipprunde", zeit: SS.erstellt, tags: ["SPIELT SIE?"], headline: `Spielt sie? ${r.fragen.length} Fragen zum ${r.md}. Spieltag`,
-      kurz: `Spielt sie? ${r.fragen.length} Fragen zum ${r.md}. Spieltag`, spielerin: `Tippen bis ${wtUhr(r.schluss)}`, pos: "Spielansetzung", n_fragen: r.fragen.length});
+      kurz: `${r.fragen[0].frage} Und ${r.fragen.length - 1} weitere Fragen`, spielerin: `Tippen bis ${wtUhr(r.schluss)}`, pos: "Spielansetzung", n_fragen: r.fragen.length});
   }
   function trHoch(m){
     const r = tippRunde(); if (!r || !SS) return false;
@@ -1856,7 +1871,38 @@ details.dzb[open]{padding-bottom:10px}
     if (Date.now() >= r.schluss) return false;
     return [tg(dt(SS.erstellt)), tg(r.schluss - 864e5), tg(r.schluss)].includes(heute);
   }
-  const trBild = (m, g) => `<div class="bild fd-b" style="width:${g}px;height:${g}px;border-radius:${g > 70 ? 11 : 8}px" aria-hidden="true"><b>${m.n_fragen}</b><small>FRAGEN</small></div>`;
+  // Fotos der Runde: je Frage die erste Spielerin mit echtem Foto, höchstens 2 je Verein
+  function trFotos(n){
+    const r = tippRunde(); if (!r) return [];
+    const echt = nm => { const f = FOTOS[nm]; return f && !f.platzhalter && (f.portrait || f.datei) ? (f.portrait || f.datei) : ""; };
+    const kand = r.fragen.map(q => { const l = [];
+      if (q.s) l.push({src: echt(q.s.n), k: q.s.k || q.k});
+      q.optionen.forEach(o => { if (o.sid) { const s = spById(o.sid); if (s) l.push({src: echt(s.n), k: s.k}); return; }
+        const u = q.umfrage ? (q.umfrage.optionen || []).find(x => x.id === o.id) : null; if (u && u.nachname && !u.logo) l.push({src: echt(u.n), k: q.k}); });
+      return l.filter(x => x.src); });
+    const out = [], je = {};
+    for (let runde = 0; runde < 4 && out.length < n; runde++) kand.forEach(l => { const x = l[runde]; if (!x || out.length >= n || out.some(y => y.src === x.src) || (je[x.k] || 0) >= 2) return; je[x.k] = (je[x.k] || 0) + 1; out.push(x); });
+    return out;
+  }
+  const trBild = (m, g) => { const f = trFotos(4), r = g > 70 ? 11 : 8;
+    if (f.length < 4) return `<div class="bild fd-b" style="width:${g}px;height:${g}px;border-radius:${r}px" aria-hidden="true"><b>${m.n_fragen}</b><small>FRAGEN</small></div>`;
+    return `<div class="bild trc" style="width:${g}px;height:${g}px;border-radius:${r}px" aria-hidden="true">${f.map(x => `<img src="${esc(x.src)}" alt="" loading="lazy">`).join("")}<span class="trc-m" style="--d:${Math.round(g * .5)}px"><b>${m.n_fragen}</b><small>FRAGEN</small></span></div>`; };
+  // Am ersten Tag, an dem jemand die Runde sieht, einmal als Banner
+  function trGross(m){
+    const r = tippRunde(); if (!r) return false;
+    let g = {}; try { g = JSON.parse(localStorage.getItem("wi_tr_gross") || "{}"); } catch (e) {}
+    const heute = new Date().toDateString();
+    if (!g[r.md]) { g[r.md] = heute; try { localStorage.setItem("wi_tr_gross", JSON.stringify(g)); } catch (e) {} }
+    return g[r.md] === heute;
+  }
+  function trBanner(m){
+    const r = tippRunde(), f = trFotos(5), rest = r ? r.schluss - Date.now() : 0, tg = Math.floor(rest / 864e5), st = Math.floor(rest % 864e5 / 36e5);
+    const mein = r ? Object.keys(TIPPS[r.md] || {}).length : 0;
+    return `<button class="trb" data-id="${esc(m.id)}"><span class="trb-k"><span>SPIELT SIE? · ${r ? r.md : ""}. SPIELTAG</span>${rest > 0 ? `<i>noch ${tg ? tg + " T " : ""}${st} Std</i>` : ""}</span>
+      <span class="trb-m"><span class="trb-f">${f.map(x => `<img src="${esc(x.src)}" alt="">`).join("")}</span><b>${m.n_fragen} Fragen.<br>Wie gut kennst du die Liga?</b></span>
+      <span class="trb-p">${Array.from({length: m.n_fragen}, (_, i) => `<i${i < mein ? ' class="an"' : ""}></i>`).join("")}</span>
+      <span class="trb-u"><small>${mein} von ${m.n_fragen} getippt · 10 Punkte je Treffer</small><em>Tippen ›</em></span></button>`;
+  }
 
   function tippschein(){
     VIEW = "tipp"; ARTIKEL = null; GAME = null; BACK = null;
@@ -1902,6 +1948,12 @@ details.dzb[open]{padding-bottom:10px}
       const inner = jn ? zeile(nachN(q.s.n), tsSrc(q.s.n), q.k, pz("ja")) : os.filter(o => o.sp).map(o => zeile(o.name, o.src, o.k || q.k, Math.min(100, pz(o.id) + (st.beide ? pz("beide") : 0)))).join("");
       return inner ? `<div class="fw-q"><span class="fw-f">${esc(q.frage)}</span>${inner}<span class="fw-n">${zahlDE(ges)} Tipps</span></div>` : ""; }).join("");
     return rows ? `<div class="kartebox fw">${kap("Spielt sie? Das tippen die Fans")}${rows}</div>` : "";
+  }
+  function zuletztZeile(){
+    if (!SPN) return "";
+    const l = zuletzt().map(id => spById(id)).filter(Boolean).slice(0, 4); if (l.length < 2) return "";
+    return `<section class="gfw"><div class="kap">${svg('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>')}ZULETZT ANGESEHEN</div><div class="gfw-g">${l.map(s =>
+      `<button class="gfw-c" data-profil="${esc(s.id)}">${pfFoto(s, 34, 34, 17)}<span><b>${esc(nachN(s.n))}</b><small>${esc(kname(s.k))}</small></span></button>`).join("")}</div></section>`;
   }
   function gefragtZeile(){
     gLaden();
@@ -1949,9 +2001,9 @@ details.dzb[open]{padding-bottom:10px}
       : "";
     // Eigene Meldungen (Datenmeldungen, Tippspiel) und Module brauchen 5 echte News Abstand (Finn 05.11.2026)
     const AFID = new Set([...(AF && AF.news || []), ...(TAW || [])].map(n => n.id)), eigen = m => m.typ === "tipprunde" || AFID.has(m.id);
-    const MINAB = 5; let seit = 3, gi = 0; const warte = [], SONDER = [[gefragtZeile, 14]];
+    const MINAB = 5; let seit = 3, gi = 0; const warte = [], SONDER = [[zuletztZeile, 10], [gefragtZeile, 16]];
     const trTop = rest.find(m => m.typ === "tipprunde" && trHoch(m));
-    if (trTop) { h += karteF(trTop); seit = 0; }
+    if (trTop) { h += trGross(trTop) ? trBanner(trTop) : karteF(trTop); seit = 0; }
     const raus = nx => { if (seit < MINAB) return;
       if (A && dt(A.news_zeit) >= (nx ? dt(nx.zeit) || 0 : 0)) { h += anaTeaser(A); A = null; seit = 0; return; }
       if (warte.length) { h += karteF(warte.shift()); seit = 0; return; }
@@ -3111,6 +3163,7 @@ details.dzb[open]{padding-bottom:10px}
   function statView(art, sanft){
     BACK = "stat"; PR_STAPEL = []; setHash(art); VIEW_STAT = art;
     document.querySelectorAll("[data-statview]").forEach(b => b.setAttribute("aria-pressed", b.dataset.statview === art));
+    document.querySelectorAll(".seg[role=tablist] button").forEach(b => b.setAttribute("aria-selected", false));
     const zur = `<button class="back" data-statzu="1">‹ Zurück</button>`;
     if (!SP || !SPN) { $("#main").innerHTML = `<div class="det sv">${zur}<p class="leer">Wird geladen …</p></div>`;
       Promise.all([SP ? SP : loadSP(), ladeSPN()]).then(() => { if (VIEW_STAT === art && BACK === "stat") statView(art, true); })
@@ -3440,11 +3493,19 @@ details.dzb[open]{padding-bottom:10px}
     return STILE = out;
   }
   window.WI_STILE = () => stileAlle();
-  const stChip = (x, klein) => `<span class="stl${x.plus ? " plus" : ""}${klein ? " k" : ""}">${esc(x.t)}${x.plus ? "<sup>+</sup>" : ""}</span>`;
+  const stChip = (x, klein) => `<span class="stl${x.plus ? " plus" : ""}${klein ? " k" : ""}"${klein ? ` role="button" tabindex="0" data-stl="${esc(x.t + (x.plus ? "+" : "") + ": " + x.info + (x.was && !/Elfmetern|schießt/.test(x.info) ? ", " + x.was : ""))}"` : ""}>${esc(x.t)}${x.plus ? "<sup>+</sup>" : ""}</span>`;
   function stilBox(s){
     const l = (stileAlle()[s.id] || []).slice(0, 2); if (!l.length) return "";
     return `<section class="pf-box">${kap("Spielstile")}<div class="stl-l">${l.map(x => `<div>${stChip(x)}<small>${esc(x.info)}${x.was && !/Elfmetern|schießt/.test(x.info) ? "<br>" + esc(x.was) : ""}</small></div>`).join("")}</div></section>`;
   }
+  document.addEventListener("click", e => {
+    const c = e.target.closest && e.target.closest("[data-stl]"); if (!c) return;
+    e.preventDefault(); e.stopPropagation();
+    const z = c.closest(".stl-z"), an = c.classList.contains("sel");
+    document.querySelectorAll(".stl.sel").forEach(x => x.classList.remove("sel")); document.querySelectorAll(".stl-i").forEach(x => x.remove());
+    if (an) return;
+    c.classList.add("sel"); (c.closest(".pf-tr") || z).insertAdjacentHTML("afterend", `<span class="stl-i">${esc(c.dataset.stl)}</span>`);
+  }, true);
   const stilKader = s => { const l = (stileAlle()[s.id] || []).slice(0, 2); return l.length ? `<span class="stl-z">${l.map(x => stChip(x, true)).join("")}</span>` : ""; };
   // Mehr aus dem Kader: Leiste mit allen Spielerinnen des Vereins, vor und zurück (Finn 05.11.2026)
   function pfWeiter(s){
@@ -3588,6 +3649,8 @@ details.dzb[open]{padding-bottom:10px}
       if (st.sch && s.pos !== "TW") ww.push([st.sch, "Torschüsse", `${dez(st.sch / nSp)} pro Spiel`, ligaRang(s, x => Sx(x).sch != null && M(x) ? Sx(x).sch / M(x) * 90 : null), "Torschüsse", d1, "pro 90 Min.", dez(st.sch / nSp) + " pro Spiel"]);
       if (af.kp != null && s.pos !== "TW") ww.push([af.kp, "Schlüsselpässe", `${dez(af.kp90)} pro 90 Minuten`, ligaRang(s, x => (afSp(x.id) || {}).kp90 ?? null), "Schlüsselpässe", d1, "pro 90 Min.", dez(af.kp90) + " pro 90 Min."]);
       if (st.zk_ges) ww.push([`${st.zk_w}/${st.zk_ges}`, "Zweikämpfe gewonnen", `${st.zk_w} von ${st.zk_ges} · ${Math.round(st.zk_w / st.zk_ges * 100)} %`, ligaRang(s, x => Sx(x).zk_ges >= 10 ? Sx(x).zk_w / Sx(x).zk_ges : null), "Zweikämpfe", pc, "gewonnen", `${st.zk_w} von ${st.zk_ges} · ${Math.round(st.zk_w / st.zk_ges * 100)} %`]);
+      if (af.abw && af.abw[3] >= 90 && (s.pos === "ABW" || s.pos === "MF")) { const [tk, ic, bl, mn] = af.abw, sum = tk + ic + bl, w = sum / mn * 90;
+        ww.push([sum, "Abwehraktionen", `${dez(w, 1)} pro 90 · ${tk} ${tk === 1 ? "Tackling" : "Tacklings"} · ${ic} abgefangen${bl ? ` · ${bl} ${bl === 1 ? "Block" : "Blocks"}` : ""}`, ligaRang(s, x => { const q = (afSp(x.id) || {}).abw; return q && q[3] >= 270 ? (q[0] + q[1] + q[2]) / q[3] * 90 : null; }), "Abwehrarbeit", d1, "pro 90 Min.", dez(w, 1) + " pro 90 Min."]); }
       if (st.p_ges) ww.push([`${st.p_ok}/${st.p_ges}`, "Pässe angekommen", `${st.p_ok} von ${st.p_ges} · ${Math.round(st.p_ok / st.p_ges * 100)} %`, ligaRang(s, x => Sx(x).p_ges >= 50 ? Sx(x).p_ok / Sx(x).p_ges : null), "Passquote", pc, "angekommen", `${st.p_ok} von ${st.p_ges} · ${Math.round(st.p_ok / st.p_ges * 100)} %`]);
       if (st.bk) ww.push([dez(st.bk / nSp, 0), "Ballkontakte pro Spiel", `${st.bk} gesamt`, ligaRang(s, x => Sx(x).bk && M(x) ? Sx(x).bk / M(x) * 90 : null), "Ballkontakte", v => dez(v, 0), "pro 90 Min.", dez(st.bk / nSp, 0) + " pro Spiel"]);
       if (af.drib) ww.push([`${af.drib[0]}/${af.drib[1]}`, "Dribblings erfolgreich", `${af.drib[0]} von ${af.drib[1]} · ${Math.round(af.drib[0] / af.drib[1] * 100)} %`, af.drib[1] >= 5 ? ligaRang(s, x => { const d = (afSp(x.id) || {}).drib; return d && d[1] >= 5 ? d[0] / d[1] : null; }) : null, "Dribblings", pc, "erfolgreich", `${af.drib[0]} von ${af.drib[1]} · ${Math.round(af.drib[0] / af.drib[1] * 100)} %`]);
@@ -3635,7 +3698,7 @@ details.dzb[open]{padding-bottom:10px}
         const kurz = r => r.fair ? (r.p >= 50 ? "foult seltener als " + r.p + " %" : "foult häufiger als " + (100 - r.p) + " %") : r.p >= 100 ? "Bestwert" : r.p <= 0 ? "niedrigster Wert" : r.p >= 50 ? "besser als " + r.p + " %" : "schlechter als " + (100 - r.p) + " %";
         const kacheln = `<div class="af-ww kw">${ww.map(w => { const r = w[3];
           return `<div><b>${w[0]}</b><span class="lb">${esc(w[1])}</span>${w[2] ? `<span class="su">${esc(w[2])}</span>` : ""}${r ? `<span class="pl-l${r.neutral ? " neu" : ""}"><i style="left:${Math.max(3, Math.min(97, r.platz === 1 && !r.neutral ? 100 : r.p))}%"></i></span><span class="rg" style="color:${rFarbe(r)}">Platz ${r.platz} von ${r.n}</span><span class="ps">${esc(rText(r))}</span>` : ""}</div>`; }).join("")}</div>`;
-        h += `<section class="pf-box">${kap("Weitere Werte")}${netz}${kacheln}<p class="af-st">Platz und Prozent: Vergleich mit allen ${esc(P)} der Liga ab 270 Minuten. Rot, gelb, grün zeigt, wo sie in der Liga steht.${ww.some(w => w[3] && w[3].neutral) ? " Paraden in Blau ohne Wertung: wenige Paraden heißen oft nur, dass die Abwehr wenig zulässt." : ""} Schlüsselpässe, Dribblings und Paraden: API-Football, übrige Werte: Spielstatistik der Sportschau.</p></section>`;
+        h += `<section class="pf-box">${kap("Weitere Werte")}${netz}${kacheln}<p class="af-st">Platz und Prozent: Vergleich mit allen ${esc(P)} der Liga ab 270 Minuten. Rot, gelb, grün zeigt, wo sie in der Liga steht.${ww.some(w => w[3] && w[3].neutral) ? " Paraden in Blau ohne Wertung: wenige Paraden heißen oft nur, dass die Abwehr wenig zulässt." : ""} Schlüsselpässe, Dribblings, Abwehrarbeit und Paraden: API-Football, übrige Werte: Spielstatistik der Sportschau.</p></section>`;
       }
       const alleAF = Object.values((AF && AF.sp) || {}), grL = alleAF.map(x => x.gr).filter(Boolean), alL = alleAF.map(x => x.alter).filter(Boolean);
       const EPOS = x => { const t = String(((x.slots || [])[0] || [])[2] || "").replace(/ (links|rechts)$/, "");
