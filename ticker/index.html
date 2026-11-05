@@ -3929,12 +3929,15 @@ details.dzb[open]{padding-bottom:10px}
       { const e = s.pos === "TW" && AF && AF.elf_tw && AF.elf_tw[s.id], li = AF && AF.elf_tw_info, lq = li && li.liga && li.liga[0] ? Math.round((li.liga[0] - li.liga[1]) / li.liga[0] * 100) : null;
         const er = (() => { if (!e || e[0] < 1) return null; const v = Object.values(AF.elf_tw).filter(q => q[0] >= 1).map(q => q[2] || 0); if (v.length < 5) return null; const w = e[2] || 0;
           const eq = v.filter(x => Math.abs(x - w) < 1e-9).length; return {p: Math.round((v.filter(x => x < w - 1e-9).length + (eq - 1) / 2) / Math.max(1, v.length - 1) * 100), n: v.length, platz: 1 + v.filter(x => x > w + 1e-9).length, eq, w, min: Math.min(...v)}; })();
-        if (e && e[0]) ww.push([`${e[2] || 0}/${e[0]}`, "Elfmeter gehalten", `${e[0]} gegen sie, ${e[0] - e[1]} verwandelt · seit ${(li.saisons || [""])[0]}${lq != null ? ` · Liga trifft ${lq} %` : ""}`, er]); }
+        if (e && e[0]) ww.push([`${e[2] || 0}/${e[0]}`, "Elfmeter gehalten", `${e[0]} gegen sie, ${e[0] - e[1]} verwandelt${lq != null ? ` · Liga ${lq} %` : ""}`, er, "Elfmeter", v => String(v), "gehalten", `${e[2] || 0} von ${e[0]} gehalten`]); }
       { const TB = x => (x.spiele || []).reduce((a, e) => a + (e.tore || []).length + (e.vorl || 0), 0), tv = TB(s), mi = M(s);
         const GG = e => { const [a, b] = String(e.erg || "").split(":").map(Number); return isNaN(a) ? null : (e.ha === "H" ? b : a); }, ZN = x => (x.spiele || []).filter(e => e.art === "S" && GG(e) === 0).length;
         if (s.pos !== "TW" && mi) ww.push([tv, tv === 1 ? "Torbeteiligung" : "Torbeteiligungen", (() => { const t = sp.reduce((a, e) => a + (e.tore || []).length, 0), v = sp.reduce((a, e) => a + (e.vorl || 0), 0); return `${t} ${t === 1 ? "Tor" : "Tore"} · ${v} ${v === 1 ? "Vorlage" : "Vorlagen"} · ${dez(tv / mi * 90, 2)} pro 90 Min.`; })(), LR(s, x => M(x) >= ab(270) ? TB(x) / M(x) * 90 : null), "Torbeteiligungen", v => dez(v, 2), "pro 90 Min.", `${tv} · ${dez(tv / mi * 90, 2)} pro 90`]);
         if (s.pos === "TW" && sp.some(e => e.art === "S")) { const st11 = sp.filter(e => e.art === "S"), gt = st11.reduce((a, e) => a + (GG(e) || 0), 0);
-          ww.push([ZN(s), "Spiele zu null", `${gt} Gegentore in ${st11.length} Spielen`, LR(s, x => M(x) >= ab(270) ? ZN(x) : null), "Zu null", v => String(v), "Spiele", `${ZN(s)} von ${st11.length}`]); } }
+          ww.push([ZN(s), "Spiele zu null", `${gt} Gegentore in ${st11.length} Spielen`, LR(s, x => M(x) >= ab(270) ? ZN(x) : null), "Zu null", v => String(v), "Spiele", `${ZN(s)} von ${st11.length}`]);
+          const GA = x => { const l = (x.spiele || []).filter(e => e.art === "S"), g = l.reduce((a, e) => a + (GG(e) || 0), 0); return l.length ? g / l.length : null; };
+          const rg = LR(s, x => M(x) >= ab(270) ? -GA(x) : null);
+          ww.push([dez(gt / st11.length, 1), "Gegentore pro Spiel", `${gt} in ${st11.length} Spielen`, rg ? Object.assign({}, rg, {gegen: 1}) : null, "Gegentore", d1, "pro Spiel", dez(gt / st11.length, 1) + " pro Spiel"]); } }
       const gelb = sp.filter(e => e.gelb && !e.gr).length; if (gelb || st.fouls != null) { const fr = LR(s, x => Sx(x).fouls != null && M(x) ? -Sx(x).fouls / M(x) * 90 : null);
         ww.push([gelb + (gelb >= 4 ? " ⚠" : ""), gelb === 1 ? "Gelbe Karte" : "Gelbe Karten", gelb >= 4 ? "bei der 5. ein Spiel Sperre" : `${st.fouls || 0} ${st.fouls === 1 ? "Foul" : "Fouls"} · ${st.gef || 0}-mal gefoult`, fr ? Object.assign({}, fr, {fair: 1}) : null]); }
       if (ww.length % 2 === 1 && M(s)) { const mi = M(s), ns = sp.filter(e => e.art === "S").length; ww.push([`${mi.toLocaleString("de-DE")}'`, "Spielminuten", `${ns} von ${sp.length} Spielen in der Startelf`, LR(s, x => M(x) >= ab(270) ? M(x) : null)]); }
@@ -3942,11 +3945,12 @@ details.dzb[open]{padding-bottom:10px}
       const rFarbe = r => r.neutral ? "#8FB0FF" : r.platz === 1 ? "#4ADE80" : r.w <= r.min + 1e-9 ? "#FF6B6B" : pfarbe0(r.p), pfarbe = p => pfarbe0(p);
       const rText = r => { const mit = r.eq > 1 ? ` (wie ${r.eq - 1} ${r.eq === 2 ? "andere" : "andere"})` : "";
         if (r.neutral) return r.platz === 1 ? "die meisten Paraden" + mit : r.w <= r.min + 1e-9 ? "die wenigsten Paraden" + mit : r.p >= 50 ? "mehr als " + r.p + " %" : "weniger als " + (100 - r.p) + " %";
+        if (r.gegen) return r.platz === 1 ? "die wenigsten Gegentore" + mit : r.w <= r.min + 1e-9 ? "die meisten Gegentore" + mit : r.p >= 50 ? "weniger Gegentore als " + r.p + " %" : "mehr Gegentore als " + (100 - r.p) + " %";
         if (r.platz === 1) return (r.fair ? "die wenigsten Fouls" : "Bestwert") + mit;
         if (r.w <= r.min + 1e-9) return (r.fair ? "die meisten Fouls" : "niedrigster Wert") + mit;
         if (r.fair) return r.p >= 50 ? "foult seltener als " + r.p + " %" : "foult häufiger als " + (100 - r.p) + " %";
-        return r.p >= 50 ? "besser als " + r.p + " %" : "schlechter als " + (100 - r.p) + " %"; };
-      const satz = r => r.fair ? (r.p >= 50 ? "foult seltener als " + r.p + " % der " + P : "foult häufiger als " + (100 - r.p) + " % der " + P) : r.p >= 100 ? "Bestwert aller " + P : r.p <= 0 ? "niedrigster Wert aller " + P : r.p >= 50 ? "besser als " + r.p + " % der " + P : "schlechter als " + (100 - r.p) + " % der " + P;
+        return r.p >= 50 ? "mehr als " + r.p + " %" : "weniger als " + (100 - r.p) + " %"; };
+      const satz = r => r.fair ? (r.p >= 50 ? "foult seltener als " + r.p + " % der " + P : "foult häufiger als " + (100 - r.p) + " % der " + P) : r.p >= 100 ? "Bestwert aller " + P : r.p <= 0 ? "niedrigster Wert aller " + P : r.p >= 50 ? "mehr als " + r.p + " % der " + P : "weniger als " + (100 - r.p) + " % der " + P;
       const mitR = ww.filter(w => w[3] && !w[3].fair);
       if (ww.length) {
         // Netz: Perzentile gegen die eigene Position, gestrichelter Ring = Durchschnitt
@@ -3970,7 +3974,7 @@ details.dzb[open]{padding-bottom:10px}
             <polygon points="${sie}" fill="rgba(143,176,255,.28)" stroke="#8FB0FF" stroke-width="2"/>
             ${lab}</svg><p class="ww-nl"><i class="sie"></i>sie <i class="mw"></i>Ø aller ${esc(P)}</p>`;
         }
-        const kurz = r => r.fair ? (r.p >= 50 ? "foult seltener als " + r.p + " %" : "foult häufiger als " + (100 - r.p) + " %") : r.p >= 100 ? "Bestwert" : r.p <= 0 ? "niedrigster Wert" : r.p >= 50 ? "besser als " + r.p + " %" : "schlechter als " + (100 - r.p) + " %";
+        const kurz = r => r.fair ? (r.p >= 50 ? "foult seltener als " + r.p + " %" : "foult häufiger als " + (100 - r.p) + " %") : r.p >= 100 ? "Bestwert" : r.p <= 0 ? "niedrigster Wert" : r.p >= 50 ? "mehr als " + r.p + " %" : "weniger als " + (100 - r.p) + " %";
         const kacheln = `<div class="af-ww kw">${ww.map(w => { const r = w[3];
           return `<div><b>${w[0]}</b><span class="lb">${esc(w[1])}</span>${w[2] ? `<span class="su">${esc(w[2])}</span>` : ""}${r ? `<span class="pl-l${r.neutral ? " neu" : ""}"><i style="left:${Math.max(3, Math.min(97, r.platz === 1 && !r.neutral ? 100 : r.p))}%"></i></span><span class="rg" style="color:${rFarbe(r)}">Platz ${r.platz} von ${r.n}</span><span class="ps">${esc(rText(r).replace(/ \(wie \d+ andere\)$/, ""))}${r.eq > 1 ? `<br><i class="wenig">gleichauf mit ${r.eq - 1} ${r.eq === 2 ? "anderen" : "anderen"}</i>` : ""}${r.wenig ? '<br><i class="wenig">wenig Spielzeit, Wert schwankt noch</i>' : ""}</span>` : ""}</div>`; }).join("")}</div>`;
         h += `<section class="pf-box">${kap("Weitere Werte")}${typZeile(s)}${netz}${kacheln}<p class="af-st">Platz und Prozent: Vergleich mit allen ${esc(P)} der Liga ab 270 Minuten, gezählt pro 90 Minuten, denn Kickbase wertet jede Aktion. Rot, gelb, grün zeigt, wo sie in der Liga steht. Schlüsselpässe, Dribblings, Abwehrarbeit und Paraden: API-Football, übrige Werte: Spielstatistik der Sportschau.</p></section>`;
