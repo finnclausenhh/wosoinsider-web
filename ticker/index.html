@@ -369,6 +369,19 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .pr-z{display:grid;grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);align-items:center;gap:8px}
 .pr-t{display:flex;align-items:center;gap:8px;min-width:0;font-size:15px;font-weight:600;line-height:1.2}
 .pr-t.h{justify-content:flex-end;text-align:right}
+.live-l{display:grid;gap:8px}
+.live-k{display:flex;align-items:center;gap:6px;font:800 11px var(--f-mono);letter-spacing:.08em;color:var(--inj)}
+.live-k i{width:7px;height:7px;border-radius:50%;background:var(--inj);animation:lvp 1.6s infinite}
+@keyframes lvp{0%,100%{opacity:1}50%{opacity:.3}}
+.spl .as{display:flex;align-items:center;gap:1px;padding:2px 4px}
+.spl .as .vorl{width:14px;height:14px;display:block}
+.spl .as b{font:800 11px var(--f-body)}
+.fleg .as{display:inline-flex;align-items:center;background:#8FB0FF;color:#0B1220;border-radius:6px;padding:1px 4px}
+.fleg .as .vorl{width:12px;height:12px}
+.bsy{display:inline-flex;gap:1px;align-items:center;margin-left:4px;vertical-align:-2px}
+.bsy .ball,.bsy .vorl{width:13px;height:13px}
+.bsy.v{color:#8FB0FF}
+.bsy .krt{width:9px;height:12px;border-radius:2px}
 .pr-tore{display:grid;grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);gap:8px;margin-top:-4px;font-size:12px;line-height:1.25}
 .pr-tore>div{display:grid;gap:5px;align-content:start;min-width:0;padding-left:38px}
 .pr-tore>.h{padding-left:0;padding-right:38px;text-align:right}
@@ -1391,6 +1404,8 @@ details.dzb[open]{padding-bottom:10px}
     links:'<path d="M15 5l-7 7 7 7"/>', rechts:'<path d="M9 5l7 7-7 7"/>', pfeil:'<path d="M4 12h15M13 6l6 6-6 6"/>', uhr:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.1"/>'
   };
+  const VORL = '<svg class="vorl" viewBox="0 0 24 24" aria-label="Vorlage"><path d="M3 15.5h7.2l2.6-3.4 2.4.9c.9.4 1.5 1.2 1.6 2.2l.1 1.3H21v2.8H3z" fill="currentColor"/>'
+    + '<path d="M9.6 12.2l1.4 1.1M11 10.6l1.3 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5.2 15.5V9.2h3.9l1.6 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
   const BALL = '<svg class="ball" viewBox="0 0 24 24" aria-label="Tor"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.6l3.6 2.6-1.4 4.2H9.8L8.4 10.2z" fill="currentColor"/></svg>';
   const SIL = '<svg class="sil" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="30" r="22"/><path d="M4 100c0-26 20-44 46-44s46 18 46 44z"/></svg>';
   const logo = (k, g) => k ? `<img class="lg" data-lk="${esc(k)}" src="logos/${esc(k)}.png" alt="" style="width:${g}px;height:${g}px" onerror="this.style.visibility='hidden'">` : `<span style="width:${g}px;height:${g}px;display:inline-block"></span>`;
@@ -2012,6 +2027,28 @@ details.dzb[open]{padding-bottom:10px}
     </section>`;
   }
 
+  // Tore, Vorlagen, Karten aus live.json an die Spielerinnen der offiziellen Aufstellung (nur live, jedes Mal neu)
+  function liveMarken(p){
+    const live = p.status === "live" || p.status === "läuft";
+    [["heim", p.heim_aufstellung], ["gast", p.gast_aufstellung]].forEach(([seite, a]) => {
+      if (!a || a.typ !== "offiziell") return;
+      const alle = [...(a.startelf || []), ...(a.bank || [])];
+      alle.forEach(s => { if (s._lt) { ["tore", "vorl", "gelb", "rot", "gr", "_lt"].forEach(f => delete s[f]); } });
+      if (!live) return;
+      const nn = x => nNorm(x).replace(/[^a-z0-9 -]/g, "");
+      const finde = n => { const x = nn(n); if (!x) return null;
+        return alle.find(s => nn(s.n) === x) || alle.find(s => nn(s.n).endsWith(" " + x) || x.endsWith(" " + nn(s.n)) || nn(s.n).endsWith(x)); };
+      const setz = (n, f, v) => { const s = finde(n); if (!s) return; s._lt = true; s[f] = v === true ? true : (s[f] || 0) + 1; };
+      (p.tore || []).filter(t => t.seite === seite && t.art !== "Eigentor").forEach(t => { setz(t.n, "tore"); if (t.vorlage) setz(t.vorlage, "vorl"); });
+      (p.karten || []).filter(c => c.seite === seite).forEach(c => { if (c.art === "gelb") setz(c.n, "gelb", true); else { setz(c.n, "rot", true); if (c.art === "gelbrot") setz(c.n, "gr", true); } });
+    });
+  }
+  function liveLeiste(){
+    if (!SP) return "";
+    const l = (SP.spieltage || []).flatMap(t => t.partien.concat(t.nachholspiele || [])).filter(p => p.status === "live" || p.status === "läuft")
+      .sort((a, b) => (dt(a.anstoss) || 0) - (dt(b.anstoss) || 0));
+    return l.length ? `<div class="live-l"><div class="live-k"><i></i>LIVE</div>${l.map(p => partieZeile(p).replace('<button class="pr', '<button data-tabspiel="1" class="pr')).join("")}</div>` : "";
+  }
   function aufAngepfiffen(m){
     if (!SP || !(m.aufstellung || /^aufstellung-/.test(m.id || ""))) return false;
     const ma = ((m.quellen || [])[0] || {}).url || "", id = m.partie_id || (ma.match(/\/ma(\d+)\//) || [])[1];
@@ -2028,7 +2065,7 @@ details.dzb[open]{padding-bottom:10px}
     const rest = filter ? alle.filter(meineMeldung) : alle;
     let A = IN && IN.analyse && IN.analyse.news_zeit && dt(IN.analyse.news_zeit) <= now && (!SEL.size || NEWSALLE || !IN.analyse.verein || SEL.has(IN.analyse.verein)) ? IN.analyse : null;
     if (!fest.length && !alle.length){ $("#main").innerHTML = vereinsZeile() + '<p class="leer">Noch keine Meldungen.</p>'; return; }
-    let h = fest.map(punktKarte).join("");
+    let h = liveLeiste() + fest.map(punktKarte).join("");
     if (SEL.size) h += NEWSALLE
       ? `<div class="hinw"><span>Alle Meldungen</span><button data-newsalle="0">Nur meine Vereine</button></div>`
       : !rest.length ? `<div class="leer" style="padding:28px 4px;display:grid;gap:10px;justify-items:center"><span>Keine Meldungen deiner Vereine in den letzten 14 Tagen.</span><button class="lk" data-newsalle="1">Alle zeigen</button></div>`
@@ -2156,7 +2193,7 @@ details.dzb[open]{padding-bottom:10px}
         const istNeu = o.modus === "o" && (s.f === "neu" || (o.neu && o.neu.has(s.n))), neu = "";
         const mwN = Math.min(84, 334 / (r.length + 1) - 4), fsN = [12, 11, 10.5, 9.5, 9].find(f => String(s.n).length * f * .56 <= mwN) || 9;
         let ex = "";
-        if (o.modus === "o") { if (s.tore > 0) ex += `<span class="tg" aria-label="${s.tore} ${s.tore > 1 ? "Tore" : "Tor"}">${s.tore <= 3 ? BALL.repeat(s.tore) : BALL + "<b>×" + s.tore + "</b>"}</span>`; if (s.vorl > 0) ex += `<span class="as">${s.vorl}V</span>`; { const x = AFNOTEN && spAus(k, s), n = x && AFNOTEN[x.id]; if (n) ex += `<span class="nt${AFBEST && AFBEST.has(x.id) ? " best" : ""}" style="background:${NFARBE(n)}">${dez(n)}</span>`; } if (s.rot) ex += `<span class="kt">${karte(true)}</span>`; else if (s.gelb) ex += `<span class="kt">${karte(false)}</span>`; }
+        if (o.modus === "o") { if (s.tore > 0) ex += `<span class="tg" aria-label="${s.tore} ${s.tore > 1 ? "Tore" : "Tor"}">${s.tore <= 3 ? BALL.repeat(s.tore) : BALL + "<b>×" + s.tore + "</b>"}</span>`; if (s.vorl > 0) ex += `<span class="as" aria-label="${s.vorl} ${s.vorl > 1 ? "Vorlagen" : "Vorlage"}">${VORL}${s.vorl > 1 ? `<b>${s.vorl}</b>` : ""}</span>`; { const x = AFNOTEN && spAus(k, s), n = x && AFNOTEN[x.id]; if (n) ex += `<span class="nt${AFBEST && AFBEST.has(x.id) ? " best" : ""}" style="background:${NFARBE(n)}">${dez(n)}</span>`; } if (s.rot) ex += `<span class="kt">${karte(true)}</span>`; else if (s.gelb) ex += `<span class="kt">${karte(false)}</span>`; }
         const unten = "", mt = istNeu || (o.modus === "o" && s.aus) ? `<span class="mt">${istNeu ? '<i class="pn">NEU</i>' : ""}${o.modus === "o" && s.aus ? `<i class="pa">↓${esc(s.aus)}'</i>` : ""}</span>` : "";
         const tag = o.modus === "p" && s.warum ? "button" : (k ? "button" : "div");
         const attr = o.modus === "p" && s.warum ? ` data-chip="${esc(o.seite + "|" + s.n)}" title="${esc(s.warum)}"` : (k ? ` data-profilname="${esc(k + "|" + (s.voll || s.n))}"` : "");
@@ -2186,7 +2223,7 @@ details.dzb[open]{padding-bottom:10px}
     if (!bank.length) return "";
     const g = {}; bank.forEach(s => (g[GRUPPE(s.p)] = g[GRUPPE(s.p)] || []).push(s));
     return `<div class="wb"><h4>${esc(titel || "Bank")}</h4><div class="bk">${["TW","ABW","MF","ST"].concat(Object.keys(g).filter(x => !["TW","ABW","MF","ST"].includes(x))).filter(p => g[p]).map(p =>
-      `<span class="ps">${esc(p)}</span><span class="ns">${g[p].map(s => `<b${s.dim ? ' class="dim"' : ""}>${esc(s.n)}${s.em ? `<span class="em">${esc(s.em)}</span>` : ""}${rausSet && rausSet.has(s.n) ? '<span class="rr">RAUS</span>' : ""}</b>`).join("")}</span>`).join("")}</div></div>`;
+      `<span class="ps">${esc(p)}</span><span class="ns">${g[p].map(s => `<b${s.dim ? ' class="dim"' : ""}>${esc(s.n)}${s.em ? `<span class="em">${esc(s.em)}</span>` : ""}${s.tore > 0 ? `<span class="bsy">${BALL.repeat(Math.min(s.tore, 3))}</span>` : ""}${s.vorl > 0 ? `<span class="bsy v">${VORL.repeat(Math.min(s.vorl, 3))}</span>` : ""}${s.rot ? `<span class="bsy">${karte(true)}</span>` : s.gelb ? `<span class="bsy">${karte(false)}</span>` : ""}${rausSet && rausSet.has(s.n) ? '<span class="rr">RAUS</span>' : ""}</b>`).join("")}</span>`).join("")}</div></div>`;
   }
   // Letzte offizielle Liga-Startelf eines Vereins vor einem Anstoß (für NEU und RAUS im Spielplan)
   function vorherElf(k, anstoss){
@@ -2222,7 +2259,7 @@ details.dzb[open]{padding-bottom:10px}
       const es = (t.elfmeterschiessen || []).map(x => `<span${x.eigen ? "" : ' class="g"'}>${esc(x.stand)} ${esc(nachN(x.n))}${x.trifft ? "" : " (verschossen)"}</span>`).join(", ");
       const elf = (t.startelf || []).map(pl);
       let h = (tl ? `<div class="zeile tl"><b>TORE</b>${tl}</div>` : "") + (es ? `<div class="zeile tl"><b>ELFMETERSCHIESSEN${t.ergebnis_ie ? " " + esc(t.ergebnis_ie) : ""}</b>${es}</div>` : "");
-      h += `<div class="af">${feld(elf, k, {modus: "o"})}<p class="fleg"><span>${BALL} Tor</span><span><i class="as">Vorl.</i> Vorlage</span><span><i class="krt" style="background:#F5C518"></i> Gelb</span><span>↓ ausgewechselt (Minute)</span></p>`;
+      h += `<div class="af">${feld(elf, k, {modus: "o"})}<p class="fleg"><span>${BALL} Tor</span><span><i class="as">${VORL}</i> Vorlage</span><span><i class="krt" style="background:#F5C518"></i> Gelb</span><span>↓ ausgewechselt (Minute)</span></p>`;
       // Wechsel: Eingewechselte mit Minute, gepaart mit der ausgewechselten Spielerin derselben Minute
       const frei = elf.filter(s => s.aus);
       const ein = (t.eingewechselt || []).map(s => ({...pl(s), em: s.ein_min})).sort((a, b) => parseInt(a.em, 10) - parseInt(b.em, 10));
@@ -2530,6 +2567,7 @@ details.dzb[open]{padding-bottom:10px}
     const det = tore.map(t => { zaehlt(t) === "heim" ? h++ : g++;
       return `<div><span class="m">${esc(t.min)}'</span>${logo(zaehlt(t) === "heim" ? p.heim_k : p.gast_k, 18)}<span><b style="font-weight:600">${esc(t.n)}</b><span class="mu">${t.et ? " (Eigentor)" : ""}${t.art === "Elfmeter" ? " (Elfmeter)" : ""}${t.vorlage ? ` (Vorlage ${esc(t.vorlage)})` : ""}</span></span><span class="st">${h}:${g}</span></div>`; }).join("");
     const pv = p.platzverweise || [], bs = belSeiten(p);
+    liveMarken(p);
     const AS = AF && AF.spiele && AF.spiele[p.id];
     AFNOTEN = AS ? AS.no : null; AFBEST = null;
     if (AS && SPN) { AFBEST = new Set(); [p.heim_k, p.gast_k].forEach(k => { const l = Object.entries(AS.no).filter(([id]) => (spById(id) || {}).k === k).sort((a, b) => b[1] - a[1]); if (l[0]) AFBEST.add(l[0][0]); }); }
@@ -2545,7 +2583,7 @@ details.dzb[open]{padding-bottom:10px}
       </div>
       
       ${sprung}${AS ? afBox : ""}${pv.length ? `<div class="kartebox">${kap("Platzverweise")}${pv.map(x => `<div style="display:flex;gap:8px;align-items:center;font-size:14px">${karte(true)}<span style="flex:1">${x.n ? esc(x.n) : '<span class="mu">ohne Namen im Spielbericht</span>'} (${esc(x.min)}')</span>${logo(x.seite === "heim" ? p.heim_k : p.gast_k, 20)}</div>`).join("")}</div>` : ""}
-      ${bs.length ? `<div class="kartebox" style="gap:8px">${kap("Englische Woche")}${bs.map(([n, b]) => `<div style="display:grid;gap:2px"><b style="font-size:14px;font-weight:600">${esc(n)}: ${esc(b.text)}</b><span class="dat">${(b.spiele || []).map(esc).join(" · ")}</span></div>`).join("")}${prog ? '<span style="font-size:12px;color:var(--frag)">Deshalb stufen wir Feldspielerinnen höchstens als Erwartet ein.</span>' : ""}</div>` : ""}
+      ${bs.length && !istLive(p) ? `<div class="kartebox" style="gap:8px">${kap("Englische Woche")}${bs.map(([n, b]) => `<div style="display:grid;gap:2px"><b style="font-size:14px;font-weight:600">${esc(n)}: ${esc(b.text)}</b><span class="dat">${(b.spiele || []).map(esc).join(" · ")}</span></div>`).join("")}${prog ? '<span style="font-size:12px;color:var(--frag)">Deshalb stufen wir Feldspielerinnen höchstens als Erwartet ein.</span>' : ""}</div>` : ""}
       ${!p.heim_aufstellung && !p.gast_aufstellung && p.status === "beendet" ? '<p class="dat">Zu diesem Spiel hat der Spielbericht keine offizielle Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : !p.heim_aufstellung && !p.gast_aufstellung ? '<p class="dat">Die mögliche Aufstellung erscheint, sobald dieser Spieltag als nächster ansteht. Die offizielle kommt ca. 60 Minuten vor Anpfiff.</p>'
         : `<span id="af-auf"></span>` + (p.status !== "beendet" ? teamSchalter(p) : teamBlock(p.heim, p.heim_k, p.heim_aufstellung, "heim", p.status === "beendet", p.anstoss) + teamBlock(p.gast, p.gast_k, p.gast_aufstellung, "gast", p.status === "beendet", p.anstoss))}
       ${prog ? `<div class="leg" style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)">${Object.keys(STUFE).filter(k => ["sicher","erwartet","unsicher"].includes(k)).map(k => `<span>${stufeSym(k, 14)}${STUFE[k][2]}</span>`).join("")}</div><button class="hk" data-legal="so-entsteht" style="background:none;padding:6px 0"><span class="mu" style="font-size:12px">Prognose von WOSOINSIDER, die offizielle Aufstellung kommt ca. 60 Minuten vor Anpfiff und ersetzt sie hier. <span class="lk">So entsteht sie</span></span></button>` : ""}
@@ -2596,7 +2634,7 @@ details.dzb[open]{padding-bottom:10px}
     if (a && (a.startelf || []).length) inh = a.typ === "offiziell" ? offiziell(a, k, anstoss) : prognose(a, seite, k);
     else inh = vorbei ? '<p class="dat">Der Spielbericht enthält keine Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : '<p class="dat">Noch keine Aufstellung.</p>';
     const badge = a ? (a.typ === "offiziell" ? '<span class="badge off">OFFIZIELL</span>' : '<span class="badge ein">PROGNOSE</span>') : "";
-    return `<div class="kartebox"><div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${badge}</div>${!vorbei && a ? stdHinweis(k, a) : ""}${inh}</div>`;
+    return `<div class="kartebox"><div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${badge}</div>${!vorbei && a && !(anstoss && dt(anstoss) && dt(anstoss).getTime() <= Date.now()) ? stdHinweis(k, a) : ""}${inh}</div>`;
   }
   function offiziell(a, k, anstoss){
     const elf = a.startelf || [], vor = anstoss ? vorherElf(k, anstoss) : null;
