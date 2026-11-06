@@ -3151,13 +3151,15 @@ details.dzb[open]{padding-bottom:10px}
   // ---------------- Laden
   const json = f => fetch(f, {cache: "no-store"}).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
   const LIVE_URL = "https://raw.githubusercontent.com/finnclausenhh/fbl-daten/main/live.json";
+  const LIVE_API = "https://api.github.com/repos/finnclausenhh/fbl-daten/contents/live.json?ref=main";
   let LIVE = null;
   const mischLive = d => { const L = (LIVE && LIVE.spiele) || {}; if (!d) return;
     (d.spieltage || []).forEach(t => t.partien.concat(t.nachholspiele || []).forEach(p => { const x = L[p.id]; if (x && p.status !== "beendet") Object.assign(p, x); })); };
   const spielLaeuft = () => SP && alleSpiele().some(p => { if (p.status === "beendet" || !p.anstoss || /T00:00/.test(p.anstoss)) return false;
     const m = (Date.now() - dt(p.anstoss).getTime()) / 60000; return m > -5 && m < 150; });
   function loadLive(){
-    return fetch(LIVE_URL + "?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(l => {
+    return fetch(LIVE_API, {cache: "no-cache", headers: {Accept: "application/vnd.github.raw+json"}}).then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .catch(() => fetch(LIVE_URL + "?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null)).then(l => {
       if (!l) return; const neu = JSON.stringify(l.spiele) !== JSON.stringify(LIVE && LIVE.spiele); LIVE = l;
       if (neu && SP) { mischLive(SP); if (!BACK && VIEW === "spielplan") GAME ? spiel(GAME, true) : spielplan();
         else if (!BACK && VIEW === "meldungen" && document.querySelector("#main .liste")) { const y = window.scrollY; list(); window.scrollTo(0, y); } } }).catch(() => {});
