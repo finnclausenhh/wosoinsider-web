@@ -245,7 +245,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .ki button,.lk{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
 .lg{display:block;object-fit:contain;flex:none}
 .plak{flex:none;border-radius:50%;display:grid;place-items:center}
-.plak svg{width:55%;height:55%;stroke:#fff;fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}.plak.fr svg{width:80%;height:80%;stroke-width:3}
+.plak svg{width:55%;height:55%;stroke:#fff;fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}.plak.fr svg{width:80%;height:80%;stroke-width:3}.plak.ab svg{width:100%;height:100%;fill:#15181D;stroke:none}
 .sym{flex:none;border-radius:50%;display:inline-grid;place-items:center;vertical-align:middle}
 .sym svg{width:62%;height:62%;stroke:#fff;fill:none;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
 .sym.sicher svg{fill:#fff;stroke-width:1.2}
@@ -889,7 +889,7 @@ button.chip.pfc{cursor:pointer}
 .af .hint{font-size:12px;color:var(--muted)}
 .af .hint .lk{color:var(--accent)}
 .btn-prog{justify-self:start;background:var(--accent);color:#fff;border-radius:10px;padding:10px 14px;font-weight:600;font-size:14px}
-.pf-tag.baby{background:rgba(229,143,181,.2);color:#F4B6D2}.pf-tag.abg{background:rgba(110,155,255,.2);color:#B5CBFF}
+.pf-tag.baby{background:rgba(229,143,181,.2);color:#F4B6D2}.pf-tag.abg{background:rgba(110,155,255,.2);color:#B5CBFF}.pf-tag.abw{background:rgba(201,206,214,.18);color:#E6E8EC}
 .pf-trainer{display:grid;gap:6px}.pf-zahl{font:800 15px var(--f-display);font-style:normal;color:var(--text,#fff);white-space:nowrap}.pf-trainer .pf-tr{cursor:default;box-sizing:border-box}
 
 /* API-Football (Testkopie 03.11.2026) */
@@ -1406,7 +1406,7 @@ details.dzb[open]{padding-bottom:10px}
   const P = {
     stern:'<path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>', haken:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
     frage:'<path d="M9 9a3 3 0 115.6 1.3c-.8 1.3-2.6 1.8-2.6 3.7M12 18.5v.1"/>', ausruf:'<path d="M12 5v9M12 18.5v.1"/>', x:'<path d="M7 7l10 10M17 7L7 17"/>',
-    plus:'<path d="M12 5v14M5 12h14"/>', verbot:'<circle cx="12" cy="12" r="8"/><path d="M6.5 17.5l11-11"/>', zurueck:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>', uhr:'<path d="M12 12V0a12 12 0 0 1 12 12z"/>', verbot:'<circle cx="12" cy="12" r="8"/><path d="M6.5 17.5l11-11"/>', zurueck:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>',
     links:'<path d="M15 5l-7 7 7 7"/>', rechts:'<path d="M9 5l7 7-7 7"/>', pfeil:'<path d="M4 12h15M13 6l6 6-6 6"/>', uhr:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.1"/>'
   };
@@ -1435,13 +1435,13 @@ details.dzb[open]{padding-bottom:10px}
   const karte = rot => `<span class="krt" style="background:${rot ? "#E24A4A" : "#F5C518"}" role="img" aria-label="${rot ? "Rote Karte" : "Gelbe Karte"}"></span>`;
 
   // Status: nur was sich geändert hat (kein Symbol für fit)
-  const STATUS = {rueckkehr:["zurueck","#22A35A","zurück"], fraglich:["frage","#E0962B","fraglich"], verletzt:["plus","#E24A4A","verletzt"], gesperrt:["verbot","#9B6BE8","gesperrt"]};
+  const STATUS = {rueckkehr:["zurueck","#22A35A","zurück"], fraglich:["frage","#E0962B","fraglich"], verletzt:["plus","#E24A4A","verletzt"], gesperrt:["verbot","#9B6BE8","gesperrt"], abwesend:["uhr","#E6E8EC","abwesend"]};
   function meldungsStatus(m){
     if (m.status) return m.status;
     const t = m.tags || [];
-    return t.includes("SPERRE") ? "gesperrt" : t.includes("VERLETZUNG") ? "verletzt" : t.includes("RÜCKKEHR") ? "rueckkehr" : null;
+    return t.includes("ABWESEND") ? "abwesend" : t.includes("SPERRE") ? "gesperrt" : t.includes("VERLETZUNG") ? "verletzt" : t.includes("RÜCKKEHR") ? "rueckkehr" : null;
   }
-  const plakette = (s, g = 22) => { const x = STATUS[String(s || "").toLowerCase()]; return x ? `<span class="plak${x[0] === "frage" ? " fr" : ""}" style="width:${g}px;height:${g}px;background:${x[1]}" role="img" aria-label="${x[2]}">${svg(P[x[0]])}</span>` : ""; };
+  const plakette = (s, g = 22) => { const x = STATUS[String(s || "").toLowerCase()]; return x ? `<span class="plak${x[0] === "frage" ? " fr" : x[0] === "uhr" ? " ab" : ""}" style="width:${g}px;height:${g}px;background:${x[1]}" role="img" aria-label="${x[2]}">${svg(P[x[0]])}</span>` : ""; };
 
   // ---------------- Datum (Europe/Berlin wie in den Daten)
   const WT = ["So","Mo","Di","Mi","Do","Fr","Sa"], WTL = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
@@ -2335,7 +2335,7 @@ details.dzb[open]{padding-bottom:10px}
     const tbl = L.filter(s => s.pos !== "TW").sort((a, b) => tb(b) - tb(a)).slice(0, 10).filter(s => tb(s) >= 3).map(s => s.id);
     return TOPIDS = new Set(no.concat(tbl));
   }
-  const ausfallNews = m => ["verletzt", "gesperrt"].includes(m.status) || (m.tags || []).some(t => ["VERLETZUNG", "SPERRE", "ROTATION"].includes(t)) && m.status !== "fit";
+  const ausfallNews = m => ["verletzt", "gesperrt", "abwesend"].includes(m.status) || (m.tags || []).some(t => ["VERLETZUNG", "SPERRE", "ROTATION"].includes(t)) && m.status !== "fit";
   function tagsVon(m){
     const t = (m.tags || []).slice(); if (t.includes("TOP") || !istSpielerin(m) || !m.spielerin || !SPN || !ausfallNews(m)) return t;
     const s = findeSP(KURZ[m.verein], m.spielerin) || (SPN.spielerinnen || []).find(x => x.n === m.spielerin); if (!s || !topIds().has(s.id)) return t;
@@ -3229,13 +3229,14 @@ details.dzb[open]{padding-bottom:10px}
   // ---------------- Suche und Spielerinnenprofil (spielerinnen.json, Finn 31.10.2026)
   let SPN = null, SPN_LADEN = null, PR_STAPEL = [], PR_HER = null, PR_NEWSALLE = false;
   const KBNAME = {TW:"TORWART", ABW:"ABWEHR", MF:"MITTELFELD", ST:"STURM"};
-  const STFARBE = {raus:"#E24A4A", gesperrt:"#9B6BE8", fraglich:"#E0962B", fit:"#2EB872", zurueck:"#2EB872", baby:"#E58FB5", abgestellt:"#6E9BFF"};
+  const STFARBE = {raus:"#E24A4A", gesperrt:"#9B6BE8", fraglich:"#E0962B", fit:"#2EB872", zurueck:"#2EB872", baby:"#E58FB5", abgestellt:"#6E9BFF", abwesend:"#C9CED6"};
   // Art des Ausfalls aus dem Grund (Finn 01.11.2026): Babypause und Abstellungen nicht als "verletzt" zeigen
   const stArt = x => { const st = (x && x.s) || "fit", g = String((x && x.grund) || "");
     if (st === "raus" && /baby|schwanger|mutterschutz/i.test(g)) return "baby";
     if (st === "raus" && /\bU ?1[5-9]\b|\bU ?2[0-3]\b|WM|EM\b|Nationalteam|Nationalmannschaft|Länderspiel|abgestellt/i.test(g)) return "abgestellt";
+    if (st === "raus" && /trainingsr(ü|ue)ckstand|belastung|schonung|geschont|krank|infekt|erk(ä|ae)ltung|grippe|pers(ö|oe)nlich|privat|famili(ä|ae)r|trauerfall|abwesend/i.test(g)) return "abwesend";
     return st; };
-  const STWORT = {raus: "verletzt", baby: "Babypause", abgestellt: "abgestellt", gesperrt: "gesperrt", fraglich: "fraglich"};
+  const STWORT = {raus: "verletzt", baby: "Babypause", abgestellt: "abgestellt", abwesend: "abwesend", gesperrt: "gesperrt", fraglich: "fraglich"};
   const PSTUFE = {sicher:["Sicher","#6E9BFF"], erwartet:["Erwartet","#22C55E"], unsicher:["Unsicher","#F59E0B"], unwahrscheinlich:["Unwahrscheinlich","#F87171"], ausgeschlossen:["Fällt aus","#8A95A8"]};
   const normS = s => String(s || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/ð/g, "d").replace(/ß/g, "ss").replace(/ø/g, "o").replace(/ł/g, "l").toLowerCase();
   const nachN = n => String(n || "").trim().split(/\s+/).slice(-1)[0];
@@ -3981,7 +3982,7 @@ details.dzb[open]{padding-bottom:10px}
     const haupt = (s.orte || [])[0];
     // Kopf
     const sa = stArt(s.status);
-    const stTag = sa === "baby" ? '<span class="pf-tag baby">BABYPAUSE</span>' : sa === "abgestellt" ? '<span class="pf-tag abg">ABGESTELLT</span>' : st === "raus" ? '<span class="pf-tag raus">VERLETZT</span>' : st === "gesperrt" ? '<span class="pf-tag sperre">GESPERRT</span>' : st === "fraglich" ? '<span class="pf-tag frag">FRAGLICH</span>' : "";
+    const stTag = sa === "baby" ? '<span class="pf-tag baby">BABYPAUSE</span>' : sa === "abgestellt" ? '<span class="pf-tag abg">ABGESTELLT</span>' : sa === "abwesend" ? '<span class="pf-tag abw">ABWESEND</span>' : st === "raus" ? '<span class="pf-tag raus">VERLETZT</span>' : st === "gesperrt" ? '<span class="pf-tag sperre">GESPERRT</span>' : st === "fraglich" ? '<span class="pf-tag frag">FRAGLICH</span>' : "";
     let h = `<div class="pf-kopf">${pfFoto(s, 132, 165, 12, true)}<div class="pf-kt">${haupt ? `<span class="pf-mk" title="Position im Spiel">${rasen(true)}<i style="left:${Math.min(86, Math.max(14, fx(haupt[0])))}%;top:${fy(haupt[1])}%"></i></span>` : ""}
       <h1>${vorn ? esc(vorn) + "<br>" : ""}${esc(nach)}</h1><div class="pf-ver"><button class="kd-btn" data-kader="${esc(s.k)}">${logo(s.k, 20)}${esc(s.verein)}</button>${s.nr ? " · Nr. " + esc(s.nr) : ""}</div>
       <div class="pf-tags">${stTag}<span class="pf-tag">${esc(KBNAME[s.pos] || s.pos || "")}</span>${(afSp(s.id) || {}).fuss ? `<span class="pf-tag fu">${{rechts: "RECHTSFUSS", links: "LINKSFUSS", "beidfüßig": "BEIDFÜSSIG"}[afSp(s.id).fuss]}</span>` : ""}</div></div></div>`;
@@ -3990,7 +3991,7 @@ details.dzb[open]{padding-bottom:10px}
     const fT = eins.reduce((a, e) => a + (e.tore || []).length, 0), fV = eins.reduce((a, e) => a + (e.vorl || 0), 0), istTW = s.pos === "TW";
     const gegenT = e => { const [a, b] = String(e.erg || "").split(":").map(Number); return isNaN(a) ? null : (e.ha === "H" ? b : a); };
     const zn3 = eins.filter(e => e.art === "S" && gegenT(e) === 0).length;
-    const stB = st === "fit" ? ["Fit", "nichts gemeldet", STFARBE.fit] : sa === "baby" ? ["Babypause", kurzZurueck(s.status), STFARBE.baby] : sa === "abgestellt" ? ["Abgestellt", kurzZurueck(s.status), STFARBE.abgestellt] : [st === "raus" ? "Verletzt" : st === "gesperrt" ? "Gesperrt" : "Fraglich", kurzZurueck(s.status), STFARBE[st]];
+    const stB = st === "fit" ? ["Fit", "nichts gemeldet", STFARBE.fit] : sa === "baby" ? ["Babypause", kurzZurueck(s.status), STFARBE.baby] : sa === "abgestellt" ? ["Abgestellt", kurzZurueck(s.status), STFARBE.abgestellt] : sa === "abwesend" ? ["Abwesend", kurzZurueck(s.status), STFARBE.abwesend] : [st === "raus" ? "Verletzt" : st === "gesperrt" ? "Gesperrt" : "Fraglich", kurzZurueck(s.status), STFARBE[st]];
     h += `<div class="pf-blick"><div><span class="k">Status</span><b style="color:${stB[2]}">${esc(stB[0])}</b><small>${esc(stB[1])}</small></div>
       <div><span class="k">${pr && pr.md ? pr.md + ". Spieltag" : "Nächster Spieltag"}</span><b class="${(sf ? sf[0] : "offen").length > 12 ? "s" : (sf ? sf[0] : "offen").length > 8 ? "m" : ""}" style="color:${sf ? sf[1] : "var(--muted)"}">${esc(sf ? sf[0] : "offen")}</b><small>${esc(prKurz(pr, wert))}</small></div>
       <div><span class="k" title="Die letzten 3 Ligaspiele von ${esc(kname(s.k))}, auch ohne ihren Einsatz">Letzte 3 Liga</span><b>${letzte3.length ? `<span class="oe">Ø</span>${avg}'` : "0"}</b>${(() => { const nS = letzte3.filter(e => e.art === "S").length, nE = letzte3.filter(e => e.art === "E").length;
@@ -4087,7 +4088,7 @@ details.dzb[open]{padding-bottom:10px}
     if ((s.verlauf || []).length) {
       const e = s.einschaetzung;
       h += `<section class="pf-box">${kap("Status-Verlauf")}${verlaufGrafik(s)}${e ? `<div class="pf-einsch"><b class="k">UNSERE EINSCHÄTZUNG</b>${esc(e.satz)}<div class="pf-ph"${verlaufGrafik(s) ? " hidden" : ""}>${(e.phasen || []).map(x => `<div${x.prog ? ' class="prog"' : ""}><span>${esc(x.d)}</span><span>${esc(x.t)}${x.prog ? " (Einschätzung)" : ""}</span></div>`).join("")}</div>${e.vergleich ? `<p class="pf-vgl">${esc(e.vergleich)}</p>` : ""}</div>` : ""}
-        <div class="pf-tl">${s.verlauf.slice().reverse().map(v => `<div class="ev"><i style="background:${STFARBE[stArt({s: v.status, grund: v.grund})] || STFARBE[v.status] || "#8A95A8"}"></i><div><div class="dt">${esc(kurz(dt(v.stand)))} · ${esc(stArt({s: v.status, grund: v.grund}) === "baby" ? "Babypause" : stArt({s: v.status, grund: v.grund}) === "abgestellt" ? "Abstellung" : {raus: "Ausfall", gesperrt: "Sperre", fraglich: "fraglich", zurueck: "zurück", fit: "fit"}[v.status] || v.status)}</div><div class="g">${esc(v.grund)}</div>${v.rueckkehr ? `<div class="q">${v.status === "gesperrt" ? "Wieder spielberechtigt" : "Rückkehr"}: ${esc(v.rueckkehr)}</div>` : ""}${v.quelle ? `<div class="q">Quelle: ${esc(v.quelle)}</div>` : ""}</div></div>`).join("")}</div></section>`;
+        <div class="pf-tl">${s.verlauf.slice().reverse().map(v => `<div class="ev"><i style="background:${STFARBE[stArt({s: v.status, grund: v.grund})] || STFARBE[v.status] || "#8A95A8"}"></i><div><div class="dt">${esc(kurz(dt(v.stand)))} · ${esc(stArt({s: v.status, grund: v.grund}) === "baby" ? "Babypause" : stArt({s: v.status, grund: v.grund}) === "abgestellt" ? "Abstellung" : stArt({s: v.status, grund: v.grund}) === "abwesend" ? "Abwesend" : {raus: "Ausfall", gesperrt: "Sperre", fraglich: "fraglich", zurueck: "zurück", fit: "fit"}[v.status] || v.status)}</div><div class="g">${esc(v.grund)}</div>${v.rueckkehr ? `<div class="q">${v.status === "gesperrt" ? "Wieder spielberechtigt" : "Rückkehr"}: ${esc(v.rueckkehr)}</div>` : ""}${v.quelle ? `<div class="q">Quelle: ${esc(v.quelle)}</div>` : ""}</div></div>`).join("")}</div></section>`;
     }
     // News
     const nw = N.filter(m => m.spielerin === s.n && m.typ !== "punkt");
