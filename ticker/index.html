@@ -369,6 +369,13 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .pr-z{display:grid;grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);align-items:center;gap:8px}
 .pr-t{display:flex;align-items:center;gap:8px;min-width:0;font-size:15px;font-weight:600;line-height:1.2}
 .pr-t.h{justify-content:flex-end;text-align:right}
+.pr-tore{display:grid;grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);gap:8px;margin-top:-4px;font-size:12px;line-height:1.25}
+.pr-tore>div{display:grid;gap:5px;align-content:start;min-width:0;padding-left:38px}
+.pr-tore>.h{padding-left:0;padding-right:38px;text-align:right}
+.tz-t{display:block;min-width:0}
+.tz-t b{font-weight:600}
+.tz-t small{display:block;font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.tore .tvl{display:block;font-size:11px;color:var(--muted)}
 .pr-t span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .mid{display:grid;justify-items:center;align-content:center;text-align:center;gap:2px;font-variant-numeric:tabular-nums;line-height:1}
 .mid .s{font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1}
@@ -2447,13 +2454,17 @@ details.dzb[open]{padding-bottom:10px}
   }
   const belSeiten = p => p.status !== "beendet" && p.belastung ? [["heim", p.heim], ["gast", p.gast]].filter(([k]) => p.belastung[k]).map(([k, n]) => [n, p.belastung[k]]) : [];
   const meinK = p => SEL.has(p.heim_k) ? p.heim_k : SEL.has(p.gast_k) ? p.gast_k : null;
+  const torListe = (p, seite) => (p.tore || []).filter(t => t.seite === seite)
+    .map(t => `<span class="tz-t"><b>${esc(t.n)}</b> ${esc(t.min)}'${t.vorlage ? `<small>Vorlage ${esc(t.vorlage)}</small>` : t.art ? `<small>${esc(t.art)}</small>` : ""}</span>`).join("");
+  const torZeile = p => istLive(p) && (p.tore || []).length
+    ? `<div class="pr-tore"><div class="h">${torListe(p, "heim")}</div><div></div><div>${torListe(p, "gast")}</div></div>` : "";
   function partieZeile(p, mitTag){
     const bs = belSeiten(p), mk = meinK(p), klein = SEL.size && !mk;
     return `<button class="pr${mk ? " mein" : ""}" ${mk ? `style="--vc:${ring(mk)}" ` : ""}data-game="${esc(p.id)}">${mitTag ? `<div class="dat" style="font-size:11px">${esc(terminiert(p) ? wtLang(p.anstoss) : "Termin offen")}</div>` : ""}<div class="pr-z">
       <span class="pr-t h"><span data-kname="${esc(KNAME[p.heim_k] || "")}" title="${esc(p.heim)}">${esc(KNAME[p.heim_k] || p.heim)}</span><span class="kd-l" data-kader="${esc(p.heim_k)}">${logo(p.heim_k, 30)}</span></span>${mitte(p)}<span class="pr-t"><span class="kd-l" data-kader="${esc(p.gast_k)}">${logo(p.gast_k, 30)}</span><span data-kname="${esc(KNAME[p.gast_k] || "")}" title="${esc(p.gast)}">${esc(KNAME[p.gast_k] || p.gast)}</span></span></div>
-      ${p.status !== "beendet" ? (() => { const v = AF && (AF.vorschau || []).some(x => x.id === p.id), a = [p.heim_aufstellung, p.gast_aufstellung].filter(Boolean), off = a.some(x => x.typ === "offiziell");
+      ${p.status !== "beendet" && !istLive(p) ? (() => { const v = AF && (AF.vorschau || []).some(x => x.id === p.id), a = [p.heim_aufstellung, p.gast_aufstellung].filter(Boolean), off = a.some(x => x.typ === "offiziell");
         return v || a.length ? `<div class="af-hin"><span class="${off ? "o" : "v"}">${off ? "OFFIZIELLE AUFSTELLUNG" : "VORSCHAU"}</span></div>` : ""; })() : ""}
-      ${p.status !== "beendet" && einsehbar(p) ? `<div class="eins-z">${einsTag()}<span>Offizielle Aufstellung kommt, bevor Kickbase schließt</span></div>` : ""}${bs.length ? (klein ? `<div class="belh klein"><span class="kap">ENGLISCHE WOCHE</span></div>` : `<div class="belh"><span class="kap">ENGLISCHE WOCHE</span>${bs.map(([n, b]) => `<span><b>${esc(n)}</b> ${esc(b.text)}</span>`).join("")}</div>`) : ""}</button>`;
+      ${p.status !== "beendet" && !istLive(p) && einsehbar(p) ? `<div class="eins-z">${einsTag()}<span>Offizielle Aufstellung kommt, bevor Kickbase schließt</span></div>` : ""}${torZeile(p)}${bs.length && !istLive(p) ? (klein ? `<div class="belh klein"><span class="kap">ENGLISCHE WOCHE</span></div>` : `<div class="belh"><span class="kap">ENGLISCHE WOCHE</span>${bs.map(([n, b]) => `<span><b>${esc(n)}</b> ${esc(b.text)}</span>`).join("")}</div>`) : ""}</button>`;
   }
   const alleSpiele = () => { const g = new Set(); return (SP.spieltage || []).flatMap(t => t.partien.concat(t.nachholspiele || [])).filter(p => !g.has(p.id) && g.add(p.id)); };
   function zeitraum(t){
@@ -2500,8 +2511,8 @@ details.dzb[open]{padding-bottom:10px}
   function schuetzinnen(tore, seite){
     const r = [], mins = {};
     tore.filter(t => zaehlt(t) === seite).forEach(t => { const n = t.n || ""; if (!mins[n]) { r.push(n); mins[n] = []; }
-      mins[n].push(`${t.min || ""}'${t.art === "Elfmeter" ? " (E)" : ""}${t.et ? " (ET)" : ""}`); });
-    return r.map(n => `<span><b>${esc(n)}</b> <span class="mu">${esc(mins[n].join(", "))}</span></span>`).join("");
+      mins[n].push(`${t.min || ""}'${t.art === "Elfmeter" ? " (E)" : ""}${t.et ? " (ET)" : ""}`); if (t.vorlage) (mins[n].v = mins[n].v || []).push(t.vorlage); });
+    return r.map(n => `<span><b>${esc(n)}</b> <span class="mu">${esc(mins[n].join(", "))}</span>${mins[n].v ? `<small class="tvl">Vorlage ${esc([...new Set(mins[n].v)].join(", "))}</small>` : ""}</span>`).join("");
   }
   function spiel(id, halten){
     const p = SP && alleSpiele().find(x => x.id === id); if (!p) return spielplan();
@@ -2516,7 +2527,7 @@ details.dzb[open]{padding-bottom:10px}
     const AS = AF && AF.spiele && AF.spiele[p.id];
     AFNOTEN = AS ? AS.no : null; AFBEST = null;
     if (AS && SPN) { AFBEST = new Set(); [p.heim_k, p.gast_k].forEach(k => { const l = Object.entries(AS.no).filter(([id]) => (spById(id) || {}).k === k).sort((a, b) => b[1] - a[1]); if (l[0]) AFBEST.add(l[0][0]); }); }
-    const hatV = p.status !== "beendet" && AF && (AF.vorschau || []).some(v => v.id === p.id), hatA = p.status !== "beendet" && [p.heim_aufstellung, p.gast_aufstellung].some(Boolean), offA = [p.heim_aufstellung, p.gast_aufstellung].some(a => a && a.typ === "offiziell");
+    const hatV = p.status !== "beendet" && !istLive(p) && AF && (AF.vorschau || []).some(v => v.id === p.id), hatA = p.status !== "beendet" && [p.heim_aufstellung, p.gast_aufstellung].some(Boolean), offA = [p.heim_aufstellung, p.gast_aufstellung].some(a => a && a.typ === "offiziell");
     const sprung = "";
     const afBox = AS ? afStatBox(p, AS) : hatV ? `<div class="kartebox" id="af-dz">${kap("Daten zum Spiel")}${datenZumSpiel(AF.vorschau.find(v => v.id === p.id))}</div>` : "";
     $("#main").innerHTML = `<div class="det">
