@@ -2033,21 +2033,37 @@ details.dzb[open]{padding-bottom:10px}
     [["heim", p.heim_aufstellung], ["gast", p.gast_aufstellung]].forEach(([seite, a]) => {
       if (!a || a.typ !== "offiziell") return;
       const alle = [...(a.startelf || []), ...(a.bank || [])];
-      alle.forEach(s => { if (s._lt) { ["tore", "vorl", "gelb", "rot", "gr", "_lt"].forEach(f => delete s[f]); } });
+      alle.forEach(s => { if (s._lt) { ["tore", "vorl", "gelb", "rot", "gr", "_lt"].forEach(f => delete s[f]); }
+        if (s._bk) { ["ein", "ein_min", "aus"].forEach(f => { if (s._bk[f] === undefined) delete s[f]; else s[f] = s._bk[f]; }); delete s._bk; } });
       if (!live) return;
       const nn = x => nNorm(x).replace(/[^a-z0-9 -]/g, "");
       const finde = n => { const x = nn(n); if (!x) return null;
         return alle.find(s => nn(s.n) === x) || alle.find(s => nn(s.n).endsWith(" " + x) || x.endsWith(" " + nn(s.n)) || nn(s.n).endsWith(x)); };
       const setz = (n, f, v) => { const s = finde(n); if (!s) return; s._lt = true; s[f] = v === true ? true : (s[f] || 0) + 1; };
       (p.tore || []).filter(t => t.seite === seite && t.art !== "Eigentor").forEach(t => { setz(t.n, "tore"); if (t.vorlage) setz(t.vorlage, "vorl"); });
+      (p.wechsel || []).filter(w => w.seite === seite).forEach(w => {
+        const sich = s => { if (s && !s._bk) s._bk = {ein: s.ein, ein_min: s.ein_min, aus: s.aus}; return s; };
+        const e = sich(finde(w.ein)), r = sich(finde(w.aus));
+        if (e) { e.ein = true; e.ein_min = w.min; }
+        if (r) r.aus = w.min;
+        (a.bank || []).forEach(s => { if (s.ein == null) { sich(s); s.ein = false; } });
+      });
       (p.karten || []).filter(c => c.seite === seite).forEach(c => { if (c.art === "gelb") setz(c.n, "gelb", true); else { setz(c.n, "rot", true); if (c.art === "gelbrot") setz(c.n, "gr", true); } });
     });
+  }
+  let LIVEP = null;
+  function wechselBox(k, p, elf, bank){
+    const seite = p.heim_k === k ? "heim" : "gast", nn = x => nNorm(x);
+    const such = (l, n) => l.find(s => nn(s.n) === nn(n)) || l.find(s => nn(s.n).endsWith(nn(n)) || nn(n).endsWith(nn(s.n))) || (n ? {n} : null);
+    const w = (p.wechsel || []).filter(x => x.seite === seite);
+    if (!w.length) return `<div class="wb"><h4>Wechsel</h4><p class="dat" style="margin:0">Bisher keine Wechsel.</p></div>`;
+    return `<div class="wb"><h4>Wechsel</h4>${w.map(x => wxZeile(k, such(bank, x.ein), such(elf.concat(bank), x.aus), ["n", "EIN"], ["r", "AUS"], esc(x.min) + "'")).join("")}</div>`;
   }
   function liveLeiste(){
     if (!SP) return "";
     const l = (SP.spieltage || []).flatMap(t => t.partien.concat(t.nachholspiele || [])).filter(p => p.status === "live" || p.status === "läuft")
       .sort((a, b) => (dt(a.anstoss) || 0) - (dt(b.anstoss) || 0));
-    return l.length ? `<div class="live-l"><div class="live-k"><i></i>LIVE</div>${l.map(p => partieZeile(p).replace('<button class="pr', '<button data-tabspiel="1" class="pr')).join("")}</div>` : "";
+    return l.length ? `<div class="live-l"><div class="live-k"><i></i>LIVE</div>${(() => { TZ_AUS = true; try { return l.map(p => partieZeile(p).replace('<button class="pr', '<button data-tabspiel="1" class="pr')).join(""); } finally { TZ_AUS = false; } })()}</div>` : "";
   }
   function aufAngepfiffen(m){
     if (!SP || !(m.aufstellung || /^aufstellung-/.test(m.id || ""))) return false;
@@ -2498,8 +2514,9 @@ details.dzb[open]{padding-bottom:10px}
   const belSeiten = p => p.status !== "beendet" && p.belastung ? [["heim", p.heim], ["gast", p.gast]].filter(([k]) => p.belastung[k]).map(([k, n]) => [n, p.belastung[k]]) : [];
   const meinK = p => SEL.has(p.heim_k) ? p.heim_k : SEL.has(p.gast_k) ? p.gast_k : null;
   const torListe = (p, seite) => (p.tore || []).filter(t => t.seite === seite)
-    .map(t => `<span class="tz-t"><b>${esc(t.n)}</b> ${esc(t.min)}'${t.vorlage ? `<small>Vorlage ${esc(t.vorlage)}</small>` : t.art ? `<small>${esc(t.art)}</small>` : ""}</span>`).join("");
-  const torZeile = p => istLive(p) && (p.tore || []).length
+    .map(t => `<span class="tz-t"><b>${esc(t.n)}</b> ${esc(t.min)}'${t.art === "Elfmeter" ? " (E)" : t.art === "Eigentor" ? " (ET)" : ""}</span>`).join("");
+  let TZ_AUS = false;
+  const torZeile = p => !TZ_AUS && istLive(p) && (p.tore || []).length
     ? `<div class="pr-tore"><div class="h">${torListe(p, "heim")}</div><div></div><div>${torListe(p, "gast")}</div></div>` : "";
   function partieZeile(p, mitTag){
     const bs = belSeiten(p), mk = meinK(p), klein = SEL.size && !mk;
@@ -2567,7 +2584,7 @@ details.dzb[open]{padding-bottom:10px}
     const det = tore.map(t => { zaehlt(t) === "heim" ? h++ : g++;
       return `<div><span class="m">${esc(t.min)}'</span>${logo(zaehlt(t) === "heim" ? p.heim_k : p.gast_k, 18)}<span><b style="font-weight:600">${esc(t.n)}</b><span class="mu">${t.et ? " (Eigentor)" : ""}${t.art === "Elfmeter" ? " (Elfmeter)" : ""}${t.vorlage ? ` (Vorlage ${esc(t.vorlage)})` : ""}</span></span><span class="st">${h}:${g}</span></div>`; }).join("");
     const pv = p.platzverweise || [], bs = belSeiten(p);
-    liveMarken(p);
+    liveMarken(p); LIVEP = istLive(p) ? p : null;
     const AS = AF && AF.spiele && AF.spiele[p.id];
     AFNOTEN = AS ? AS.no : null; AFBEST = null;
     if (AS && SPN) { AFBEST = new Set(); [p.heim_k, p.gast_k].forEach(k => { const l = Object.entries(AS.no).filter(([id]) => (spById(id) || {}).k === k).sort((a, b) => b[1] - a[1]); if (l[0]) AFBEST.add(l[0][0]); }); }
@@ -2578,8 +2595,7 @@ details.dzb[open]{padding-bottom:10px}
       <button class="back" data-back="1">‹ ${p.md ? `${p.md}. Spieltag` : "Spielplan"}</button>
       <div class="kopf"><div class="info">${esc(info)}</div>
         <div class="tz2"><button class="tk kd-btn" data-kader="${esc(p.heim_k)}">${logo(p.heim_k, 40)}<span>${esc(p.heim)}</span></button>${mitte(p)}<button class="tk kd-btn" data-kader="${esc(p.gast_k)}">${logo(p.gast_k, 40)}<span>${esc(p.gast)}</span></button></div>
-        ${tore.length ? `<div class="tore"><div class="h">${schuetzinnen(tore, "heim")}</div>${BALL}<div>${schuetzinnen(tore, "gast")}</div></div>
-          <button class="tbtn" data-tore="1" aria-expanded="${TOREOFFEN}">${TOREOFFEN ? "Tore im Detail ausblenden" : "Tore im Detail mit Vorlage"}</button>${TOREOFFEN ? `<div class="tdet">${det}</div>` : ""}` : ""}
+        ${tore.length ? `<div class="tore"><div class="h">${schuetzinnen(tore, "heim")}</div>${BALL}<div>${schuetzinnen(tore, "gast")}</div></div>` : ""}
       </div>
       
       ${sprung}${AS ? afBox : ""}${pv.length ? `<div class="kartebox">${kap("Platzverweise")}${pv.map(x => `<div style="display:flex;gap:8px;align-items:center;font-size:14px">${karte(true)}<span style="flex:1">${x.n ? esc(x.n) : '<span class="mu">ohne Namen im Spielbericht</span>'} (${esc(x.min)}')</span>${logo(x.seite === "heim" ? p.heim_k : p.gast_k, 20)}</div>`).join("")}</div>` : ""}
@@ -2651,6 +2667,7 @@ details.dzb[open]{padding-bottom:10px}
       h += bankNamen(draussen.map(s => ({...s, p: GRUPPE(s.p), dim: true})), rausSet, "Ohne Einsatz");
     } else h += bankNamen(bank.map(s => ({...s, p: GRUPPE(s.p)})), rausSet);
     h += aenderungen(k, elf.filter(s => neuSet.has(s.n)), raus);
+    if (LIVEP && (LIVEP.heim_k === k || LIVEP.gast_k === k)) h += wechselBox(k, LIVEP, elf, bank);
     return h + `</div>`;
   }
   document.addEventListener("click", e => { if (e.target.closest("[data-anaart]") && typeof anaArticle === "function") anaArticle(); });
