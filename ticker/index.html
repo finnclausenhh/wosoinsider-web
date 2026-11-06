@@ -1585,7 +1585,7 @@ details.dzb[open]{padding-bottom:10px}
   function punktKarte(m){
     const fest = angeheftet(m), md = m.md != null ? String(m.md) : "";
     return `<button class="pk${fest ? " fest" : ""}" data-id="${esc(m.id)}"><div class="pk-t" aria-hidden="true">${md ? `<b>${esc(md)}</b><span>SP.</span>` : "<b>·</b>"}</div>
-      <div class="pk-b">${tag("AUF DEN PUNKT")}<h2>${esc(m.headline)}</h2>${(m.updates || []).length ? `<div class="pk-u">${logo(m.updates[0].k, 16)}<span>${esc(m.updates[0].text)}</span></div>` : ""}<div class="z">${fest ? "Angeheftet bis zum letzten Anpfiff" : esc(relativ(m.zeit))}</div></div></button>`;
+      <div class="pk-b">${tag("AUF DEN PUNKT")}<h2>${esc(m.headline)}</h2>${(m.updates || []).length ? `<div class="pk-u">${logo(m.updates[0].k, 16)}<span>${esc(m.updates[0].text)}</span></div>` : ""}<div class="z">${fest ? "Angeheftet bis zum Anpfiff" : m.fertig ? "Stand zum Anpfiff " + esc((m.pin_bis || "").slice(11, 16)) : esc(relativ(m.zeit))}</div></div></button>`;
   }
   function anteil(s){ const t = String(s).split(" von "); if (t.length !== 2) return null; const a = parseInt(t[0], 10), b = parseInt(t[1], 10);
     return (Number.isInteger(a) && Number.isInteger(b) && b > 0 && b <= 40 && a <= b) ? [a, b] : null; }
@@ -2512,7 +2512,7 @@ details.dzb[open]{padding-bottom:10px}
     const md = m.md != null && m.md !== "" ? String(m.md) : "";
     return `<div class="tags">${tag("AUF DEN PUNKT")}${md ? tag(md + ". SPIELTAG") : ""}</div>
       <h1 class="disp" style="font-size:30px">${esc(m.headline)}</h1>
-      <div class="dat">${esc(lang(m.zeit))}${m.aktualisiert ? ` · zuletzt aktualisiert ${esc(wtLang(m.aktualisiert).split(",")[0])} ${esc(m.aktualisiert.slice(11, 16))} Uhr` : ""}${SEL.size ? " · gefiltert auf deine Vereine" : ""}</div>
+      <div class="dat">${esc(lang(m.zeit))}${m.fertig ? ` · abgeschlossen mit dem ersten Anpfiff ${esc((m.pin_bis || "").slice(11, 16))} Uhr, danach sind in Kickbase keine Änderungen mehr möglich` : m.aktualisiert ? ` · zuletzt aktualisiert ${esc(wtLang(m.aktualisiert).split(",")[0])} ${esc(m.aktualisiert.slice(11, 16))} Uhr` : ""}${SEL.size ? " · gefiltert auf deine Vereine" : ""}</div>
       ${updBlock}
       ${(m.text || []).map(p => `<p style="font-size:16.5px">${esc(p)}</p>`).join("")}
       ${sek("Sicher aufstellen", m.sicher, "#2EB872")}${sek("Finger weg", m.finger_weg, "#E24A4A")}${wkBlock}${sek("Günstiger Tipp", m.tipp, "#2F5BFF")}${sek("Achtung", m.achtung, "#E0962B")}
