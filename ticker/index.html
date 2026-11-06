@@ -878,7 +878,7 @@ button.chip.pfc{cursor:pointer}
 .kk.n{background:rgba(34,197,94,.18);color:#22C55E}.kk.r{background:rgba(248,113,113,.15);color:#F87171}.kk.a{background:rgba(169,180,198,.15);color:var(--muted)}.kk.u{background:rgba(245,158,11,.18);color:#F59E0B}
 .bk{display:grid;grid-template-columns:36px 1fr;row-gap:6px;column-gap:4px;font-size:14px}
 .bk .ps{font:600 10.5px var(--f-mono);color:var(--muted);letter-spacing:.6px;padding-top:3px}
-.bk .ns{display:flex;flex-wrap:wrap}.bk .ns b{font-weight:600}.bk .ns b:not(:first-child)::before{content:"·";color:var(--muted);font-weight:400;margin:0 7px}
+.bk .ns{display:flex;flex-wrap:wrap}.bk .ns b{font-weight:600}.bk .ns{gap:3px 14px}
 .bk .ns b.dim{color:var(--muted)}.bk .rr{color:#F87171;font:800 9.5px var(--f-body);margin-left:4px;vertical-align:1px}.bk .em{color:var(--muted);font-weight:500;font-size:12px;margin-left:3px}
 .af .hint{font-size:12px;color:var(--muted)}
 .af .hint .lk{color:var(--accent)}
@@ -2035,7 +2035,8 @@ details.dzb[open]{padding-bottom:10px}
       const alle = [...(a.startelf || []), ...(a.bank || [])];
       alle.forEach(s => { if (s._lt) { ["tore", "vorl", "gelb", "rot", "gr", "_lt"].forEach(f => delete s[f]); }
         if (s._bk) { ["ein", "ein_min", "aus"].forEach(f => { if (s._bk[f] === undefined) delete s[f]; else s[f] = s._bk[f]; }); delete s._bk; } });
-      if (!live) return;
+      const luecke = p.status === "beendet" && (p.wechsel || []).length && !alle.some(s => s.ein === true || s.aus);
+      if (!live && !luecke) return;
       const nn = x => nNorm(x).replace(/[^a-z0-9 -]/g, "");
       const finde = n => { const x = nn(n); if (!x) return null;
         return alle.find(s => nn(s.n) === x) || alle.find(s => nn(s.n).endsWith(" " + x) || x.endsWith(" " + nn(s.n)) || nn(s.n).endsWith(x)); };
@@ -2051,12 +2052,18 @@ details.dzb[open]{padding-bottom:10px}
       (p.karten || []).filter(c => c.seite === seite).forEach(c => { if (c.art === "gelb") setz(c.n, "gelb", true); else { setz(c.n, "rot", true); if (c.art === "gelbrot") setz(c.n, "gr", true); } });
     });
   }
-  let LIVEP = null;
+  let LIVEP = null, SPIELP = null;
   function wechselBox(k, p, elf, bank){
     const seite = p.heim_k === k ? "heim" : "gast", nn = x => nNorm(x);
     const such = (l, n) => l.find(s => nn(s.n) === nn(n)) || l.find(s => nn(s.n).endsWith(nn(n)) || nn(n).endsWith(nn(s.n))) || (n ? {n} : null);
-    const w = (p.wechsel || []).filter(x => x.seite === seite);
-    if (!w.length) return `<div class="wb"><h4>Wechsel</h4><p class="dat" style="margin:0">Bisher keine Wechsel.</p></div>`;
+    let w = (p.wechsel || []).filter(x => x.seite === seite);
+    if (!w.length && p.status === "beendet") {  // nach dem Spieltage-Lauf: Einwechselminuten aus der Aufstellung
+      const rein = bank.filter(s => s.ein === true).sort((a, b) => (parseInt(a.ein_min, 10) || 99) - (parseInt(b.ein_min, 10) || 99));
+      const raus = elf.concat(bank).filter(s => s.aus), frei = raus.slice();
+      w = rein.map(s => { let i = frei.findIndex(r => String(r.aus) === String(s.ein_min)); if (i < 0) i = frei.length ? 0 : -1;
+        const r = i >= 0 ? frei.splice(i, 1)[0] : null; return {ein: s.n, aus: r ? r.n : "", min: s.ein_min || (r && r.aus) || ""}; });
+    }
+    if (!w.length) return `<div class="wb"><h4>Wechsel</h4><p class="dat" style="margin:0">${p.status === "beendet" ? "Keine Wechsel." : "Bisher keine Wechsel."}</p></div>`;
     return `<div class="wb"><h4>Wechsel</h4>${w.map(x => wxZeile(k, such(bank, x.ein), such(elf.concat(bank), x.aus), ["n", "EIN"], ["r", "AUS"], esc(x.min) + "'")).join("")}</div>`;
   }
   function liveLeiste(){
@@ -2518,7 +2525,7 @@ details.dzb[open]{padding-bottom:10px}
   const belSeiten = p => p.status !== "beendet" && p.belastung ? [["heim", p.heim], ["gast", p.gast]].filter(([k]) => p.belastung[k]).map(([k, n]) => [n, p.belastung[k]]) : [];
   const meinK = p => SEL.has(p.heim_k) ? p.heim_k : SEL.has(p.gast_k) ? p.gast_k : null;
   const torListe = (p, seite) => (p.tore || []).filter(t => t.seite === seite)
-    .map(t => `<span class="tz-t"><b>${esc(t.n)}</b> ${esc(t.min)}'${t.art === "Elfmeter" ? " (E)" : t.art === "Eigentor" ? " (ET)" : ""}</span>`).join("");
+    .map(t => `<span class="tz-t"><b>${esc(t.n)}</b> ${esc(t.min)}'${t.art === "Elfmeter" ? " (E)" : t.art === "Eigentor" ? " (ET)" : t.art === "Freistoß" ? " (FS)" : ""}</span>`).join("");
   let TZ_AUS = false;
   const torZeile = p => !TZ_AUS && istLive(p) && (p.tore || []).length
     ? `<div class="pr-tore"><div class="h">${torListe(p, "heim")}</div><div></div><div>${torListe(p, "gast")}</div></div>` : "";
@@ -2573,10 +2580,7 @@ details.dzb[open]{padding-bottom:10px}
 
   function zaehlt(t){ return t.et ? (t.seite === "heim" ? "gast" : "heim") : t.seite; }
   function schuetzinnen(tore, seite){
-    const r = [], mins = {};
-    tore.filter(t => zaehlt(t) === seite).forEach(t => { const n = t.n || ""; if (!mins[n]) { r.push(n); mins[n] = []; }
-      mins[n].push(`${t.min || ""}'${t.art === "Elfmeter" ? " (E)" : ""}${t.et ? " (ET)" : ""}`); if (t.vorlage) (mins[n].v = mins[n].v || []).push(t.vorlage); });
-    return r.map(n => `<span><b>${esc(n)}</b> <span class="mu">${esc(mins[n].join(", "))}</span>${mins[n].v ? `<small class="tvl">Vorlage ${esc([...new Set(mins[n].v)].join(", "))}</small>` : ""}</span>`).join("");
+    return tore.filter(t => zaehlt(t) === seite).map(t => `<span><b>${esc(t.n || "")}</b> <span class="mu">${esc(t.min || "")}'${t.art === "Elfmeter" ? " (E)" : t.art === "Freistoß" ? " (FS)" : ""}${t.et || t.art === "Eigentor" ? " (ET)" : ""}</span>${t.vorlage ? `<small class="tvl">${esc(t.vorlage)}</small>` : ""}</span>`).join("");
   }
   function spiel(id, halten){
     const p = SP && alleSpiele().find(x => x.id === id); if (!p) return spielplan();
@@ -2588,7 +2592,7 @@ details.dzb[open]{padding-bottom:10px}
     const det = tore.map(t => { zaehlt(t) === "heim" ? h++ : g++;
       return `<div><span class="m">${esc(t.min)}'</span>${logo(zaehlt(t) === "heim" ? p.heim_k : p.gast_k, 18)}<span><b style="font-weight:600">${esc(t.n)}</b><span class="mu">${t.et ? " (Eigentor)" : ""}${t.art === "Elfmeter" ? " (Elfmeter)" : ""}${t.vorlage ? ` (Vorlage ${esc(t.vorlage)})` : ""}</span></span><span class="st">${h}:${g}</span></div>`; }).join("");
     const pv = p.platzverweise || [], bs = belSeiten(p);
-    liveMarken(p); LIVEP = istLive(p) ? p : null;
+    liveMarken(p); LIVEP = istLive(p) ? p : null; SPIELP = p;
     const AS = AF && AF.spiele && AF.spiele[p.id];
     AFNOTEN = AS ? AS.no : null; AFBEST = null;
     if (AS && SPN) { AFBEST = new Set(); [p.heim_k, p.gast_k].forEach(k => { const l = Object.entries(AS.no).filter(([id]) => (spById(id) || {}).k === k).sort((a, b) => b[1] - a[1]); if (l[0]) AFBEST.add(l[0][0]); }); }
@@ -2670,8 +2674,9 @@ details.dzb[open]{padding-bottom:10px}
       h += bankNamen(rein.map(s => ({...s, p: GRUPPE(s.p), em: s.ein_min ? "↑" + s.ein_min + "'" : ""})), null, "Eingewechselt");
       h += bankNamen(draussen.map(s => ({...s, p: GRUPPE(s.p), dim: true})), rausSet, "Ohne Einsatz");
     } else h += bankNamen(bank.map(s => ({...s, p: GRUPPE(s.p)})), rausSet);
-    h += aenderungen(k, elf.filter(s => neuSet.has(s.n)), raus);
-    if (LIVEP && (LIVEP.heim_k === k || LIVEP.gast_k === k)) h += wechselBox(k, LIVEP, elf, bank);
+    const sp_ = SPIELP && (SPIELP.heim_k === k || SPIELP.gast_k === k) ? SPIELP : null, aus_ = sp_ && sp_.status === "beendet";
+    if (!aus_) h += aenderungen(k, elf.filter(s => neuSet.has(s.n)), raus);
+    if (sp_ && (istLive(sp_) || aus_)) h += wechselBox(k, sp_, elf, bank);
     return h + `</div>`;
   }
   document.addEventListener("click", e => { if (e.target.closest("[data-anaart]") && typeof anaArticle === "function") anaArticle(); });
@@ -3158,7 +3163,7 @@ details.dzb[open]{padding-bottom:10px}
   const LIVE_API = "https://api.github.com/repos/finnclausenhh/fbl-daten/contents/live.json?ref=main";
   let LIVE = null;
   const mischLive = d => { const L = (LIVE && LIVE.spiele) || {}; if (!d) return;
-    (d.spieltage || []).forEach(t => t.partien.concat(t.nachholspiele || []).forEach(p => { const x = L[p.id]; if (x && p.status !== "beendet") Object.assign(p, x); })); };
+    (d.spieltage || []).forEach(t => t.partien.concat(t.nachholspiele || []).forEach(p => { const x = L[p.id]; if (x && p.status !== "beendet") Object.assign(p, x); else if (x && !(p.wechsel || []).length && (x.wechsel || []).length) p.wechsel = x.wechsel; })); };
   const spielLaeuft = () => SP && alleSpiele().some(p => { if (p.status === "beendet" || !p.anstoss || /T00:00/.test(p.anstoss)) return false;
     const m = (Date.now() - dt(p.anstoss).getTime()) / 60000; return m > -5 && m < 150; });
   function loadLive(){
@@ -4285,7 +4290,7 @@ details.dzb[open]{padding-bottom:10px}
     N = N.concat(neu).sort((a, b) => String(b.zeit).localeCompare(String(a.zeit)));
     if (VIEW === "meldungen" && document.querySelector("#main .liste")) { const y = window.scrollY; list(); window.scrollTo(0, y); } }; mische(); });
   fetch("patchnotes.json", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(d => { PATCH = d; if (decodeURIComponent(location.hash.slice(1)) === "patches") legal("patches"); }).catch(() => {});
-  loadSP().then(() => { if (spielLaeuft()) loadLive(); });
+  loadSP().then(() => loadLive());
   setInterval(() => { if (!document.hidden && spielLaeuft()) loadLive(); }, 30000);
   setInterval(() => { if (document.hidden || !SP) return; document.querySelectorAll("[data-lm]").forEach(el => {
     const p = alleSpiele().find(x => x.id === el.dataset.lm); if (p && istLive(p)) { const t = liveText(p); if (el.textContent !== t) el.textContent = t; } }); }, 15000);
