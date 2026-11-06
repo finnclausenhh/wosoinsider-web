@@ -3174,6 +3174,9 @@ details.dzb[open]{padding-bottom:10px}
   }
 
   // ---------------- Laden
+  const API_DATEN = "https://api.github.com/repos/finnclausenhh/fbl-daten/contents/";
+  const frisch = f => fetch(API_DATEN + f + "?ref=main", {cache: "no-cache", headers: {Accept: "application/vnd.github.raw+json"}})
+    .then(r => r.ok ? r.json() : Promise.reject(r.status)).catch(() => json(f));
   const json = f => fetch(f, {cache: "no-store"}).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
   const LIVE_URL = "https://raw.githubusercontent.com/finnclausenhh/fbl-daten/main/live.json";
   const LIVE_API = "https://api.github.com/repos/finnclausenhh/fbl-daten/contents/live.json?ref=main";
@@ -3190,7 +3193,7 @@ details.dzb[open]{padding-bottom:10px}
         else if (!BACK && VIEW === "meldungen" && document.querySelector("#main .liste")) { const y = window.scrollY; list(); window.scrollTo(0, y); } } }).catch(() => {});
   }
   function loadSP(){
-    return json("spielplan.json").then(d => { mischLive(d); SP = d; if (MD == null) MD = d.aktuell;
+    return frisch("spielplan.json").then(d => { mischLive(d); SP = d; if (MD == null) MD = d.aktuell;
       if (BACK) return; if (VIEW === "spielplan") GAME ? spiel(GAME, true) : spielplan(); else if (VIEW === "inside" && IN) { const y = window.scrollY; inside(); window.scrollTo(0, y); } })
       .catch(() => { if (VIEW === "spielplan" && !SP) $("#main").innerHTML = '<p class="leer">Der Spielplan konnte nicht geladen werden. Seite neu laden.</p>'; });
   }
@@ -4288,8 +4291,15 @@ details.dzb[open]{padding-bottom:10px}
   });
 
   vzKnopf();
-  json("news.json").then(d => {
-    N = d.meldungen || [];
+  let NSTAND = null;
+  setInterval(() => { if (document.hidden || !N.length) return; frisch("news.json").then(d => {
+    if (!d || !d.meldungen || d.stand === NSTAND) return; NSTAND = d.stand;
+    const eigen = new Set([...(AF && AF.news || []), ...(TAW || [])].map(n => n.id)), neuIds = new Set(d.meldungen.map(m => m.id));
+    N = d.meldungen.concat(N.filter(m => eigen.has(m.id) && !neuIds.has(m.id)));
+    if (VIEW === "meldungen" && !ARTIKEL && !BACK && document.querySelector("#main .liste")) { const y = window.scrollY; list(); window.scrollTo(0, y); }
+  }).catch(() => {}); }, 90000);
+  frisch("news.json").then(d => {
+    N = d.meldungen || []; NSTAND = d.stand;
     const h = decodeURIComponent(location.hash.slice(1));
     if (h.startsWith("spielerin/")) { list(); oeffneProfil(h.slice(10), {typ: "meldungen"}); }
     else if (h === "suche") { list(); suche(); }
