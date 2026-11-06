@@ -1406,7 +1406,7 @@ details.dzb[open]{padding-bottom:10px}
   const P = {
     stern:'<path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>', haken:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
     frage:'<path d="M9 9a3 3 0 115.6 1.3c-.8 1.3-2.6 1.8-2.6 3.7M12 18.5v.1"/>', ausruf:'<path d="M12 5v9M12 18.5v.1"/>', x:'<path d="M7 7l10 10M17 7L7 17"/>',
-    plus:'<path d="M12 5v14M5 12h14"/>', uhr:'<path d="M12 12V0a12 12 0 0 1 12 12z"/>', verbot:'<circle cx="12" cy="12" r="8"/><path d="M6.5 17.5l11-11"/>', zurueck:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>', abw:'<path d="M12 12V0a12 12 0 0 1 12 12z"/>', verbot:'<circle cx="12" cy="12" r="8"/><path d="M6.5 17.5l11-11"/>', zurueck:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>',
     links:'<path d="M15 5l-7 7 7 7"/>', rechts:'<path d="M9 5l7 7-7 7"/>', pfeil:'<path d="M4 12h15M13 6l6 6-6 6"/>', uhr:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     warn:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.1"/>'
   };
@@ -1435,13 +1435,13 @@ details.dzb[open]{padding-bottom:10px}
   const karte = rot => `<span class="krt" style="background:${rot ? "#E24A4A" : "#F5C518"}" role="img" aria-label="${rot ? "Rote Karte" : "Gelbe Karte"}"></span>`;
 
   // Status: nur was sich geändert hat (kein Symbol für fit)
-  const STATUS = {rueckkehr:["zurueck","#22A35A","zurück"], fraglich:["frage","#E0962B","fraglich"], verletzt:["plus","#E24A4A","verletzt"], gesperrt:["verbot","#9B6BE8","gesperrt"], abwesend:["uhr","#E6E8EC","abwesend"]};
+  const STATUS = {rueckkehr:["zurueck","#22A35A","zurück"], fraglich:["frage","#E0962B","fraglich"], verletzt:["plus","#E24A4A","verletzt"], gesperrt:["verbot","#9B6BE8","gesperrt"], abwesend:["abw","#E6E8EC","abwesend"]};
   function meldungsStatus(m){
     if (m.status) return m.status;
     const t = m.tags || [];
     return t.includes("ABWESEND") ? "abwesend" : t.includes("SPERRE") ? "gesperrt" : t.includes("VERLETZUNG") ? "verletzt" : t.includes("RÜCKKEHR") ? "rueckkehr" : null;
   }
-  const plakette = (s, g = 22) => { const x = STATUS[String(s || "").toLowerCase()]; return x ? `<span class="plak${x[0] === "frage" ? " fr" : x[0] === "uhr" ? " ab" : ""}" style="width:${g}px;height:${g}px;background:${x[1]}" role="img" aria-label="${x[2]}">${svg(P[x[0]])}</span>` : ""; };
+  const plakette = (s, g = 22) => { const x = STATUS[String(s || "").toLowerCase()]; return x ? `<span class="plak${x[0] === "frage" ? " fr" : x[0] === "abw" ? " ab" : ""}" style="width:${g}px;height:${g}px;background:${x[1]}" role="img" aria-label="${x[2]}">${svg(P[x[0]])}</span>` : ""; };
 
   // ---------------- Datum (Europe/Berlin wie in den Daten)
   const WT = ["So","Mo","Di","Mi","Do","Fr","Sa"], WTL = ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];

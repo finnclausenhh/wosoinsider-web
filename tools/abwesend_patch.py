@@ -10,11 +10,11 @@ import sys
 
 ERSETZUNGEN = [
     ('gesperrt:["verbot","#9B6BE8","gesperrt"]};',
-     'gesperrt:["verbot","#9B6BE8","gesperrt"], abwesend:["uhr","#E6E8EC","abwesend"]};'),
+     'gesperrt:["verbot","#9B6BE8","gesperrt"], abwesend:["abw","#E6E8EC","abwesend"]};'),
     ('return t.includes("SPERRE") ? "gesperrt"',
      'return t.includes("ABWESEND") ? "abwesend" : t.includes("SPERRE") ? "gesperrt"'),
     ('<span class="plak${x[0] === "frage" ? " fr" : ""}"',
-     '<span class="plak${x[0] === "frage" ? " fr" : x[0] === "uhr" ? " ab" : ""}"'),
+     '<span class="plak${x[0] === "frage" ? " fr" : x[0] === "abw" ? " ab" : ""}"'),
     ("plus:'<path d=\"M12 5v14M5 12h14\"/>', ",
      "plus:'<path d=\"M12 5v14M5 12h14\"/>', uhr:'<path d=\"M12 12V0a12 12 0 0 1 12 12z\"/>', "),
     ('.plak.fr svg{width:80%;height:80%;stroke-width:3}',
@@ -43,7 +43,7 @@ ERSETZUNGEN = [
 def main():
     pfad = sys.argv[1]
     s = open(pfad, encoding="utf-8").read()
-    if 'abwesend:["uhr"' in s:
+    if 'abwesend:["abw"' in s:
         print("schon gepatcht")
         return
     for alt, neu in ERSETZUNGEN:
