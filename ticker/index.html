@@ -2012,12 +2012,18 @@ details.dzb[open]{padding-bottom:10px}
     </section>`;
   }
 
+  function aufAngepfiffen(m){
+    if (!SP || !(m.aufstellung || /^aufstellung-/.test(m.id || ""))) return false;
+    const ma = ((m.quellen || [])[0] || {}).url || "", id = m.partie_id || (ma.match(/\/ma(\d+)\//) || [])[1];
+    const p = id && (SP.spieltage || []).flatMap(t => t.partien.concat(t.nachholspiele || [])).find(x => x.id === id);
+    return !!p && (p.status === "live" || p.status === "läuft" || p.status === "beendet");
+  }
   function list(){
     GAME = null; ARTIKEL = null;
     tsRundeNews();
     const now = Date.now();
     const fest = N.filter(angeheftet).sort((a, b) => dt(a.pin_bis) - dt(b.pin_bis));
-    const alle = N.filter(m => !fest.includes(m)).sort((a, b) => (dt(b.zeit) || 0) - (dt(a.zeit) || 0));
+    const alle = N.filter(m => !fest.includes(m) && !aufAngepfiffen(m)).sort((a, b) => (dt(b.zeit) || 0) - (dt(a.zeit) || 0));
     const filter = SEL.size && !NEWSALLE;
     const rest = filter ? alle.filter(meineMeldung) : alle;
     let A = IN && IN.analyse && IN.analyse.news_zeit && dt(IN.analyse.news_zeit) <= now && (!SEL.size || NEWSALLE || !IN.analyse.verein || SEL.has(IN.analyse.verein)) ? IN.analyse : null;
@@ -3098,7 +3104,8 @@ details.dzb[open]{padding-bottom:10px}
   function loadLive(){
     return fetch(LIVE_URL + "?t=" + Date.now(), {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(l => {
       if (!l) return; const neu = JSON.stringify(l.spiele) !== JSON.stringify(LIVE && LIVE.spiele); LIVE = l;
-      if (neu && SP) { mischLive(SP); if (!BACK && VIEW === "spielplan") GAME ? spiel(GAME, true) : spielplan(); } }).catch(() => {});
+      if (neu && SP) { mischLive(SP); if (!BACK && VIEW === "spielplan") GAME ? spiel(GAME, true) : spielplan();
+        else if (!BACK && VIEW === "meldungen" && document.querySelector("#main .liste")) { const y = window.scrollY; list(); window.scrollTo(0, y); } } }).catch(() => {});
   }
   function loadSP(){
     return json("spielplan.json").then(d => { mischLive(d); SP = d; if (MD == null) MD = d.aktuell;
