@@ -2036,6 +2036,10 @@ details.dzb[open]{padding-bottom:10px}
       alle.forEach(s => { if (s._lt) { ["tore", "vorl", "gelb", "rot", "gr", "_lt"].forEach(f => delete s[f]); }
         if (s._bk) { ["ein", "ein_min", "aus"].forEach(f => { if (s._bk[f] === undefined) delete s[f]; else s[f] = s._bk[f]; }); delete s._bk; } });
       const luecke = p.status === "beendet" && (p.wechsel || []).length && !alle.some(s => s.ein === true || s.aus);
+      const ohneV = p.status === "beendet" && (p.tore || []).some(t => t.vorlage && t.seite === seite) && !alle.some(s => s.vorl > 0);
+      if (!live && !luecke && ohneV) { const nn2 = x => nNorm(x).replace(/[^a-z0-9 -]/g, "");
+        (p.tore || []).filter(t => t.seite === seite && t.vorlage).forEach(t => { const x = nn2(t.vorlage), s = alle.find(s => nn2(s.n) === x) || alle.find(s => nn2(s.n).endsWith(x) || x.endsWith(nn2(s.n)));
+          if (s) { s._lt = true; s.vorl = (s.vorl || 0) + 1; } }); return; }
       if (!live && !luecke) return;
       const nn = x => nNorm(x).replace(/[^a-z0-9 -]/g, "");
       const finde = n => { const x = nn(n); if (!x) return null;
@@ -2204,10 +2208,10 @@ details.dzb[open]{padding-bottom:10px}
   function feld(elf, k, o){
     ({elf, form: o.formation} = standardElf(elf, o.formation, k));
     const rows = LINIE.map(p => elf.filter(s => (LINIE.includes(s.p) ? s.p : "MF") === p)).filter(r => r.length);
-    const n = rows.length, H = n <= 4 ? 470 : n === 5 ? 520 : 570, F = n >= 6 ? 48 : 54;
+    const n = rows.length, H = n <= 4 ? 520 : n === 5 ? 610 : 680, F = n >= 6 ? 48 : 54;
     let h = `<div class="feld" style="height:${H}px">${feldSVG()}`;
     rows.forEach((r, ri) => {
-      const y = n === 1 ? 50 : 11 + ri * (75 / (n - 1));  // Anker = Fotomitte, unten Platz für Name und Minute
+      const y = n === 1 ? 50 : 9 + ri * (77 / (n - 1));  // Anker = Fotomitte, unten Platz für Name und Minute
       r.forEach((s, i) => {
         const x = (i + 1) / (r.length + 1) * 100, src = fotoSp(k, s);
         const inner = src ? `<img src="${esc(src)}" alt="" loading="lazy" onerror="this.parentNode.innerHTML='<b>${initialen(s.voll || s.n)}</b>'">` : `<b>${initialen(s.voll || s.n)}</b>`;
