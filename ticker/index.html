@@ -2024,7 +2024,7 @@ details.dzb[open]{padding-bottom:10px}
     return `<section class="sek bil">
       ${!oeff ? `<div class="bil-test">Testansicht: öffentlich erst ab ${BILANZ_AB} geprüften Aufstellungen, aktuell ${n}.</div>` : ""}
       <div class="kap" style="color:#14B8A6">PROGNOSE-BILANZ</div><h2>Wie gut sind unsere Aufstellungen?</h2>
-      <p class="mu">${n} Aufstellungen geprüft · Stand ${esc(tagDatum(TQ.stand))} · jeden Dienstag neu</p>
+      <p class="mu">${n} Aufstellungen geprüft · Stand ${esc(tagDatum(TQ.stand))} · täglich neu</p>
       <div class="bil-k">${TQ.gesamt_24h && TQ.gesamt_24h.teams ? `<div><span>24 h vor Anpfiff</span><b style="color:#6E9BFF">${pz(TQ.gesamt_24h.elf_quote)}</b><small>im Schnitt ${esc(String(TQ.gesamt_24h.elf_treffer_schnitt).replace(".", ","))} von 11 richtig</small></div>` : `<div><span>24 h vor Anpfiff</span><b class="mu">kommt</b><small>ab dem nächsten Spieltag</small></div>`}
         <div><span>Letzte Prognose</span><b style="color:#6E9BFF">${pz(g.elf_quote)}</b><small>im Schnitt ${esc(String(g.elf_treffer_schnitt).replace(".", ","))} von 11 richtig</small></div></div>
       ${stufen || !oeff ? `<div class="bil-s">${!stufen ? `<div class="bil-test">Testansicht: je Status erst ab ${STUFEN_AB} Aufstellungen.</div>` : ""}<div class="kap">HÄLT DER STATUS, WAS ER VERSPRICHT?</div>${ST.map(([k, l, c]) => { const x = (g.je_stufe || {})[k]; if (!x || !x.n) return "";

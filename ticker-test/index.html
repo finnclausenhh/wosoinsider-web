@@ -2030,7 +2030,7 @@ details.dzb[open]{padding-bottom:10px}
     return `<section class="sek bil">
       ${!oeff ? `<div class="bil-test">Testansicht: öffentlich erst ab ${BILANZ_AB} geprüften Aufstellungen, aktuell ${n}.</div>` : ""}
       <div class="kap" style="color:#14B8A6">PROGNOSE-BILANZ</div><h2>Wie gut sind unsere Aufstellungen?</h2>
-      <p class="mu">${n} Aufstellungen geprüft · Stand ${esc(tagDatum(TQ.stand))} · jeden Dienstag neu</p>
+      <p class="mu">${n} Aufstellungen geprüft · Stand ${esc(tagDatum(TQ.stand))} · täglich neu</p>
       <div class="bil-k">${TQ.gesamt_24h && TQ.gesamt_24h.teams ? `<div><span>24 h vor Anpfiff</span><b style="color:#6E9BFF">${pz(TQ.gesamt_24h.elf_quote)}</b><small>im Schnitt ${esc(String(TQ.gesamt_24h.elf_treffer_schnitt).replace(".", ","))} von 11 richtig</small></div>` : `<div><span>24 h vor Anpfiff</span><b class="mu">kommt</b><small>ab dem nächsten Spieltag</small></div>`}
         <div><span>Letzte Prognose</span><b style="color:#6E9BFF">${pz(g.elf_quote)}</b><small>im Schnitt ${esc(String(g.elf_treffer_schnitt).replace(".", ","))} von 11 richtig</small></div></div>
       ${stufen || !oeff ? `<div class="bil-s">${!stufen ? `<div class="bil-test">Testansicht: je Status erst ab ${STUFEN_AB} Aufstellungen.</div>` : ""}<div class="kap">HÄLT DER STATUS, WAS ER VERSPRICHT?</div>${ST.map(([k, l, c]) => { const x = (g.je_stufe || {})[k]; if (!x || !x.n) return "";
@@ -2552,12 +2552,23 @@ details.dzb[open]{padding-bottom:10px}
   let TZ_AUS = false;
   const torZeile = p => !TZ_AUS && istLive(p) && (p.tore || []).length
     ? `<div class="pr-tore"><div class="h">${torListe(p, "heim")}</div><div></div><div>${torListe(p, "gast")}</div></div>` : "";
+  // Hinweis unter der Partie (Finn 07.11.2026): offizielle Aufstellung auch aus den Live-Meldungen (news.json), sonst Vorschau;
+  // am Spieltag zusätzlich, ab wann die Aufstellung erwartet wird (rund 60 Minuten vor Anpfiff).
+  function afHin(p){
+    const v = AF && (AF.vorschau || []).some(x => x.id === p.id), a = [p.heim_aufstellung, p.gast_aufstellung].filter(Boolean);
+    const d = dt(p.anstoss), tt = d ? String(d.getDate()).padStart(2, "0") + String(d.getMonth() + 1).padStart(2, "0") : "";
+    const live = [p.heim_k, p.gast_k].filter(k => k && tt && (N || []).some(m => m.id === "aufstellung-" + String(k).toLowerCase() + "-" + tt && !m.platzhalter)).length;
+    const off = Math.max(live, a.filter(x => x.typ === "offiziell").length);
+    if (off) return `<div class="af-hin"><span class="o">${off >= 2 ? "AUFSTELLUNGEN SIND DA" : "ERSTE AUFSTELLUNG IST DA"}</span></div>`;
+    if (!v && !a.length) return "";
+    const heute = d && d.toDateString() === new Date().toDateString() && terminiert(p);
+    return `<div class="af-hin"><span class="v">VORSCHAU</span>${heute ? `<span class="a">AUFSTELLUNG AB CA. ${uhr(new Date(d.getTime() - 3600000))}</span>` : ""}</div>`;
+  }
   function partieZeile(p, mitTag){
     const bs = belSeiten(p), mk = meinK(p), klein = SEL.size && !mk;
     return `<button class="pr${mk ? " mein" : ""}" ${mk ? `style="--vc:${ring(mk)}" ` : ""}data-game="${esc(p.id)}">${mitTag ? `<div class="dat" style="font-size:11px">${esc(terminiert(p) ? wtLang(p.anstoss) : "Termin offen")}</div>` : ""}<div class="pr-z">
       <span class="pr-t h"><span data-kname="${esc(KNAME[p.heim_k] || "")}" title="${esc(p.heim)}">${esc(KNAME[p.heim_k] || p.heim)}</span><span class="kd-l" data-kader="${esc(p.heim_k)}">${logo(p.heim_k, 30)}</span></span>${mitte(p)}<span class="pr-t"><span class="kd-l" data-kader="${esc(p.gast_k)}">${logo(p.gast_k, 30)}</span><span data-kname="${esc(KNAME[p.gast_k] || "")}" title="${esc(p.gast)}">${esc(KNAME[p.gast_k] || p.gast)}</span></span></div>
-      ${p.status !== "beendet" && !istLive(p) ? (() => { const v = AF && (AF.vorschau || []).some(x => x.id === p.id), a = [p.heim_aufstellung, p.gast_aufstellung].filter(Boolean), off = a.some(x => x.typ === "offiziell");
-        return v || a.length ? `<div class="af-hin"><span class="${off ? "o" : "v"}">${off ? "OFFIZIELLE AUFSTELLUNG" : "VORSCHAU"}</span></div>` : ""; })() : ""}
+      ${p.status !== "beendet" && !istLive(p) ? afHin(p) : ""}
       ${p.status !== "beendet" && !istLive(p) && einsehbar(p) ? `<div class="eins-z">${einsTag()}<span>Offizielle Aufstellung kommt, bevor Kickbase schließt</span></div>` : ""}${torZeile(p)}${bs.length && !istLive(p) ? (klein ? `<div class="belh klein"><span class="kap">ENGLISCHE WOCHE</span></div>` : `<div class="belh"><span class="kap">ENGLISCHE WOCHE</span>${bs.map(([n, b]) => `<span><b>${esc(n)}</b> ${esc(b.text)}</span>`).join("")}</div>`) : ""}</button>`;
   }
   const alleSpiele = () => { const g = new Set(); return (SP.spieltage || []).flatMap(t => t.partien.concat(t.nachholspiele || [])).filter(p => !g.has(p.id) && g.add(p.id)); };
