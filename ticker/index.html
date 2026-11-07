@@ -1464,6 +1464,21 @@ details.dzb[open]{padding-bottom:10px}
 
   // ---------------- Zustand
   let N = [], SP = null, IN = null, FOTOS = {}, PATCH = null;
+  function liveAufMisch(){
+    if (!SP || !N || !N.length) return;
+    (SP.spieltage || []).forEach(t => t.partien.concat(t.nachholspiele || []).forEach(p => {
+      if (p.status === "beendet" || !p.anstoss) return;
+      const d = dt(p.anstoss); if (!d) return;
+      const tt = String(d.getDate()).padStart(2, "0") + String(d.getMonth() + 1).padStart(2, "0");
+      ["heim", "gast"].forEach(sd => { const a = p[sd + "_aufstellung"], k = p[sd + "_k"]; if (!k || (a && a.typ === "offiziell" && !a._live)) return;
+        const m = N.find(x => x.id === "aufstellung-" + String(k).toLowerCase() + "-" + tt && !x.platzhalter && x.aufstellung && (x.aufstellung.startelf || []).length === 11);
+        if (!m) return;
+        const au = m.aufstellung;
+        p[sd + "_aufstellung"] = {typ: "offiziell", _live: true, formation: au.formation, geschaetzt: au.geschaetzt, hinweis: au.hinweis,
+          startelf: au.startelf.map(c => ({...c, voll: c.voll || c.n})), bank: (au.bank || []).map(c => ({n: c.n, voll: c.voll || c.n, p: c.p, pid: c.pid})),
+          quelle: ((m.quellen || [])[0] || {}).url || ""}; });
+    }));
+  }
   let VIEW = "meldungen", MD = null, GAME = null, TIMER = null, SCROLL = 0, BACK = null;
   let TOREOFFEN = false, CHIPSEL = {heim:null, gast:null};
   let FDIR = "up", FIDX = 0, IMD = null, ALLCAL = false, KALINFO = null, MXINFO = null;
@@ -1729,7 +1744,7 @@ details.dzb[open]{padding-bottom:10px}
   function gLaden(){
     if (G_LADEN) return G_LADEN;
     G_LADEN = Promise.all([
-      SP ? Promise.resolve(SP) : json("spielplan.json").then(d => { SP = d; if (MD == null) MD = d.aktuell; }).catch(() => {}),
+      SP ? Promise.resolve(SP) : json("spielplan.json").then(d => { SP = d; liveAufMisch(); if (MD == null) MD = d.aktuell; }).catch(() => {}),
       ladeSPN().catch(() => {}),
       json("tracking/trefferquote.json").then(d => { TQ = d; }).catch(() => { TQ = {}; }),
       json("klickzahlen.json").then(d => { KZ = d; }).catch(() => { KZ = {}; }),
@@ -3209,7 +3224,7 @@ details.dzb[open]{padding-bottom:10px}
         else if (!BACK && VIEW === "meldungen" && document.querySelector("#main .liste")) { const y = window.scrollY; list(); window.scrollTo(0, y); } } }).catch(() => {});
   }
   function loadSP(){
-    return frisch("spielplan.json").then(d => { mischLive(d); SP = d; if (MD == null) MD = d.aktuell;
+    return frisch("spielplan.json").then(d => { mischLive(d); SP = d; liveAufMisch(); if (MD == null) MD = d.aktuell;
       if (BACK) return; if (VIEW === "spielplan") GAME ? spiel(GAME, true) : spielplan(); else if (VIEW === "inside" && IN) { const y = window.scrollY; inside(); window.scrollTo(0, y); } })
       .catch(() => { if (VIEW === "spielplan" && !SP) $("#main").innerHTML = '<p class="leer">Der Spielplan konnte nicht geladen werden. Seite neu laden.</p>'; });
   }
@@ -4312,11 +4327,11 @@ details.dzb[open]{padding-bottom:10px}
   setInterval(() => { if (document.hidden || !N.length) return; frisch("news.json").then(d => {
     if (!d || !d.meldungen || d.stand === NSTAND) return; NSTAND = d.stand;
     const eigen = new Set([...(AF && AF.news || []), ...(TAW || [])].map(n => n.id)), neuIds = new Set(d.meldungen.map(m => m.id));
-    N = d.meldungen.concat(N.filter(m => eigen.has(m.id) && !neuIds.has(m.id)));
+    N = d.meldungen.concat(N.filter(m => eigen.has(m.id) && !neuIds.has(m.id))); liveAufMisch();
     if (VIEW === "meldungen" && !ARTIKEL && !BACK && document.querySelector("#main .liste")) { const y = window.scrollY; list(); window.scrollTo(0, y); }
   }).catch(() => {}); }, 90000);
   frisch("news.json").then(d => {
-    N = d.meldungen || []; NSTAND = d.stand;
+    N = d.meldungen || []; NSTAND = d.stand; liveAufMisch();
     const h = decodeURIComponent(location.hash.slice(1));
     if (h.startsWith("spielerin/")) { list(); oeffneProfil(h.slice(10), {typ: "meldungen"}); }
     else if (h === "suche") { list(); suche(); }
