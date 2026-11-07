@@ -3934,7 +3934,8 @@ details.dzb[open]{padding-bottom:10px}
     ["Fair Play", x => (x.stat || {}).fouls != null && stMin(x) >= 540 ? -x.stat.fouls / stMin(x) * 90 : null, "pos", -99, "wenigste Fouls pro 90 Minuten"],
     ["Paradenkönigin", x => { const a = afSp(x.id); return a && a.parsp >= 3 ? a.par / a.parsp : null; }, "tw", 0, "Paraden pro Spiel"],
     ["Weiße Weste", x => stSum(x, e => e.art === "S" && stGegen(e) === 0 ? 1 : 0), "tw", 2, "Spiele zu null"],
-    ["Elfmeterkillerin", x => { const e = AF && AF.elf_tw && AF.elf_tw[x.id]; return e && e[0] >= 4 ? e[1] / e[0] : null; }, "tw", .01, "nicht verwandelte Elfmeter seit " + (((AF && AF.elf_tw_info) || {}).saisons || [""])[0], {ohneMin: 1, mindestN: 5}]];
+    // Finn 07.11.2026: Quote ab 3 Elfmetern gegen sie (Neue nicht benachteiligen), Beschreibung erst beim Rechnen (AF ist beim Laden noch leer)
+    ["Elfmeterkillerin", x => { const e = AF && AF.elf_tw && AF.elf_tw[x.id]; return e && e[0] >= 3 ? e[1] / e[0] : null; }, "tw", .01, (x, w) => { const e = AF.elf_tw[x.id], j = ((AF.elf_tw_info || {}).saisons || [])[0]; return `${Math.round(w * 100)} % der Elfmeter gegen sie nicht verwandelt (${e[1]} von ${e[0]}${j ? ", seit " + j + "/" + String(j + 1).slice(2) : ""})`; }, {ohneMin: 1, mindestN: 5, P: "Torhüterinnen ab 3 Elfmetern"}]];
   function stileAlle(){
     if (STILE || !SPN) return STILE || {};
     const L = SPN.spielerinnen || [], out = {}, add = (id, x) => (out[id] = out[id] || []).push(x);
@@ -3942,10 +3943,10 @@ details.dzb[open]{padding-bottom:10px}
       const gruppen = feld === "feld" ? {feld: L.filter(x => x.pos !== "TW")} : feld === "tw" ? {tw: L.filter(x => x.pos === "TW")} : L.reduce((g, x) => { if (x.pos !== "TW") (g[x.pos] = g[x.pos] || []).push(x); return g; }, {});
       Object.entries(gruppen).forEach(([gk, peers]) => {
         const v = peers.filter(x => opt.ohneMin || stMin(x) >= 270).map(x => [x, f(x)]).filter(p => p[1] != null); if (v.length < (opt.mindestN || 8)) return;
-        const n = v.length, cut = stCut(n), P = feld === "feld" ? "Feldspielerinnen" : feld === "tw" ? "Torhüterinnen" : (PLURAL[gk] || "Spielerinnen");
+        const n = v.length, cut = stCut(n), P = opt.P || (feld === "feld" ? "Feldspielerinnen" : feld === "tw" ? "Torhüterinnen" : (PLURAL[gk] || "Spielerinnen"));
         v.forEach(([x, w]) => { if (w < minW) return; const platz = 1 + v.filter(p => p[1] > w + 1e-9).length, eq = v.filter(p => Math.abs(p[1] - w) < 1e-9).length;
           if (platz > cut || eq > cut) return;
-          add(x.id, {t: name, platz, plus: platz === 1 && eq === 1, info: platz === 1 && eq === 1 ? `Bestwert aller ${n} ${P}` : `Platz ${platz} von ${n} ${P}`, was}); }); }); });
+          add(x.id, {t: name, platz, plus: platz === 1 && eq === 1, info: platz === 1 && eq === 1 ? `Bestwert aller ${n} ${P}` : `Platz ${platz} von ${n} ${P}`, was: typeof was === "function" ? was(x, w) : was}); }); }); });
     L.forEach(x => { const [t, v] = stElf(x); if (t >= 3 && v === 0) add(x.id, {t: "Eiskalt vom Punkt", plus: t >= 8, info: `${t} von ${t} Elfmetern verwandelt (diese und letzte Saison)`, was: "Elfmeter"}); });
     ((IN && IN.standards) || []).forEach(st => [["ecken", "Ecken"], ["fs", "Freistöße"]].forEach(([key, lbl]) => { const e = (st[key] || [])[0]; if (!e || Number(e[1]) < 3) return;
       const x = L.find(y => y.k === st.k && normS(nachN(y.n)) === normS(nachN(e[0]))); if (x && !(out[x.id] || []).some(z => z.t === "Standardspezialistin")) add(x.id, {t: "Standardspezialistin", plus: false, info: `schießt bei ${kname(st.k)} die ${lbl}`, was: "Standards"}); }));
@@ -3953,10 +3954,10 @@ details.dzb[open]{padding-bottom:10px}
     return STILE = out;
   }
   window.WI_STILE = () => stileAlle();
-  const stChip = (x, klein) => `<span class="stl${x.plus ? " plus" : ""}${klein ? " k" : ""}"${klein ? ` role="button" tabindex="0" data-stl="${esc(x.t + (x.plus ? "+" : "") + ": " + (x.was && !/Elfmetern|schießt/.test(x.info) ? x.was + ", " : "") + x.info)}"` : ""}>${esc(x.t)}${x.plus ? "<sup>+</sup>" : ""}</span>`;
+  const stChip = (x, klein) => `<span class="stl${x.plus ? " plus" : ""}${klein ? " k" : ""}"${klein ? ` role="button" tabindex="0" data-stl="${esc(x.t + (x.plus ? "+" : "") + ": " + (x.was && !/Elfmetern verwandelt|schießt/.test(x.info) ? x.was + ", " : "") + x.info)}"` : ""}>${esc(x.t)}${x.plus ? "<sup>+</sup>" : ""}</span>`;
   function stilBox(s){
     const l = (stileAlle()[s.id] || []).slice(0, 2); if (!l.length) return "";
-    return `<section class="pf-box">${kap("Spielstile")}<div class="stl-l">${l.map(x => `<div>${stChip(x)}<small>${x.was && !/Elfmetern|schießt/.test(x.info) ? `<b class="stl-w">${esc(x.was.charAt(0).toUpperCase() + x.was.slice(1))}</b>: ` : ""}${esc(x.info)}</small></div>`).join("")}</div></section>`;
+    return `<section class="pf-box">${kap("Spielstile")}<div class="stl-l">${l.map(x => `<div>${stChip(x)}<small>${x.was && !/Elfmetern verwandelt|schießt/.test(x.info) ? `<b class="stl-w">${esc(x.was.charAt(0).toUpperCase() + x.was.slice(1))}</b>: ` : ""}${esc(x.info)}</small></div>`).join("")}</div></section>`;
   }
   document.addEventListener("click", e => {
     const c = e.target.closest && e.target.closest("[data-stl]"); if (!c) return;
