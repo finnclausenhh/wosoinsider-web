@@ -2485,7 +2485,8 @@ details.dzb[open]{padding-bottom:10px}
       ? (!freigabe(fi) && quelleURL(fi) ? `<a href="${esc(quelleURL(fi))}" target="_blank" rel="noopener">${nachweis(fi)}, Wikimedia Commons</a>` : nachweis(fi))
       : fc && fc.autor ? (fc.url ? `<a href="${esc(fc.url)}" target="_blank" rel="noopener">Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}, Wikimedia Commons</a>` : `Foto: ${esc(fc.autor)}, ${esc(fc.lizenz)}`) : "";
     ARTIKEL = id; const um = umfrageZu(m.id), tsA = tsArtikel(m);
-    $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${tsA ? tsA : um ? umfrageBlock(um) : ""}<div id="art-sv">${auf || sc ? "" : artVerlauf(m)}</div><div id="art-eo">${(auf || sc ? "" : einordnung(m)) || kbBox(m.kickbase)}</div><div id="pf-karte">${auf || sc ? "" : profilKarte(m)}</div>
+    const stdA = !auf && !sc && !m.grafik && (m.tags || []).includes("STANDARD"), stdHtml = () => (IN ? stdFeld(KURZ[m.verein]) : "") + kbBox(m.kickbase);
+    $("#main").innerHTML = `<article class="det">${zurueck()}${kopf}${tsA ? tsA : um ? umfrageBlock(um) : ""}<div id="art-sv">${auf || sc ? "" : artVerlauf(m)}</div><div id="art-eo">${stdA ? stdHtml() : (auf || sc ? "" : einordnung(m)) || kbBox(m.kickbase)}</div><div id="pf-karte">${auf || sc ? "" : profilKarte(m)}</div>
       <div id="kom" data-beitrag="${esc(m.id)}"></div>
       <div class="nachw">
       ${m.instagram ? `<a href="${esc(m.instagram)}" target="_blank" rel="noopener" style="font-size:14px">Instagram-Profil von ${esc(m.spielerin)}</a>` : ""}
@@ -2494,7 +2495,8 @@ details.dzb[open]{padding-bottom:10px}
       <p class="nq-mehr" hidden><button data-legal="so-entsteht">So entsteht WOSOINSIDER ›</button></p>
       </div>
     </article>`;
-    if (!auf && !sc && !SPN && istSpielerin(m)) ladeSPN().then(() => { const el = $("#pf-karte"); if (el && ARTIKEL === id) el.innerHTML = profilKarte(m); const eo = $("#art-eo"); if (eo && ARTIKEL === id) eo.innerHTML = einordnung(m) || kbBox(m.kickbase); const sv = $("#art-sv"); if (sv && ARTIKEL === id) sv.innerHTML = artVerlauf(m); }).catch(() => {});
+    if (!auf && !sc && !SPN && istSpielerin(m)) ladeSPN().then(() => { const el = $("#pf-karte"); if (el && ARTIKEL === id) el.innerHTML = profilKarte(m); const eo = $("#art-eo"); if (eo && ARTIKEL === id && !stdA) eo.innerHTML = einordnung(m) || kbBox(m.kickbase); const sv = $("#art-sv"); if (sv && ARTIKEL === id) sv.innerHTML = artVerlauf(m); }).catch(() => {});
+    if (stdA && !IN) loadIN().then(() => { const eo = $("#art-eo"); if (eo && ARTIKEL === id) eo.innerHTML = stdHtml(); }).catch(() => {});
     // Kommentare: nur in der öffentlichen Webversion (Skripte setzt ticker_bau.py ein)
     if (window.WIKOM) window.WIKOM.mount(m.id);
     window.scrollTo(0, 0);
@@ -2555,7 +2557,7 @@ details.dzb[open]{padding-bottom:10px}
     if (off) return `<div class="af-hin"><span class="o">${off >= 2 ? "AUFSTELLUNGEN SIND DA" : "ERSTE AUFSTELLUNG IST DA"}</span></div>`;
     if (!v && !a.length) return "";
     const heute = d && d.toDateString() === new Date().toDateString() && terminiert(p);
-    return `<div class="af-hin"><span class="v">VORSCHAU</span>${heute ? `<span class="a">AUFSTELLUNG AB CA. ${uhr(new Date(d.getTime() - 3600000))}</span>` : ""}</div>`;
+    return `<div class="af-hin">${heute ? `<span class="a">AUFSTELLUNG AB CA. ${uhr(new Date(d.getTime() - 3600000))}</span>` : '<span class="v">VORSCHAU</span>'}</div>`;
   }
   function partieZeile(p, mitTag){
     const bs = belSeiten(p), mk = meinK(p), klein = SEL.size && !mk;
