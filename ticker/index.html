@@ -1415,6 +1415,7 @@ details.dzb[open]{padding-bottom:10px}
 .dz-d4 .d4{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;text-align:center;margin-top:4px}
 .dz-d4 .d4 b{display:block;font:800 40px/1 var(--f-display)}.dz-d4 .d4 .m b{font-size:28px}.dz-d4 .d4 small{font-size:12px;color:var(--muted)}
 .dz-d4 .d4z{margin:6px 0 0;text-align:center;font-size:12px;color:var(--muted)}
+.pr-ring .t1{display:flex;justify-content:space-between;align-items:center;gap:8px}.pr-ring .t1 .badge{flex:none}
 </style>
 
 
@@ -2309,9 +2310,10 @@ details.dzb[open]{padding-bottom:10px}
     const erw = qs.reduce((x, y) => x + y, 0), pz = Math.round(erw / 11 * 100), lo = Math.floor(erw), hi = Math.ceil(erw);
     const cnt = {}; a.startelf.forEach(s => { cnt[s.st] = (cnt[s.st] || 0) + 1; });
     const tl = [["sicher", "sichere"], ["erwartet", "erwartete"], ["unsicher", "unsichere"], ["unwahrscheinlich", "unwahrscheinliche"]].filter(([k]) => cnt[k]).map(([k, w]) => cnt[k] + " " + w);
+    if (pz < 90) return "";
     const C = 2 * Math.PI * 27;
     return `<div class="pr-ring"><div class="r"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="7"/><circle cx="32" cy="32" r="27" fill="none" stroke="#8FB0FF" stroke-width="7" stroke-dasharray="${(C * pz / 100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 32 32)" stroke-linecap="round"/></svg><b>${pz}%</b></div>
-      <div class="t"><b>So sicher sind wir</b><span>${tl.length > 1 ? tl.slice(0, -1).join(", ") + " und " + tl[tl.length - 1] : tl[0]} Spielerinnen, also ${lo === hi ? lo : lo + " bis " + hi} von 11 richtig erwartet. Bisher lagen wir im Schnitt bei <b>${String(g.elf_treffer_schnitt).replace(".", ",")} von 11</b> (${g.teams} Aufstellungen geprüft).</span></div></div>`;
+      <div class="t"><span class="t1"><b>So sicher sind wir</b><span class="badge ein">PROGNOSE</span></span><span>${tl.length > 1 ? tl.slice(0, -1).join(", ") + " und " + tl[tl.length - 1] : tl[0]} Spielerinnen, also ${lo === hi ? lo : lo + " bis " + hi} von 11 richtig erwartet. Bisher lagen wir im Schnitt bei <b>${String(g.elf_treffer_schnitt).replace(".", ",")} von 11</b> (${g.teams} Aufstellungen geprüft).</span></div></div>`;
   }
   function quickInfo(k, g){
     const s = spAus(k, g), st = STUFE[g.st], w = String(g.warum || ""), wert = (w.match(/Einsatzwert (\d+) ?%/) || [])[1], src = fotoSp(k, g);
@@ -2843,7 +2845,8 @@ details.dzb[open]{padding-bottom:10px}
     if (a && (a.startelf || []).length) inh = a.typ === "offiziell" ? offiziell(a, k, anstoss) : prognose(a, seite, k);
     else inh = vorbei ? '<p class="dat">Der Spielbericht enthält keine Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : '<p class="dat">Noch keine Aufstellung.</p>';
     const badge = a ? (a.typ === "offiziell" ? '<span class="badge off">OFFIZIELL</span>' : '<span class="badge ein">PROGNOSE</span>') : "";
-    return `<div class="kartebox"><div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${badge}</div>${progRing(a)}${inh}${!vorbei && a && !(anstoss && dt(anstoss) && dt(anstoss).getTime() <= Date.now()) ? stdKacheln(k, a) : ""}</div>`;
+    const rg = progRing(a);
+    return `<div class="kartebox">${rg ? "" : `<div class="tb-k"><button class="kd-btn" data-kader="${esc(k)}" aria-label="Kader ${esc(name)}">${logo(k, 22)}<span class="n">${esc(name)}</span></button>${badge}</div>`}${rg}${inh}${!vorbei && a && !(anstoss && dt(anstoss) && dt(anstoss).getTime() <= Date.now()) ? stdKacheln(k, a) : ""}</div>`;
   }
   function offiziell(a, k, anstoss){
     const elf = a.startelf || [], vor = anstoss ? vorherElf(k, anstoss) : null;
