@@ -876,6 +876,8 @@ button.chip.pfc{cursor:pointer}
 .feld .fm{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.08);border-radius:8px;padding:4px 8px;font:600 12px var(--f-body)}
 .wb{background:var(--soft);border-radius:12px;padding:10px;display:grid;gap:8px}
 .wb h4{margin:0;font:800 16px var(--f-display);text-transform:uppercase;letter-spacing:.3px}
+.wb.lst{margin-top:8px}
+.lst-k{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--muted)}
 .mk .vl{font:800 10px var(--f-body);color:#fff;background:#16A34A;border-radius:5px;padding:1px 5px;line-height:13px;white-space:nowrap}.wx .mk{display:inline-flex;gap:3px;align-items:center;margin-left:6px;vertical-align:-2px}.wx .mk .ball{width:14px;height:14px}.wx .mk .krt{width:9px;height:12px;display:inline-block;border-radius:1.5px}
 .wx{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;background:var(--card);border-radius:10px;padding:7px 10px}
 .wx .p{display:flex;align-items:center;gap:8px;min-width:0}.wx .p.r{flex-direction:row-reverse;text-align:right}
@@ -1888,7 +1890,8 @@ details.dzb[open]{padding-bottom:10px}
   function tsArtikel(m){
     gLaden(); const z = tsFrageZu(m); if (!z) return "";
     const {r, q} = z; tsLaden(r.md);
-    const zu = new Date() >= r.schluss, k = tsKarte(q, r, zu, TIPPS[r.md] || {}, TS.ok && TS.stand[r.md], true);
+    const zu = new Date() >= r.schluss; if (zu && !Object.keys(TIPPS[r.md] || {}).length) return "";  // Spieltag: nur noch für Tippende (Finn 07.11.2026)
+    const k = tsKarte(q, r, zu, TIPPS[r.md] || {}, TS.ok && TS.stand[r.md], true);
     return `<div class="tsd-art"><div class="tsd-ak"><span class="kap">SPIELT SIE?</span><span class="tsd-bis">${svg(P.uhr)}${zu ? "Tippen beendet" : "Tippen bis " + esc(wtUhr(r.schluss))}</span></div>${k.html}
       <button class="tsd-mehr" data-tipp="1">${r.fragen.length > 1 ? `${r.fragen.length - 1} weitere ${r.fragen.length === 2 ? "Frage" : "Fragen"} im Tippschein` : "Zum Tippschein"} ›</button></div>`;
   }
@@ -1923,7 +1926,9 @@ details.dzb[open]{padding-bottom:10px}
   // Sammel-News (Finn 04.11.2026): hat mindestens eine Frage keinen passenden Artikel, steht eine normal große Meldung im Feed, die zum Tippschein führt
   function tsRundeNews(){
     const r = tippRunde(); if (!r || !SS) return;
-    const id = `tipp-runde-md${r.md}`; if (N.some(m => m.id === id)) return;
+    const id = `tipp-runde-md${r.md}`;
+    if (Date.now() >= r.schluss) { const i = N.findIndex(m => m.id === id); if (i >= 0) N.splice(i, 1); return; }  // nach Tippschluss nicht mehr im Feed (Finn 07.11.2026)
+    if (N.some(m => m.id === id)) return;
     const ohne = r.fragen.filter(q => !N.some(m => m.typ !== "tipprunde" && (tsFrageZu(m) || {}).q === q));
     if (!ohne.length) return;
     N.push({id, typ: "tipprunde", zeit: SS.erstellt, tags: ["SPIELT SIE?"], headline: `Spielt sie? ${r.fragen.length} Fragen zum ${r.md}. Spieltag`,
@@ -2002,6 +2007,7 @@ details.dzb[open]{padding-bottom:10px}
   // Fan-Wert an der Prognose: Spielansicht, nur Einsatzfragen dieser Partie, ab 10 Tipps, immer mit Anzahl
   function tsFanBlock(p){
     gLaden(); const r = tippRunde(); if (!r) return "";
+    if ([p.heim_aufstellung, p.gast_aufstellung].some(a => a && a.typ === "offiziell")) return "";  // offizielle Aufstellung da: Fan-Wert unnötig (Finn 07.11.2026)
     const qs = r.fragen.filter(q => q.partie === p.id && (q.typ === "einsatz" || !q.typ)); if (!qs.length) return "";
     tsLaden(r.md); const srv = TS.ok && TS.stand[r.md]; if (!srv) return "";
     const rows = qs.map(q => { const st = srv[q.id] || {}, ges = Object.values(st).reduce((a, b) => a + (Number(b) || 0), 0); if (ges < 10) return "";
@@ -2081,6 +2087,19 @@ details.dzb[open]{padding-bottom:10px}
     });
   }
   let LIVEP = null, SPIELP = null;
+  // Live-Statistik unter den Wechseln (Finn 07.11.2026): live.json "stats", gleiche Schlüssel wie apifootball.json "w".
+  // Nach Abpfiff bleibt der letzte Stand, bis die Statistik mit Noten (afStatBox) da ist.
+  function liveStatBox(p){
+    if (!p || !p.stats || (AF && AF.spiele && AF.spiele[p.id])) return "";
+    const w = p.stats, Z = [["sch", "Torschüsse"], ["tor", "aufs Tor"], ["bes", "Ballbesitz", 0, " %"], ["xg", "Expected Goals (xG)", 2], ["eck", "Ecken"], ["par", "Paraden"], ["fou", "Fouls"], ["pq", "Passquote", 0, " %"]];
+    const hf = "#6E9BFF", gf = "#A9B4C6";
+    const z = Z.filter(x => w[x[0]] && w[x[0]][0] != null && w[x[0]][1] != null).map(([k, t, d, e]) => { const [a, b] = w[k], s = a + b || 1, f = x => (d ? dez(x, d) : Math.round(x)) + (e || "");
+      return `<div class="af-bar"><span class="w">${f(a)}</span><div class="m"><span>${t}</span><span class="bb"><i style="width:${a / s * 100}%;background:${hf}"></i><i style="width:${b / s * 100}%;background:${gf}"></i></span></div><span class="w r">${f(b)}</span></div>`; }).join("");
+    if (!z) return "";
+    const live = istLive(p), mi = live && p.minute ? (/^\d/.test(p.minute) ? p.minute + "'" : p.minute) : "";
+    return `<div class="wb lst"><h4>${live ? "Live-Statistik" : "Statistik"}</h4><div class="lst-k">${logo(p.heim_k, 18)}<span>${live ? (mi ? "Stand " + esc(mi) : "live") : "Stand Abpfiff, Noten folgen"}</span>${logo(p.gast_k, 18)}</div>
+      <div style="display:grid;gap:9px">${z}</div><p class="af-st" style="margin:0">Teamwerte: API-Football, alle 2 bis 5 Minuten neu.</p></div>`;
+  }
   function wechselBox(k, p, elf, bank){
     const seite = p.heim_k === k ? "heim" : "gast", nn = x => nNorm(x);
     const such = (l, n) => l.find(s => nn(s.n) === nn(n)) || l.find(s => nn(s.n).endsWith(nn(n)) || nn(n).endsWith(nn(s.n))) || (n ? {n} : null);
@@ -2132,7 +2151,7 @@ details.dzb[open]{padding-bottom:10px}
       if (SONDER.length && gi >= SONDER[0][1]) { const x = SONDER.shift()[0](); if (x) { h += x; seit = 0; } } };
     rest.forEach(m => { if (m === trTop) return; if (eigen(m)) { warte.push(m); return; } raus(m); h += karteF(m); seit++; gi++; });
     raus(null); while (warte.length) h += karteF(warte.shift());
-    function karteF(m){ let h = ""; const u = m.typ !== "punkt" && umfrageZu(m.id), uT = u ? u : null; h += m.typ === "punkt" ? punktKarte(m) : uT ? (tsFrageZu(m) ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}"><span class="tag" style="background:rgba(47,91,255,.18);color:#8FB0FF">SPIELT SIE?</span><span class="t">${esc(uT.frage)}</span><b>Tippen ›</b></button></div>` : `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(uT.frage)}</span><b>${STIMMEN[uT.id] ? "abgestimmt" : "Abstimmen ›"}</b></button></div>`) : u ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(u.frage)}</span><b>${STIMMEN[u.id] ? "abgestimmt" : "im Artikel"}</b></button></div>` : newsKarte(m); return h; }
+    function karteF(m){ let h = ""; const u = m.typ !== "punkt" && umfrageZu(m.id), uT = u ? u : null; h += m.typ === "punkt" ? punktKarte(m) : uT ? (tsFrageZu(m) && Date.now() >= tsFrageZu(m).r.schluss ? newsKarte(m) : tsFrageZu(m) ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}"><span class="tag" style="background:rgba(47,91,255,.18);color:#8FB0FF">SPIELT SIE?</span><span class="t">${esc(uT.frage)}</span><b>Tippen ›</b></button></div>` : `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(uT.frage)}</span><b>${STIMMEN[uT.id] ? "abgestimmt" : "Abstimmen ›"}</b></button></div>`) : u ? `<div class="nkw">${newsKarte(m)}<button class="um-h" data-id="${esc(m.id)}">${tag("UMFRAGE")}<span class="t">${esc(u.frage)}</span><b>${STIMMEN[u.id] ? "abgestimmt" : "im Artikel"}</b></button></div>` : newsKarte(m); return h; }
     if (A) h += anaTeaser(A);
     if (filter && rest.length) h += `<div class="hinw"><span>${alle.length - rest.length} weitere Meldungen anderer Vereine</span><button data-newsalle="1">Alle zeigen</button></div>`;
     $("#main").innerHTML = vereinsZeile() + `<div class="liste">${h}</div>`;
@@ -2723,7 +2742,7 @@ details.dzb[open]{padding-bottom:10px}
     } else h += bankNamen(bank.map(s => ({...s, p: GRUPPE(s.p)})), rausSet);
     const sp_ = SPIELP && (SPIELP.heim_k === k || SPIELP.gast_k === k) ? SPIELP : null, aus_ = sp_ && sp_.status === "beendet";
     if (!aus_) h += aenderungen(k, elf.filter(s => neuSet.has(s.n)), raus);
-    if (sp_ && (istLive(sp_) || aus_)) h += wechselBox(k, sp_, elf, bank);
+    if (sp_ && (istLive(sp_) || aus_)) h += wechselBox(k, sp_, elf, bank) + (istLive(sp_) || k === sp_.gast_k ? liveStatBox(sp_) : "");
     return h + `</div>`;
   }
   document.addEventListener("click", e => { if (e.target.closest("[data-anaart]") && typeof anaArticle === "function") anaArticle(); });
