@@ -19,7 +19,86 @@
 (function(){ var r = history.replaceState.bind(history);
   history.replaceState = function(s, t, u){ return r(s, t, u == null ? u : new URL(u, location.href).href); }; })();
 </script>
-<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>
+// Reichweitenmessung mit GoatCounter (ohne Cookies, ohne Skript von Dritten, ohne Gerätespeicher).
+// Sendet nur Pfad, Titel, Referrer und Kampagnen-Parameter (z. B. ?utm_source=instagram) als Zählpixel.
+// Zählt nur auf wosoinsider.de, nicht im Artifact, lokal oder in Vorschauen.
+(function () {
+  var GC = "https://wosoinsider.goatcounter.com/count";
+  if (!/(^|\.)wosoinsider\.de$/.test(location.hostname)) { window.wiZaehl = function () {}; return; }
+  // Eigene Aufrufe über ein Lesezeichen mit ?intern: werden getrennt unter intern/... gezählt.
+  var INTERN = /[?&]intern(=|&|$)/.test(location.search);
+  function z(p, t, ev) {
+    if (INTERN) { p = "intern/" + String(p).replace(/^\//, ""); t = "[intern] " + (t || ""); ev = true; }
+    var q = "p=" + encodeURIComponent(p);
+    if (t) q += "&t=" + encodeURIComponent(t);
+    if (ev) q += "&e=true";
+    else {
+      if (document.referrer) q += "&r=" + encodeURIComponent(document.referrer);
+      if (location.search) q += "&q=" + encodeURIComponent(location.search);
+    }
+    q += "&rnd=" + Math.random().toString(36).slice(2);
+    try { new Image().src = GC + "?" + q; } catch (e) {}
+  }
+  window.wiZaehl = z;
+  function seite() { z(location.pathname, document.title, false); }
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", seite) : seite();
+})();
+// Ereignisse im Ticker: geöffnete Meldungen (plus Spielerin und Verein), Reiter, Spiele, Analyse.
+// Braucht zaehler.js davor. Liest news.json über die base-Adresse (fbl-daten), nur für Überschrift, Spielerin, Verein.
+(function () {
+  var NEWS = null;
+  function slug(s) {
+    return String(s).toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+  function laden() {
+    if (!NEWS) NEWS = fetch("news.json").then(function (r) { return r.json(); })
+      .then(function (d) { var m = {}; (d.meldungen || []).forEach(function (x) { m[x.id] = x; }); return m; })
+      .catch(function () { NEWS = null; return {}; });
+    return NEWS;
+  }
+  function meldung(id) {
+    laden().then(function (m) {
+      var x = m[id];
+      if (!x) { wiZaehl("meldung/" + id, null, true); return; }
+      wiZaehl("meldung/" + id, x.headline, true);
+      if (x.spielerin) wiZaehl("spielerin/" + slug(x.spielerin), x.spielerin + (x.verein ? " (" + x.verein + ")" : ""), true);
+      if (x.verein) wiZaehl("verein/" + slug(x.verein), x.verein, true);
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var x = e.target.closest && e.target.closest("[data-id],[data-punkt],[data-tab],[data-tabgo],[data-game],[data-ana]");
+    if (!x) return;
+    var d = x.dataset;
+    if (d.tab || d.tabgo) wiZaehl("reiter/" + (d.tab || d.tabgo), null, true);
+    else if (d.game) wiZaehl("spiel/" + d.game, null, true);
+    else if (d.ana !== undefined) wiZaehl("inside/analyse", "Analyse", true);
+    else meldung(d.id || d.punkt);
+  }, true);
+  // Direktlink auf eine Meldung (wosoinsider.de/ticker/#id), z. B. aus Instagram
+  var h = decodeURIComponent(location.hash.slice(1));
+  if (h && !/^(spielplan|inside|analyse|impressum|datenschutz|kontakt|so-entsteht)$/.test(h)) meldung(h);
+  else if (h) wiZaehl("reiter/" + h, null, true);
+})();
+</script>
+</head><body>
+<title>WOSOINSIDER</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>/* Schriften lokal aus dem Artifact, keine Verbindung zu Google */
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-ext-0.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-1.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-ext-2.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-3.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:800;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-ext-4.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:800;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-5.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-500-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-500-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 700;font-display:swap;src:url(https://wosoinsider.de/fonts/inter-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 700;font-display:swap;src:url(https://wosoinsider.de/fonts/inter-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+</style>
+<style>
+/* aus dem ersten Style-Block des Tickers (der Artifact-Kopf verwirft dort ergänzte Regeln) */
 /* Runde 11 (Finn 04.11.2026): Weitere Werte mit Umschalter, Netz, Steckbrief neu, Einsatzbalken im Kader */
 .ww-netz{width:100%;max-width:360px;justify-self:center;display:block;overflow:visible}
 .pf-tx small.kd-ty{display:block;color:#C9D3E2;font-size:12px;margin-top:1px;white-space:normal;overflow:visible;cursor:pointer;text-decoration:underline dotted rgba(255,255,255,.3);text-underline-offset:3px}
@@ -126,85 +205,8 @@
 /* Rollen im Kader (05.11.2026) */
 .kd-r{font-weight:600}.kd-t{font:700 9.5px var(--f-mono);letter-spacing:.04em;color:#C9A7FF;border:1px solid rgba(201,167,255,.5);border-radius:5px;padding:0 4px;justify-self:start;width:max-content;margin-top:3px}
 .kd-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--muted);margin:2px 0 6px}.kd-leg span b{font-weight:600}
-</style><script>
-// Reichweitenmessung mit GoatCounter (ohne Cookies, ohne Skript von Dritten, ohne Gerätespeicher).
-// Sendet nur Pfad, Titel, Referrer und Kampagnen-Parameter (z. B. ?utm_source=instagram) als Zählpixel.
-// Zählt nur auf wosoinsider.de, nicht im Artifact, lokal oder in Vorschauen.
-(function () {
-  var GC = "https://wosoinsider.goatcounter.com/count";
-  if (!/(^|\.)wosoinsider\.de$/.test(location.hostname)) { window.wiZaehl = function () {}; return; }
-  // Eigene Aufrufe über ein Lesezeichen mit ?intern: werden getrennt unter intern/... gezählt.
-  var INTERN = /[?&]intern(=|&|$)/.test(location.search);
-  function z(p, t, ev) {
-    if (INTERN) { p = "intern/" + String(p).replace(/^\//, ""); t = "[intern] " + (t || ""); ev = true; }
-    var q = "p=" + encodeURIComponent(p);
-    if (t) q += "&t=" + encodeURIComponent(t);
-    if (ev) q += "&e=true";
-    else {
-      if (document.referrer) q += "&r=" + encodeURIComponent(document.referrer);
-      if (location.search) q += "&q=" + encodeURIComponent(location.search);
-    }
-    q += "&rnd=" + Math.random().toString(36).slice(2);
-    try { new Image().src = GC + "?" + q; } catch (e) {}
-  }
-  window.wiZaehl = z;
-  function seite() { z(location.pathname, document.title, false); }
-  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", seite) : seite();
-})();
-// Ereignisse im Ticker: geöffnete Meldungen (plus Spielerin und Verein), Reiter, Spiele, Analyse.
-// Braucht zaehler.js davor. Liest news.json über die base-Adresse (fbl-daten), nur für Überschrift, Spielerin, Verein.
-(function () {
-  var NEWS = null;
-  function slug(s) {
-    return String(s).toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  }
-  function laden() {
-    if (!NEWS) NEWS = fetch("news.json").then(function (r) { return r.json(); })
-      .then(function (d) { var m = {}; (d.meldungen || []).forEach(function (x) { m[x.id] = x; }); return m; })
-      .catch(function () { NEWS = null; return {}; });
-    return NEWS;
-  }
-  function meldung(id) {
-    laden().then(function (m) {
-      var x = m[id];
-      if (!x) { wiZaehl("meldung/" + id, null, true); return; }
-      wiZaehl("meldung/" + id, x.headline, true);
-      if (x.spielerin) wiZaehl("spielerin/" + slug(x.spielerin), x.spielerin + (x.verein ? " (" + x.verein + ")" : ""), true);
-      if (x.verein) wiZaehl("verein/" + slug(x.verein), x.verein, true);
-    });
-  }
-  document.addEventListener("click", function (e) {
-    var x = e.target.closest && e.target.closest("[data-id],[data-punkt],[data-tab],[data-tabgo],[data-game],[data-ana]");
-    if (!x) return;
-    var d = x.dataset;
-    if (d.tab || d.tabgo) wiZaehl("reiter/" + (d.tab || d.tabgo), null, true);
-    else if (d.game) wiZaehl("spiel/" + d.game, null, true);
-    else if (d.ana !== undefined) wiZaehl("inside/analyse", "Analyse", true);
-    else meldung(d.id || d.punkt);
-  }, true);
-  // Direktlink auf eine Meldung (wosoinsider.de/ticker/#id), z. B. aus Instagram
-  var h = decodeURIComponent(location.hash.slice(1));
-  if (h && !/^(spielplan|inside|analyse|impressum|datenschutz|kontakt|so-entsteht)$/.test(h)) meldung(h);
-  else if (h) wiZaehl("reiter/" + h, null, true);
-})();
-</script>
-</head><body>
-<title>WOSOINSIDER</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<style>/* Schriften lokal aus dem Artifact, keine Verbindung zu Google */
-@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-ext-0.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
-@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-1.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
-@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-ext-2.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
-@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-3.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
-@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:800;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-ext-4.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
-@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:800;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-latin-5.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
-@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-500-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
-@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(https://wosoinsider.de/fonts/barlow-condensed-500-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
-@font-face{font-family:'Inter';font-style:normal;font-weight:400 700;font-display:swap;src:url(https://wosoinsider.de/fonts/inter-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
-@font-face{font-family:'Inter';font-style:normal;font-weight:400 700;font-display:swap;src:url(https://wosoinsider.de/fonts/inter-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
-</style>
-<style>
+
+
 /* Design wie die iOS-App (ab Version 0.7): dunkles Schema, Karten ohne Rahmen, Farben aus Theme.swift */
 :root{
   color-scheme:dark;
@@ -654,7 +656,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .mx .c .r{position:absolute;right:2px;top:2px;width:5px;height:7px;background:var(--inj)}
 .mx .c[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
 .ak-kurz{display:grid;gap:6px}.ak-kurz ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:14px}
-.ak-aus{display:grid;gap:8px}.ak-z{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:start;background:var(--card);border-radius:12px;padding:10px 12px}
+.ak-z.lnk{cursor:pointer;-webkit-tap-highlight-color:transparent}.ak-z.lnk:hover,.ak-z.lnk:focus-visible{outline:1.5px solid var(--accent)}.ak-go{display:block;margin-top:8px;font:600 12px var(--f-mono,inherit);color:var(--accent)}.pf-km.lnk{cursor:pointer}.pf-km.lnk:hover{background:rgba(47,91,255,.08)}.ak-aus{display:grid;gap:8px}.ak-z{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:start;background:var(--card);border-radius:12px;padding:10px 12px}
 .ak-md{display:grid;justify-items:center;line-height:1}.ak-md b{font-family:var(--f-display);font-weight:800;font-size:24px}.ak-md span{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap}
 .ak-g{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--muted)}.ak-g b{color:var(--ink)}.ak-t p{margin:3px 0 0;font-size:13.5px;line-height:1.35}
 .ak-n{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.ak-n span{background:var(--soft);border-radius:6px;padding:2px 7px;font-size:12px}
@@ -799,7 +801,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .pf-sae .fl{height:64px;width:72%;display:flex;align-items:flex-end;background:rgba(255,255,255,.04);border-radius:5px;overflow:hidden}
 .pf-sae .s{display:block;width:100%;border-radius:4px 4px 0 0;position:relative}
 .pf-sae .s em{position:absolute;left:0;right:0;top:3px;font:700 9.5px var(--f-mono);font-style:normal;color:#fff;text-align:center}
-.pf-sae .s.S{background:#6E9BFF}.pf-sae .s.E{background:#4ADE80}.pf-sae .s.B{background:#5B6780}.pf-sae .s.X{background:#E24A4A}
+.pf-sae .s.lo em{top:auto;bottom:100%;margin-bottom:2px;color:var(--ink)} .pf-sae .s.S{background:#6E9BFF}.pf-sae .s.E{background:#4ADE80}.pf-sae .s.B{background:#5B6780}.pf-sae .s.X{background:#E24A4A}
 .pf-sae.po .s.S,.pf-sae.po .s.E{background:#E0962B}.pf-sae.cl .s.S,.pf-sae.cl .s.E{background:#9B6BE8}
 .pf-sae .md{font:600 10px var(--f-mono);color:var(--muted)}.pf-sae.po .md{color:#F7C27A}.pf-sae.cl .md{color:#C9AEF7}
 .pf-sae .pf-ohne{width:18px;height:18px}
@@ -1087,6 +1089,24 @@ details.dzb[open]{padding-bottom:10px}
 .af-innews{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px;font-size:13px;width:100%;text-align:left}
 
 /* TESTKOPIE Gamification (04.11.2026) */
+.fv{background:var(--card);border-radius:14px;padding:14px 12px;display:grid;gap:6px;margin-top:4px}
+.fv-k{display:grid;gap:2px}.fv-k h3{margin:0;font-size:20px}.fv-k .mu{font-size:12px;color:var(--muted)}
+.fv-leg{display:flex;gap:12px;font-size:11px;color:var(--muted);align-items:center;flex-wrap:wrap;margin-bottom:2px}
+.fv-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;box-sizing:border-box}
+.fv-leg i.v{border:2px solid #A9B4C6}.fv-leg i.l{background:#F4F5F7}.fv-r{margin-left:auto}
+.fv-z{display:grid;grid-template-columns:34px 80px minmax(0,1fr) 58px;gap:10px;align-items:center;min-height:48px;padding:6px 8px;border-radius:12px;background:transparent;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;width:100%}
+.fv-z.h{background:rgba(245,158,11,.10)}
+.fv-p{width:34px;height:34px;border-radius:50%;overflow:hidden;background:#2A3B5E;box-shadow:inset 0 0 0 2px var(--vc);display:grid;place-items:center;font-size:13px}
+.fv-p img{width:100%;height:100%;object-fit:cover}
+.fv-n{display:grid;line-height:1.15;min-width:0}.fv-n b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fv-n small{font-size:11px}
+.fv-t{position:relative;height:20px;margin:0 8px}
+.fv-t::before{content:"";position:absolute;left:-8px;right:-8px;top:9px;height:2px;border-radius:1px;background:var(--soft)}
+.fv-l{position:absolute;top:8px;height:4px;border-radius:2px}
+.fv-t i{position:absolute;top:3px;width:14px;height:14px;border-radius:50%;margin-left:-7px;box-sizing:border-box}
+.fv-t i.v{border:2px solid #A9B4C6;background:var(--card)}
+.fv-h{font-size:11px;color:var(--muted);margin:4px 0 0;line-height:1.4}
+.pf-eins-leg{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);margin-top:8px}
+.fv-tf{display:grid;gap:1px;font-size:12px;font-weight:700;text-align:right;line-height:1.2}.fv-tf em{font-style:normal;font-weight:600;font-size:10px;color:var(--muted);margin-right:4px}.fv-tf span:last-child{color:var(--muted);font-weight:600}
 .eins{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:800;letter-spacing:.3px;color:#4ADE80;white-space:nowrap}
 .eins svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .eins-z{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);margin-top:6px;justify-content:center}
@@ -1329,25 +1349,6 @@ details.dzb[open]{padding-bottom:10px}
 .sb2 .ic.fu{gap:2px}
 .sb2 .ic.fu span{display:grid;justify-items:center;gap:1px;font:700 9px var(--f-mono);color:var(--muted)}
 .sb2 .ic.fu span.an{color:#8FB0FF}
-
-.fv{background:var(--card);border-radius:14px;padding:14px 12px;display:grid;gap:6px;margin-top:4px}
-.fv-k{display:grid;gap:2px}.fv-k h3{margin:0;font-size:20px}.fv-k .mu{font-size:12px;color:var(--muted)}
-.fv-leg{display:flex;gap:12px;font-size:11px;color:var(--muted);align-items:center;flex-wrap:wrap;margin-bottom:2px}
-.fv-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;box-sizing:border-box}
-.fv-leg i.v{border:2px solid #A9B4C6}.fv-leg i.l{background:#F4F5F7}.fv-r{margin-left:auto}
-.fv-z{display:grid;grid-template-columns:34px 80px minmax(0,1fr) 58px;gap:10px;align-items:center;min-height:48px;padding:6px 8px;border-radius:12px;background:transparent;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;width:100%}
-.fv-z.h{background:rgba(245,158,11,.10)}
-.fv-p{width:34px;height:34px;border-radius:50%;overflow:hidden;background:#2A3B5E;box-shadow:inset 0 0 0 2px var(--vc);display:grid;place-items:center;font-size:13px}
-.fv-p img{width:100%;height:100%;object-fit:cover}
-.fv-n{display:grid;line-height:1.15;min-width:0}.fv-n b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fv-n small{font-size:11px}
-.fv-t{position:relative;height:20px;margin:0 8px}
-.fv-t::before{content:"";position:absolute;left:-8px;right:-8px;top:9px;height:2px;border-radius:1px;background:var(--soft)}
-.fv-l{position:absolute;top:8px;height:4px;border-radius:2px}
-.fv-t i{position:absolute;top:3px;width:14px;height:14px;border-radius:50%;margin-left:-7px;box-sizing:border-box}
-.fv-t i.v{border:2px solid #A9B4C6;background:var(--card)}
-.fv-h{font-size:11px;color:var(--muted);margin:4px 0 0;line-height:1.4}
-.pf-eins-leg{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted);margin-top:8px}
-.fv-tf{display:grid;gap:1px;font-size:12px;font-weight:700;text-align:right;line-height:1.2}.fv-tf em{font-style:normal;font-weight:600;font-size:10px;color:var(--muted);margin-right:4px}.fv-tf span:last-child{color:var(--muted);font-weight:600}
 
 .elf-l{display:grid;gap:6px}
 .elf-r{display:grid;grid-template-columns:22px minmax(0,1fr) var(--pkw,auto) 34px;gap:10px;align-items:center;background:var(--soft);border-radius:10px;padding:8px 10px;width:100%;text-align:left;box-sizing:border-box}
@@ -1826,6 +1827,63 @@ details.dzb[open]{padding-bottom:10px}
       return Object.assign({}, q, {p, s, umfrage: u, ein: einsehbar(p)}); }).filter(Boolean);
     return {md: r.md, schluss: dt(r.schluss), erst: r.erst, fragen};
   }
+  // alte Berechnung im Browser, nicht mehr verwendet
+  function tippRundeAlt(){
+    const t = tippTag(); if (!t || !SPN) return null;
+    const ps = t.partien.filter(terminiert); if (!ps.length) return null;
+    const erst = ps.map(p => p.anstoss).sort()[0], schluss = new Date(dt(erst).getTime() - SCHLUSS_MIN * 60000);
+    const proV = {}, frei = k => (proV[k] || 0) < 2, nimm = k => { proV[k] = (proV[k] || 0) + 1; };
+    const fragen = [], belegt = new Set();
+    // 1. Bestehende Startelf-Umfragen des Spieltags (mit Infos und Einschätzung), höchstens 2
+    (UM || []).filter(u => (u.art || "startelf") === "startelf" && u.partie && t.partien.some(p => p.id === u.partie)).slice(0, 2).forEach(u => {
+      const p = t.partien.find(x => x.id === u.partie), e = u.einschaetzung, eo = e && (u.optionen || []).find(o => o.id === e.option);
+      (u.optionen || []).forEach(o => o.nachname && belegt.add(normS(o.nachname)));
+      nimm(u.verein);
+      fragen.push({id: "u-" + u.id, art: u.position === "TW" ? "TOR" : "WER STARTET", p, ein: einsehbar(p), frage: u.frage, umfrage: u,
+        warum: (u.position === "TW" ? "Torhüterinnen punkten bei Kickbase stark. " : "") + (u.optionen || []).filter(o => o.info).map(o => `${o.nachname || o.n}: ${o.info}`).join(" · "),
+        prognose: eo ? `${STUFE[e.stufe] ? STUFE[e.stufe][2] : ""}: ${eo.nachname || eo.n}. ${e.text}` : "",
+        optionen: (u.optionen || []).map(o => ({id: o.id, n: o.nachname || (o.id === "andere" ? "Andere" : o.n)}))});
+    });
+    // 2. Startelf-Fragen aus der Prognose: nur Kickbase-Gewicht, nur echte Unsicherheit, nur mit Anlass
+    const kand = [];
+    t.partien.forEach(p => {
+      [[p.heim_k, p.heim_aufstellung], [p.gast_k, p.gast_aufstellung]].forEach(([k, a]) => {
+        if (!a || a.typ !== "prognose") return;
+        (a.startelf || []).concat(a.bank || []).forEach(x => {
+          if (!["erwartet", "unsicher"].includes(x.st) || belegt.has(normS(x.n))) return;
+          const s = findeSP(k, x.n); if (!s) return;
+          const f = FOTOS[s.n] || {}; if (!f.portrait && !f.datei) return;
+          const w = s.prognose && s.prognose.wert != null ? s.prognose.wert : Number((String(x.warum || "").match(/Einsatzwert (\d+)/) || [])[1] || 0);
+          if (w >= 95 || w < 30) return;
+          const tore = sTore(s), vorl = sVorl(s), tw = x.p === "TW", gewicht = tore * 2 + vorl + (tw ? 6 : 0);
+          if (gewicht < 3) return;
+          const ll = (s.spiele || []).slice(-1)[0], lp = (s.pokal || []).slice(-1)[0];
+          const letzt = [ll && {d: ll.datum, wb: "Liga", g: ll.gegner, art: ll.art}, lp && {d: lp.datum, wb: lp.wb, g: lp.gegner, art: lp.art}].filter(Boolean).sort((a, b) => dt(b.d) - dt(a.d))[0];
+          const einsch = (String(x.warum || "").split("Einschätzung WOSOINSIDER:")[1] || "").trim();
+          const l3 = (s.spiele || []).slice(-3), s3 = l3.filter(e => e.art === "S").length;
+          let anlass = "";
+          if (letzt && letzt.art === "B") anlass = `Zuletzt ${imWb(letzt.wb)} gegen ${letzt.g} nur auf der Bank.`;
+          else if (letzt && letzt.art === "E") anlass = `Zuletzt ${imWb(letzt.wb)} gegen ${letzt.g} nur eingewechselt.`;
+          else if (einsch) anlass = einsch.replace(/\.?$/, ".");
+          else if (l3.length === 3 && s3 < 3) anlass = `In den letzten 3 Ligaspielen ${s3}-mal in der Startelf.`;
+          if (!anlass) return;
+          const stz = (String(x.warum || "").match(/(\d)\/5 Startelf/) || [])[1];
+          kand.push({id: "s-" + s.id, art: "STARTELF", p, k, s, ein: einsehbar(p), gewicht,
+            frage: `Steht ${nachN(s.n)} in der Startelf?`,
+            warum: `${anlass} ${tw ? "Torhüterinnen punkten bei Kickbase stark." : `Diese Saison ${tore} ${tore === 1 ? "Tor" : "Tore"}, ${vorl} ${vorl === 1 ? "Vorlage" : "Vorlagen"}.`}`,
+            prognose: `${STUFE[x.st][2]}. ${stz ? stz + " von 5 zuletzt in der Startelf, " : ""}Einsatzwert ${w} %.`,
+            optionen: [{id: "ja", n: "Ja"}, {id: "nein", n: "Nein"}]});
+        });
+      });
+    });
+    kand.sort((a, b) => b.gewicht - a.gewicht);
+    // mindestens 2 Fragen zu nicht einsehbaren Spielen, höchstens 2 je Verein, insgesamt 5
+    const pick = q => { if (fragen.length >= 5 || !frei(q.k) || fragen.some(f => f.id === q.id)) return; nimm(q.k); fragen.push(q); };
+    kand.filter(q => !q.ein).slice(0, 2).forEach(pick);
+    kand.forEach(pick);
+    fragen.sort((a, b) => dt(a.p.anstoss) - dt(b.p.anstoss));
+    return {md: t.nr, schluss, erst, fragen};
+  }
 
   // Auflösung: Startelf aus der offiziellen Aufstellung, Umfragen über die bestehende Auflösung
   function tippErgebnis(q){
@@ -2097,8 +2155,8 @@ details.dzb[open]{padding-bottom:10px}
     [["heim", p.heim_aufstellung], ["gast", p.gast_aufstellung]].forEach(([seite, a]) => {
       if (!a || a.typ !== "offiziell") return;
       const alle = [...(a.startelf || []), ...(a.bank || [])];
-      alle.forEach(s => { if (s._lt) { ["tore", "vorl", "gelb", "rot", "gr", "_lt"].forEach(f => delete s[f]); }
-        if (s._lv) { delete s.vorl; delete s._lv; }  // Finn 07.11.: nur die ergänzte Vorlage zurücknehmen, Tore und Karten aus der Aufstellung bleiben
+      alle.forEach(s => { if (s._lt) { ["tore", "vorl", "gelb", "rot", "gr", "_lt", "_lf"].forEach(f => delete s[f]); }
+        if (s._lv) { delete s.vorl; delete s._lv; }  // Finn 07.11.: nur die ergänzte Vorlage zurücknehmen
         if (s._bk) { ["ein", "ein_min", "aus"].forEach(f => { if (s._bk[f] === undefined) delete s[f]; else s[f] = s._bk[f]; }); delete s._bk; }
         if (s._tz) { s.tore = (s.tore || 0) - s._tz; if (!(s.tore > 0)) delete s.tore; delete s._tz; }
         if (s._vz) { s.vorl = (s.vorl || 0) - s._vz; if (!(s.vorl > 0)) delete s.vorl; delete s._vz; }
@@ -2122,7 +2180,7 @@ details.dzb[open]{padding-bottom:10px}
       const nn = x => nNorm(x).replace(/[^a-z0-9 -]/g, "");
       const finde = n => { const x = nn(n); if (!x) return null;
         return alle.find(s => nn(s.n) === x) || alle.find(s => nn(s.n).endsWith(" " + x) || x.endsWith(" " + nn(s.n)) || nn(s.n).endsWith(x)); };
-      const setz = (n, f, v) => { const s = finde(n); if (!s) return; s._lt = true; s[f] = v === true ? true : (s[f] || 0) + 1; };
+      const setz = (n, f, v) => { const s = finde(n); if (!s) return; if (!s._lf) s._lf = {}; if (!s._lf[f]) { s._lf[f] = 1; if (v !== true) s[f] = 0; } s._lt = true; s[f] = v === true ? true : (s[f] || 0) + 1; };  // Fix 07.11.: Tore/Vorlagen aus den Spieldaten nicht doppelt zählen (Kramer zeigte 2 Bälle bei 1 Tor)
       (p.tore || []).filter(t => t.seite === seite && t.art !== "Eigentor").forEach(t => { setz(t.n, "tore"); if (t.vorlage) setz(t.vorlage, "vorl"); });
       (p.wechsel || []).filter(w => w.seite === seite).forEach(w => {
         const sich = s => { if (s && !s._bk) s._bk = {ein: s.ein, ein_min: s.ein_min, aus: s.aus}; return s; };
@@ -2275,17 +2333,30 @@ details.dzb[open]{padding-bottom:10px}
     const x = SPIDX[k + "|" + nNorm(s.voll || "")] || SPIDX[k + "|" + nNorm(nachN(s.voll || s.n))];
     const o = x && (x.orte || []).filter(o => o[1] > .15); if (!o || !o.length) return null;
     const c = o.reduce((a, q) => a + q[2], 0), haupt = o.slice().sort((a, b) => b[2] - a[2])[0];
-    return {y: o.reduce((a, q) => a + q[1] * q[2], 0) / c, x: haupt[0]};
+    return {y: o.reduce((a, q) => a + q[1] * q[2], 0) / c, x: haupt[0], xs: o.map(q => [q[0], q[2]])};
+  }
+  // Reihe ohne offizielle x-Werte: Spielerinnen den Plätzen links nach rechts zuordnen (Gesamtkosten minimal), nicht nur nach Durchschnitts-x sortieren
+  const SLOTX = {1: [.5], 2: [.3, .7], 3: [.2, .5, .8], 4: [.1, .4, .6, .9], 5: [.1, .3, .5, .7, .9]};
+  function ordneReihe(r){
+    const T = SLOTX[r.length]; if (!T) return r.slice().sort((a, b) => (a.x ?? .5) - (b.x ?? .5) || a.i - b.i);
+    // Finn 08.11.2026 (Hahn): Abstand zur Mitte zählt zusätzlich zur Seite. Sonst rutscht bei zwei Linksaußen die Mittelstürmerin auf den Flügel.
+    const d = (px, t) => Math.abs(Math.abs(px - .5) - Math.abs(t - .5)) + Math.abs(px - t);
+    const kost = (q, t) => q.xs && q.xs.length ? q.xs.reduce((a, [px, w]) => a + d(px, t) * w, 0) / q.xs.reduce((a, [, w]) => a + w, 0) : q.x != null ? d(q.x, t) : .3;
+    let best = null, bc = Infinity;
+    const perm = (rest, cur, c) => { if (c >= bc) return; if (!rest.length) { bc = c; best = cur; return; }
+      rest.forEach((q, j) => perm(rest.filter((_, m) => m !== j), cur.concat(q), c + kost(q, T[cur.length]))); };
+    perm(r, [], 0);
+    return best;
   }
   function standardElf(elf, form, k){
     const tw = elf.filter(s => s.p === "TW"), feldsp = elf.filter(s => s.p !== "TW");
     if (tw.length !== 1 || feldsp.length !== 10) return {elf, form};
     const TIEF = {ABW: .3, DM: .45, MF: .55, OM: .65, ST: .9};
-    const info = feldsp.map((s, i) => { const o = k && spOrt(k, s); return {s, i, y: o ? o.y : (TIEF[s.p] ?? .55), x: s.x != null ? s.x : o ? o.x : null}; });  // Saisonposition vor gemeldeter Position
+    const info = feldsp.map((s, i) => { const o = k && spOrt(k, s); return {s, i, y: o ? o.y : (TIEF[s.p] ?? .55), x: s.x != null ? s.x : o ? o.x : null, xs: s.x != null ? null : o ? o.xs : null}; });  // Saisonposition vor gemeldeter Position
     const GR = y => y < .4 ? 0 : y >= .8 ? 2 : 1, GRL = p => p === "ABW" ? 0 : p === "ST" ? 2 : 1;
     const sortiert = info.slice().sort((a, b) => a.y - b.y || a.i - b.i);
     const fuelle = rows => { const out = []; let i = 0; rows.forEach(([lab, n]) => { const r = sortiert.slice(i, i + n); i += n;
-      r.sort((a, b) => (a.x ?? .5) - (b.x ?? .5) || a.i - b.i).forEach(q => out.push({...q.s, p: lab, _g: GR(q.y)})); }); return out; };
+      (r.every(q => q.s.x != null) ? r.sort((a, b) => a.x - b.x || a.i - b.i) : ordneReihe(r)).forEach(q => out.push({...q.s, p: lab, _g: GR(q.y)})); }); return out; };
     const kosten = f => fuelle(FORMEN[f]).reduce((a, s) => a + (GRL(s.p) !== s._g ? 1 : 0), 0);
     let best = FORMEN[form] ? form : null;
     if (!best) {
@@ -2348,14 +2419,18 @@ details.dzb[open]{padding-bottom:10px}
         const ph = istPlatzhalter(src), badge = o.modus === "p" && STUFE[s.st] && !ph ? `<span class="sb">${stufeSym(s.st, 16)}</span>` : "";
         let foKl = o.modus === "p" && STUFE[s.st] && ph ? " ph-r" : "", foSt = foKl ? `--rc:${STUFE[s.st][1]};` : "";
         const istNeu = o.modus === "o" && (s.f === "neu" || (o.neu && o.neu.has(s.n))), neu = "";
-        const mwN = Math.min(84, 334 / (r.length + 1) - 4), fsN = [12, 11, 10.5, 9.5, 9].find(f => String(s.n).length * f * .56 <= mwN) || 9;
+        const mwN = Math.min(84, 334 / (r.length + 1) - 4), passt = z => [12, 11, 10.5, 9.5, 9].find(f => z.length * f * .56 <= mwN);
+        // Finn 08.11.2026 (van de Velde): Würde der Name kleiner als 10,5 px, mehrteilige Namen zweizeilig (vorn "van de", unten "Velde")
+        const nw = String(s.n).split(" "), nb = String(s.n).split("-"), klein = !(passt(String(s.n)) >= 10.5);
+        const zwei = klein && nw.length > 1 ? [nw.slice(0, -1).join(" "), nw[nw.length - 1]] : klein && nb.length === 2 ? [nb[0] + "-", nb[1]] : null;
+        const fsN = (zwei ? passt(zwei[0].length > zwei[1].length ? zwei[0] : zwei[1]) : passt(String(s.n))) || 9, nmH = zwei ? `${esc(zwei[0])}<br>${esc(zwei[1])}` : esc(s.n);
         let ex = "";
         if (o.modus === "o") { if (s.tore > 0) ex += `<span class="ob o1" aria-label="${s.tore} ${s.tore > 1 ? "Tore" : "Tor"}">${BALL}${s.tore > 1 ? `<b>${s.tore}</b>` : ""}</span>`; if (s.vorl > 0) ex += `<span class="ob ov ${s.tore > 0 ? "o2" : "o1"}" aria-label="${s.vorl} ${s.vorl > 1 ? "Vorlagen" : "Vorlage"}">V${s.vorl > 1 ? `<b>${s.vorl}</b>` : ""}</span>`;
           if (s.tore > 0) foKl = " sc-t"; else if (s.vorl > 0) foKl = " sc-v"; { const x = AFNOTEN && spAus(k, s), n = x && AFNOTEN[x.id]; if (n) ex += `<span class="nt${AFBEST && AFBEST.has(x.id) ? " best" : ""}" style="background:${NFARBE(n)}">${dez(n)}</span>`; } if (s.rot) ex += `<span class="ob o3">${karte(true)}</span>`; else if (s.gelb) ex += `<span class="ob o3">${karte(false)}</span>`; }
         const unten = "", mt = istNeu || (o.modus === "o" && s.aus) ? `<span class="mt">${istNeu ? '<i class="pn">NEU</i>' : ""}${o.modus === "o" && s.aus ? `<i class="pa">↓${esc(s.aus)}'</i>` : ""}</span>` : "";
         const tag = o.modus === "p" && s.warum ? "button" : (k ? "button" : "div");
         const attr = o.modus === "p" && s.warum ? ` data-chip="${esc(o.seite + "|" + s.n)}" title="${esc(s.warum)}"` : (k ? ` data-profilname="${esc(k + "|" + (s.voll || s.n))}"` : "");
-        h += `<${tag} class="spl${o.sel === s.n ? " sel" : ""}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;--h:${F / 2}px"${attr}><span class="fo${foKl}" style="${foSt}width:${F}px;height:${F}px"><span class="cl"${bg}>${inner}</span>${badge}${neu}${ex}</span><span class="nm" style="font-size:${fsN}px;max-width:none;overflow:visible">${esc(s.n)}${unten}</span>${mt}</${tag}>`;
+        h += `<${tag} class="spl${o.sel === s.n ? " sel" : ""}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;--h:${F / 2}px"${attr}><span class="fo${foKl}" style="${foSt}width:${F}px;height:${F}px"><span class="cl"${bg}>${inner}</span>${badge}${neu}${ex}</span><span class="nm" style="font-size:${fsN}px;max-width:none;overflow:visible${zwei ? ";line-height:1.1" : ""}">${nmH}${unten}</span>${mt}</${tag}>`;
       });
     });
     return h + (o.formation ? `<span class="fm">${esc(o.formation)}${o.gesch ? " (geschätzt)" : ""}</span>` : "") + `</div>`;
@@ -2777,6 +2852,7 @@ details.dzb[open]{padding-bottom:10px}
         ${tore.length ? `<div class="tore"><div class="h">${schuetzinnen(tore, "heim")}</div>${BALL}<div>${schuetzinnen(tore, "gast")}</div></div>` : ""}
       </div>
       
+      ${(() => { const A = IN && IN.analyse, ab = A && (A.ausblick || []).find(x => x.md === p.md && [p.heim_k, p.gast_k].includes(A.verein) && [p.heim_k, p.gast_k].includes(x.gk)); return ab ? `<button class="lk" style="font-size:13px;justify-self:start;text-decoration:none;margin:8px 0" data-tabgo="inside" data-ana="1">Unsere Einschätzung zu diesem Spiel in der Analyse ›</button>` : ""; })()}
       ${sprung}${pv.length ? `<div class="kartebox">${kap("Platzverweise")}${pv.map(x => `<div style="display:flex;gap:8px;align-items:center;font-size:14px">${karte(true)}<span style="flex:1">${x.n ? esc(x.n) : '<span class="mu">ohne Namen im Spielbericht</span>'} (${esc(x.min)}')</span>${logo(x.seite === "heim" ? p.heim_k : p.gast_k, 20)}</div>`).join("")}</div>` : ""}
       ${bs.length && !istLive(p) ? `<div class="kartebox" style="gap:8px">${kap("Englische Woche")}${bs.map(([n, b]) => `<div style="display:grid;gap:2px"><b style="font-size:14px;font-weight:600">${esc(n)}: ${esc(b.text)}</b><span class="dat">${(b.spiele || []).map(esc).join(" · ")}</span></div>`).join("")}${prog ? '<span style="font-size:12px;color:var(--frag)">Deshalb stufen wir Feldspielerinnen höchstens als Erwartet ein.</span>' : ""}</div>` : ""}
       ${!p.heim_aufstellung && !p.gast_aufstellung && p.status === "beendet" ? '<p class="dat">Zu diesem Spiel hat der Spielbericht keine offizielle Aufstellung. Darauf haben wir leider keinen Einfluss.</p>' : !p.heim_aufstellung && !p.gast_aufstellung ? '<p class="dat">Die mögliche Aufstellung erscheint, sobald dieser Spieltag als nächster ansteht. Die offizielle kommt ca. 60 Minuten vor Anpfiff.</p>'
@@ -3124,7 +3200,7 @@ details.dzb[open]{padding-bottom:10px}
       <div class="seg" role="group" aria-label="Spieltag">${tage.map(t => `<button data-imd="${t.md}" aria-pressed="${t.md === IMD}">Sp. ${t.md}</button>`).join("")}</div>
       ${!ps.length ? '<p class="dat">Deine Vereine sind an diesem Spieltag nicht unter den Spielen mit Ansage.</p>' : ""}
       ${ps.map(g => `<div class="ig"><div class="vs"><span class="h">${esc(kname(g.heim))}</span><span class="kd-l" data-kader="${esc(g.heim)}">${logo(g.heim, 24)}</span><span class="d"><b>${esc(g.datum)}</b><small>${esc(g.zeit)} Uhr</small></span><span class="kd-l" data-kader="${esc(g.gast)}">${logo(g.gast, 24)}</span><span>${esc(kname(g.gast))}</span></div>
-        ${(g.fakten || []).map(x => `<div class="fakt"><i></i><span>${fett(x)}</span></div>`).join("")}${kbBox(g.kb)}${(() => { const v = AF && (AF.vorschau || []).find(v => v.h === g.heim && v.g === g.gast); return v ? `<details class="dzb"><summary>Daten zum Spiel</summary>${datenZumSpiel(v)}</details>` : ""; })()}</div>`).join("")}</section>`;
+        ${(g.fakten || []).map(x => `<div class="fakt"><i></i><span>${fett(x)}</span></div>`).join("")}${kbBox(g.kb)}${(() => { const v = AF && (AF.vorschau || []).find(v => v.h === g.heim && v.g === g.gast); return v ? `<details class="dzb"><summary>Daten zum Spiel</summary>${datenZumSpiel(v)}</details>` : ""; })()}${(() => { const pg = SP && alleSpiele().find(q => q.heim_k === g.heim && q.gast_k === g.gast && q.status !== "beendet"); return pg ? `<button class="lk" style="font-size:12px;justify-self:start;text-decoration:none" data-game="${esc(pg.id)}" data-tabspiel="1">Vorschau und voraussichtliche Aufstellung ›</button>` : ""; })()}</div>`).join("")}</section>`;
   }
   function kalenderSektion(K){
     const V = K.vereine || {}, km = v => (V[v] || []).reduce((a, g) => a + (g.km ? 2 * g.km : 0), 0);
@@ -3166,10 +3242,10 @@ details.dzb[open]{padding-bottom:10px}
       <div class="leg"><span><i style="background:var(--accent)"></i>Startelf (Minuten)</span><span><i style="box-shadow:inset 0 0 0 1.5px var(--accent)"></i>eingewechselt</span><span><i style="background:rgba(226,74,74,.3)"></i>verletzt / Reha</span><span><i style="background:var(--pokal);border-radius:50%"></i>Tor</span>${A.cl_ab ? '<span><i style="background:var(--euro);width:3px"></i>Champions League läuft</span>' : ""}</div>
       <div class="info${MXINFO ? " an" : ""}" id="mxinfo">${esc(MXINFO || "Feld antippen für Details.")}</div>
       ${A.kurz ? `<div class="ak-kurz">${kap("Kurz erklärt")}<ul>${A.kurz.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>` : ""}
-      ${A.ausblick ? `<div class="ak-aus">${kap("Unsere Einschätzung")}${A.ausblick.map(x => { const d = new Date(x.datum + "T12:00");
-        return `<div class="ak-z"><div class="ak-md"><b>${x.md}.</b><span>${WT[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.</span></div>
+      ${A.ausblick ? `<div class="ak-aus">${kap("Unsere Einschätzung")}${A.ausblick.map(x => { const d = new Date(x.datum + "T12:00"), pg = SP && alleSpiele().find(g => g.md === x.md && [g.heim_k, g.gast_k].includes(A.verein) && [g.heim_k, g.gast_k].includes(x.gk));
+        return `<div class="ak-z${pg ? " lnk" : ""}"${pg ? ` role="button" tabindex="0" data-game="${esc(pg.id)}" data-tabspiel="1"` : ""}><div class="ak-md"><b>${x.md}.</b><span>${WT[d.getDay()]} ${d.getDate()}.${d.getMonth() + 1}.</span></div>
         <div class="ak-t"><div class="ak-g">${x.ha === "A" ? "in" : "gegen"} ${logo(x.gk, 16)}<b>${esc(kname(x.gk))}</b><span class="ak-kb ${x.kbart || ""}">Kickbase: ${esc(x.kb)}</span></div><p>${esc(x.satz)}</p>
-        ${(x.namen || []).length ? `<div class="ak-n">${x.namen.map(n => `<span>${esc(n)}</span>`).join("")}</div>` : ""}${(x.fehlt || []).length ? `<div class="ak-n ak-f">${x.fehlt.map(n => `<span>${esc(n)}</span>`).join("")}</div>` : ""}</div></div>`; }).join("")}</div>` : ""}
+        ${(x.namen || []).length ? `<div class="ak-n">${x.namen.map(n => `<span>${esc(n)}</span>`).join("")}</div>` : ""}${(x.fehlt || []).length ? `<div class="ak-n ak-f">${x.fehlt.map(n => `<span>${esc(n)}</span>`).join("")}</div>` : ""}${pg ? '<span class="ak-go">Vorschau und voraussichtliche Aufstellung ›</span>' : ""}</div></div>`; }).join("")}</div>` : ""}
       ${A.kurz || A.ausblick ? `<details class="ak-mehr"><summary>Ganze Analyse lesen</summary>` : ""}
       <div class="body" style="display:grid;gap:12px">${(A.text || []).map((p, i) => `<p>${i === 0 && !p.startsWith("Erklärung") ? "<b>Erklärung:</b> " : ""}${esc(p)}</p>`).join("")}</div>
       ${(A.einschaetzung || []).length ? `<div class="einsch">${kap("Unsere Einschätzung für die nächsten Ligaspiele")}${A.einschaetzung.map(p => `<p>${fett(p)}</p>`).join("")}</div>` : ""}
@@ -3414,7 +3490,7 @@ details.dzb[open]{padding-bottom:10px}
   const nachN = n => String(n || "").trim().split(/\s+/).slice(-1)[0];
   // ---------------- API-Football (Testkopie): Noten, Teamwerte, Vorschau
   let AF = null;
-  const ladeAF = () => AF ? Promise.resolve(AF) : json("apifootball.json").then(d => { AF = d || {}; return AF; }).catch(() => { AF = {}; return AF; });
+  const ladeAF = () => AF ? Promise.resolve(AF) : json("https://finnclausenhh.github.io/fbl-daten/apifootball.json").then(d => { AF = d || {}; return AF; }).catch(() => { AF = {}; return AF; });
   const dez = (x, n = 1) => Number(x).toFixed(n).replace(".", ",");
   const NFARBE = n => n >= 8 ? "#4ADE80" : n >= 7 ? "#A6E3B8" : n >= 6 ? "#F5C26B" : "#FF8A8A";
   const NOTE_ERKL = "Note: 0 bis 10, berechnet von API-Football aus den Spielwerten (Pässe, Zweikämpfe, Schüsse, Tore). Keine Kickbase-Punkte. Für Formkurve und Schnitt zählen nur Einsätze ab 46 Minuten.";
@@ -4180,7 +4256,7 @@ details.dzb[open]{padding-bottom:10px}
     const dicht = (() => { let mx = 0; kom.forEach((z, i) => { let c = 1; for (let j = i + 1; j < kom.length; j++) if ((dt(kom[j].datum) - dt(z.datum)) / 864e5 <= 8) c++; mx = Math.max(mx, c); }); return mx; })();
     const WB = {Liga: ["LIGA", "l"], Pokal: ["POKAL", "p"], CL: ["UWCL", "c"], Europapokal: ["EUROPA", "c"]};
     const komH = zeilen.slice(0, 3).map(z => z.pause ? `<div class="pf-km pause"><span class="pf-wb l">PAUSE</span><span>Länderspielpause</span><span class="r">${z.pause} Tage ohne Spiel</span></div>`
-      : `<div class="pf-km"><span class="pf-wb ${(WB[z.wb] || WB.Liga)[1]}">${(WB[z.wb] || WB.Liga)[0]}</span><span class="gg">${z.ha === "H" ? "gegen" : "in"} ${esc(kname(z.gk) !== z.gk && z.gk ? kname(z.gk) : z.gegner)}${z.rang ? ` <small>${z.rang}.</small>` : ""}${einsehbarZeit(z.datum, z.wb) ? einsTag(true) : ""}</span><span class="r">${esc(tagDatum(z.datum))}, ${esc(uhr(dt(z.datum)))}</span></div>`).join("");
+      : `<div class="pf-km${pfSpiel(z, s) ? " lnk" : ""}"${pfSpiel(z, s) ? ` role="button" tabindex="0" data-game="${esc(pfSpiel(z, s))}" data-tabspiel="1"` : ""}><span class="pf-wb ${(WB[z.wb] || WB.Liga)[1]}">${(WB[z.wb] || WB.Liga)[0]}</span><span class="gg">${z.ha === "H" ? "gegen" : "in"} ${esc(kname(z.gk) !== z.gk && z.gk ? kname(z.gk) : z.gegner)}${z.rang ? ` <small>${z.rang}.</small>` : ""}${einsehbarZeit(z.datum, z.wb) ? einsTag(true) : ""}</span><span class="r">${esc(tagDatum(z.datum))}, ${esc(uhr(dt(z.datum)))}</span></div>`).join("");
     const l5 = sp.slice(-5), s5 = l5.filter(e => e.art === "S"), aus5 = s5.filter(e => (e.min || 0) < 85 && !e.rot).length, e5 = l5.filter(e => e.art === "E").length;
     const kbz = l5.length ? `<div class="pf-kbz"><div><b>${s5.length}/${l5.length}</b><span>in der Startelf (letzte ${l5.length} Ligaspiele)${aus5 ? `, davon ${aus5}x vorzeitig ausgewechselt` : s5.length ? ", immer durchgespielt" : ""}${e5 ? `, ${e5}x eingewechselt` : ""}</span></div></div>` : "";
     const elf = (afSp(s.id) || {}).elf, elfC = elf ? `<span class="pf-std el">Elfmeter <i>${elf[0]} von ${elf[0] + elf[1]} verwandelt</i></span>` : "";
@@ -4253,7 +4329,7 @@ details.dzb[open]{padding-bottom:10px}
       ${alle.length ? `<div class="pf-saeulen">${alle.map((e, i) => { const hoch = e.art === "S" || e.art === "E" ? Math.max(8, Math.min(120, e.min) / 120 * 100) : 8;
         const lab = e.typ === "Liga" ? e.md + "." : e.typ === "Pokal" ? "P" : "CL";
         return `<button class="pf-sae${e.typ !== "Liga" ? " cup " + (e.typ === "Pokal" ? "po" : "cl") : ""}" data-sae="${i}" aria-pressed="false" aria-label="${esc(lab + " " + e.gegner)}"><span class="tz">${(e.tore || []).length ? `<i class="t">${e.tore.length}T</i>` : ""}${e.vorl ? `<i class="v">${e.vorl}V</i>` : ""}${e.rot || e.gr ? '<i class="k r"></i>' : e.gelb ? '<i class="k g"></i>' : ""}</span>
-          <span class="fl"><span class="s ${e.art}" style="height:${hoch}%">${e.art === "S" || e.art === "E" ? `<em>${e.min}'</em>` : ""}</span></span>${e.gk ? logo(e.gk, 18) : '<span class="pf-ohne"></span>'}<span class="md">${lab}</span>${(() => { const af = afSp(s.id), n = e.typ === "Liga" && af && (af.no || []).find(x => x[0] === e.md); return AF && AF.sp ? `<span class="nt${n && n[2] < 46 ? " k" : ""}" style="color:${n ? NFARBE(n[1]) : "transparent"}">${n ? dez(n[1]) : "–"}</span>` : ""; })()}</button>`; }).join("")}</div>
+          <span class="fl"><span class="s ${e.art}${hoch < 34 ? " lo" : ""}" style="height:${hoch}%">${e.art === "S" || e.art === "E" ? `<em>${e.min}'</em>` : ""}</span></span>${e.gk ? logo(e.gk, 18) : '<span class="pf-ohne"></span>'}<span class="md">${lab}</span>${(() => { const af = afSp(s.id), n = e.typ === "Liga" && af && (af.no || []).find(x => x[0] === e.md); return AF && AF.sp ? `<span class="nt${n && n[2] < 46 ? " k" : ""}" style="color:${n ? NFARBE(n[1]) : "transparent"}">${n ? dez(n[1]) : "–"}</span>` : ""; })()}</button>`; }).join("")}</div>
       <div class="pf-det" id="pf-det"></div>
       ${(() => { const has = a => alle.some(e => e.typ === "Liga" && e.art === a), L1 = [["S", "Startelf"], ["E", "Joker"], ["B", "Bank"], ["X", "fehlte"]].filter(x => has(x[0])).map(x => `<span><i class="${x[0]}"></i>${x[1]}</span>`);
         if (alle.some(e => e.typ === "Pokal")) L1.push('<span><i class="po"></i>Pokal</span>'); if (alle.some(e => e.typ === "CL")) L1.push('<span><i class="cl"></i>UWCL</span>');
@@ -4399,6 +4475,11 @@ details.dzb[open]{padding-bottom:10px}
       det.innerHTML = `<b>${esc(titel)}</b> ${e.ha === "A" ? "in" : "gegen"} ${esc(e.gk ? kname(e.gk) : e.gegner)}${e.erg ? " · " + esc(e.erg) : ""}${e.typ !== "Liga" ? ' <span class="mu">(zählt nicht für Kickbase)</span>' : ""}<br>${esc(was)}${extra ? "<br>" + esc(extra) : ""}`;
       det.classList.add("an");
     }));
+  }
+  function pfSpiel(z, s){  // Ligaspiel aus "Nächste Spiele" im Spielplan finden, sonst keine Verknüpfung
+    if (!SP || !z || !z.gk || (z.wb && z.wb !== "Liga")) return "";
+    const g = alleSpiele().filter(p => p.status !== "beendet" && [p.heim_k, p.gast_k].includes(s.k) && [p.heim_k, p.gast_k].includes(z.gk) && (!z.datum || !p.anstoss || String(p.anstoss).slice(0, 10) === String(z.datum).slice(0, 10)));
+    return g.length === 1 ? g[0].id : "";
   }
   function profilKarte(m){
     if (!m.spielerin || !istSpielerin(m) || !SPN) return "";
