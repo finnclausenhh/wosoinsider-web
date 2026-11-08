@@ -1,0 +1,481 @@
+/* WOSOINSIDER Kommentare (Web-Ticker)
+ * Braucht vorher: supabase.js (lokal gehostet) und kommentare-config.js (URL + Publishable Key).
+ * Einbau: Der Ticker legt im Artikel <div id="kom" data-beitrag="ID"></div> an und ruft WIKOM.mount(ID).
+ * Lesen ohne Anmeldung. Erst beim ersten Schreiben, Liken oder Melden entsteht eine anonyme Sitzung.
+ * Alle Regeln (Tempo, Wortfilter, Sperren, Meldeschwelle) prüft die Datenbank, nicht diese Datei.
+ */
+(function () {
+  "use strict";
+  var CFG = window.WI_KOMMENTARE || {};
+  var AKTIV = !!(CFG.url && CFG.key && window.supabase && window.supabase.createClient);
+  var sb = AKTIV ? window.supabase.createClient(CFG.url, CFG.key, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: "woso-konto" }
+  }) : null;
+
+  var MAX = 500, SEITE = 20;
+  var S = { beitrag: null, liste: [], likes: {}, ich: null, sort: "neu", zeige: SEITE, antwort: null,
+            melden: null, fehler: "", fehlerAn: null, sendet: false, offenRegeln: false, laden: false, geladen: false };
+  var ENTWURF = {};
+  var STUMM = {};     // stummgeschaltete Personen {id: Name}, nur auf diesem Gerät
+  try { STUMM = JSON.parse(localStorage.getItem("woso-stumm") || "{}") || {}; } catch (e) {}
+  function stummSpeichern() { try { localStorage.setItem("woso-stumm", JSON.stringify(STUMM)); } catch (e) {} }   // Entwürfe je Meldung und Antwort, überleben das Neuzeichnen des Artikels
+  var TIMER = null;
+
+  var FEHLER = {
+    WI_TEMPO: "Kurz durchatmen: Zwischen zwei Kommentaren braucht es ein paar Sekunden.",
+    WI_LIMIT: "Für den Moment hast du genug kommentiert. Später geht es weiter.",
+    WI_DOPPELT: "Diesen Kommentar hast du schon geschrieben.",
+    WI_WORT: "Der Kommentar verstößt gegen unsere Kommentarregeln und wurde nicht veröffentlicht.",
+    WI_GESPERRT: "Dein Profil ist zurzeit für Kommentare gesperrt.",
+    WI_AUS: "Kommentare sind gerade pausiert.",
+    WI_KONTO: "Kommentieren geht gerade nur mit Konto.",
+    WI_ANTWORT: "Auf diesen Kommentar kann man nicht mehr antworten.",
+    WI_KURZ: "Der Kommentar ist zu kurz.",
+    WI_EIGEN: "Eigene Kommentare kannst du nicht liken oder melden.",
+    WI_WEG: "Den Kommentar gibt es nicht mehr.",
+    WI_LOGIN: "Verbindung fehlgeschlagen. Bitte noch einmal versuchen.",
+    WI_KEIN_MOD: "Dafür fehlen die Rechte.",
+    WI_NAME: "Dieser Name geht nicht. Erlaubt sind 3 bis 24 Zeichen (Buchstaben, Zahlen, Leerzeichen, - _ .), nichts mit Redaktion oder WOSOINSIDER.",
+    WI_NAME_VERGEBEN: "Diesen Namen gibt es schon. Bitte einen anderen wählen.",
+    WI_NAME_FEST: "Du hast deinen Namen schon einmal geändert. Weitere Änderungen sind nicht möglich."
+  };
+  var GRUENDE = [["beleidigung", "Beleidigung"], ["hass", "Hass oder Hetze"], ["spam", "Spam oder Werbung"],
+                 ["falschinfo", "Falschinformation"], ["rechtswidrig", "Rechtswidriger Inhalt"], ["sonstiges", "Sonstiges"]];
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function fehlertext(e) {
+    var m = String((e && (e.message || e.error_description)) || e || "");
+    var k = (m.match(/WI_[A-Z_]+/) || [])[0];
+    if (k && FEHLER[k]) return FEHLER[k];
+    if (/anonymous.*disabled|signups not allowed/i.test(m)) return "Kommentare sind noch nicht freigeschaltet.";
+    if (/rate limit|too many/i.test(m)) return "Zu viele Anfragen. Bitte gleich noch einmal versuchen.";
+    return "Das hat nicht geklappt. Bitte später noch einmal versuchen.";
+  }
+  function vor(z) {
+    var d = (Date.now() - new Date(z).getTime()) / 1000;
+    if (d < 60) return "gerade eben";
+    if (d < 3600) return "vor " + Math.floor(d / 60) + " Min.";
+    if (d < 86400) return "vor " + Math.floor(d / 3600) + " Std.";
+    if (d < 7 * 86400) { var t = Math.floor(d / 86400); return "vor " + t + (t === 1 ? " Tag" : " Tagen"); }
+    var x = new Date(z); return x.getDate() + "." + (x.getMonth() + 1) + "." + x.getFullYear();
+  }
+  function el() { return document.getElementById("kom"); }
+  function istMod() { return !!(S.ich && (S.ich.rolle === "moderator" || S.ich.rolle === "admin")); }
+
+  // ---------- Daten ----------
+  function hatSitzung() {
+    return sb.auth.getSession().then(function (r) { return !!(r.data && r.data.session); });
+  }
+  function sitzung() {
+    return hatSitzung().then(function (ok) {
+      if (ok) return;
+      return sb.auth.signInAnonymously().then(function (r) { if (r.error) throw r.error; });
+    }).then(function () { return profilLaden(); });
+  }
+  function profilLaden() {
+    return sb.rpc("mein_profil").then(function (r) { if (!r.error) S.ich = r.data; });
+  }
+  function laden() {
+    if (!S.beitrag) return Promise.resolve();
+    var b = S.beitrag; S.laden = true;
+    return sb.from("kommentar")
+      .select("id,beitrag,eltern,autor,text,status,grund,likes,angeheftet,erstellt,profil:profil!kommentar_autor_fkey(name,rolle,verifiziert)")
+      .eq("beitrag", b).order("erstellt", { ascending: false }).limit(500)
+      .then(function (r) {
+        if (b !== S.beitrag) return;
+        S.laden = false; S.geladen = true;
+        if (r.error) { S.liste = []; S.fehler = "Kommentare konnten nicht geladen werden."; S.fehlerAn = null; return; }
+        S.liste = r.data || [];
+        return hatSitzung().then(function (ok) {
+          if (!ok || !S.liste.length) return;
+          return Promise.all([
+            S.ich ? null : profilLaden(),
+            sb.from("kommentar_like").select("kommentar").in("kommentar", S.liste.map(function (k) { return k.id; }))
+              .then(function (l) { S.likes = {}; (l.data || []).forEach(function (x) { S.likes[x.kommentar] = true; }); })
+          ]);
+        });
+      })
+      .catch(function () { S.laden = false; S.geladen = true; S.fehler = "Kommentare konnten nicht geladen werden."; })
+      .then(zeichnen);
+  }
+
+  // ---------- Darstellung ----------
+  // Blauer Haken: Redaktion (Admin/Moderator) und verifizierte Profile
+  var HAKEN = '<svg class="wk-haken" viewBox="0 0 24 24" role="img" aria-label="Verifiziert"><title>Verifiziert</title>' +
+    '<path fill="#3B8BFF" d="M12 1.5l2.6 1.9 3.2-.2 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.2L12 22.5l-2.6-1.9-3.2.2-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.2z"/>' +
+    '<path d="M7.6 12.3l3 3 5.8-6" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function badge(k) {
+    var p = k.profil || {};
+    var team = p.rolle === "admin" || p.rolle === "moderator";
+    return (p.verifiziert || team ? HAKEN : "") + (team ? '<span class="wk-red">Redaktion</span>' : "");
+  }
+  function nameFehlt() { return !S.ich || !S.ich.name_gewaehlt; }
+  function nameFeld(eltern) {
+    var id = "wk-n-" + (eltern || "h");
+    var wert = ENTWURF.name != null ? ENTWURF.name : (S.ich ? S.ich.name : "");
+    return '<div class="wk-name"><label for="' + id + '">Dein Name</label>' +
+      '<input id="' + id + '" data-kname maxlength="24" autocomplete="nickname" placeholder="z. B. Lena aus Köln" value="' + esc(wert) + '">' +
+      '<span class="wk-mu wk-1z">Leer = zufälliger Name, später einmal änderbar</span></div>';
+  }
+  function namensZeile() {
+    if (!S.ich || nameFehlt()) return "";
+    if (S.nameForm) {
+      return '<form class="wk-form wk-nform" data-knamensform><div class="wk-name"><label for="wk-n-neu">Neuer Name</label>' +
+        '<input id="wk-n-neu" maxlength="24" autocomplete="nickname" value="' + esc(S.ich.name) + '"></div>' +
+        '<div class="wk-fz"><span class="wk-mu">Geht nur ein einziges Mal.</span>' +
+        '<button type="button" class="wk-link" data-kaktion="name-zu">Abbrechen</button><button type="submit" class="wk-senden">Speichern</button></div>' +
+        (S.fehler && S.fehlerAn === "name" ? '<p class="wk-fehler" role="alert">' + esc(S.fehler) + "</p>" : "") + "</form>";
+    }
+    return "";
+  }
+  function formular(eltern) {
+    var key = S.beitrag + "|" + (eltern || ""), wert = ENTWURF[key] || "";
+    var fehlerHier = S.fehler && S.fehlerAn === (eltern || "haupt");
+    if (!eltern && !S.offen && !wert && !fehlerHier)
+      return '<button type="button" class="wk-zu" data-kaktion="schreiben"><span>Deine Meinung …</span><b>Posten</b></button>';
+    var wer = nameFehlt() ? "" : "Du schreibst als <b>" + esc(S.ich.name) + "</b>" +
+      (S.ich.name_aenderung_frei && !eltern ? ' · <button type="button" class="wk-link wk-klein" data-kaktion="name-aendern">ändern</button>' : "") + " · ";
+    return '<form class="wk-form' + (eltern ? " wk-antw" : "") + '" data-kform="' + esc(eltern || "") + '">' +
+      (nameFehlt() ? nameFeld(eltern) : "") +
+      '<label class="wk-sr" for="wk-t-' + esc(eltern || "h") + '">' + (eltern ? "Antwort schreiben" : "Kommentar schreiben") + "</label>" +
+      '<textarea id="wk-t-' + esc(eltern || "h") + '" maxlength="' + MAX + '" rows="' + (eltern ? 2 : 3) + '" placeholder="' +
+        (eltern ? "Antworten …" : "Was meinst du?") + '">' + esc(wert) + "</textarea>" +
+      '<div class="wk-fz"><span class="wk-mu">' + wer + '<span data-kzahl>' + wert.length + "</span>/" + MAX + "</span>" +
+      '<button type="button" class="wk-link" data-kaktion="' + (eltern ? "abbrechen" : "zuklappen") + '">Abbrechen</button>' +
+      '<button type="submit" class="wk-senden"' + (S.sendet ? " disabled" : "") + ">" + (S.sendet ? "Sendet …" : "Senden") + "</button></div>" +
+      (fehlerHier ? '<p class="wk-fehler" role="alert">' + esc(S.fehler) + "</p>" : "") +
+      "</form>";
+  }
+  function kommentar(k, istAntwort) {
+    var eigen = S.ich && k.autor === S.ich.id;
+    var geloescht = k.status === "geloescht";
+    var nichtOeffentlich = k.status === "pruefung" || k.status === "ausgeblendet";
+    var team = k.profil && (k.profil.rolle === "admin" || k.profil.rolle === "moderator");
+    var h = '<div class="wk-k' + (istAntwort ? " wk-sub" : "") + (team ? " wk-team" : "") + (nichtOeffentlich ? " wk-verborgen" : "") + '">' +
+      (k.angeheftet && !istAntwort ? '<div class="wk-pin">Angeheftet</div>' : "") +
+      '<div class="wk-kopf"><b class="wk-name-z">' + esc(k.profil ? k.profil.name : "Fan") + badge(k) + "</b>" +
+      '<span class="wk-mu">' + vor(k.erstellt) + "</span></div>";
+    if (nichtOeffentlich) {
+      h += '<p class="wk-hinweis">' + (eigen ? "Nur für dich sichtbar. " : "Nicht öffentlich. ") + esc(k.grund || "") + "</p>";
+    }
+    h += '<p class="wk-text' + (geloescht ? " wk-mu" : "") + '">' + esc(k.text) + "</p>";
+    if (!geloescht) {
+      h += '<div class="wk-akt">';
+      var h0 = h; h = "";
+      if (k.status === "sichtbar") {
+        h0 += '<button data-kaktion="like" data-kid="' + k.id + '" aria-pressed="' + (S.likes[k.id] ? "true" : "false") + '"' +
+             (eigen ? " disabled" : "") + ">" + (S.likes[k.id] ? "♥" : "♡") + " " + (k.likes || 0) + "</button>";
+        if (!istAntwort) h0 += '<button data-kaktion="antworten" data-kid="' + k.id + '">Antworten</button>';
+        if (!eigen) h += '<button data-kaktion="melden" data-kid="' + k.id + '">Melden</button>';
+        if (!eigen && !(k.profil && (k.profil.rolle === "admin" || k.profil.rolle === "moderator")))
+          h += '<button data-kaktion="stumm" data-kid="' + k.id + '" title="Kommentare dieser Person nicht mehr anzeigen">Stumm</button>';
+      }
+      if (eigen) h += '<button data-kaktion="loeschen" data-kid="' + k.id + '">Löschen</button>';
+      if (eigen && istMod() && !istAntwort && k.status === "sichtbar")
+        h += '<button class="wk-mod" data-kaktion="anheften" data-kid="' + k.id + '" data-an="' + (k.angeheftet ? "0" : "1") + '">' + (k.angeheftet ? "Lösen" : "Anheften") + "</button>";
+      if (istMod() && !eigen) {
+        if (!istAntwort && k.status === "sichtbar")
+          h += '<button class="wk-mod" data-kaktion="anheften" data-kid="' + k.id + '" data-an="' + (k.angeheftet ? "0" : "1") + '">' + (k.angeheftet ? "Lösen" : "Anheften") + "</button>";
+        h += k.status === "sichtbar"
+          ? '<button class="wk-mod" data-kaktion="ausblenden" data-kid="' + k.id + '">Ausblenden</button>'
+          : '<button class="wk-mod" data-kaktion="freigeben" data-kid="' + k.id + '">Freigeben</button>';
+        h += '<button class="wk-mod" data-kaktion="sperren" data-kid="' + k.id + '">Sperren 7 T.</button>';
+      }
+      var mehr = h;
+      h = h0 + (mehr ? '<button class="wk-dots" data-kaktion="menu" data-kid="' + k.id + '" aria-expanded="' + (S.menu === k.id) + '" aria-label="Weitere Aktionen">•••</button>' : "") + "</div>" +
+        (mehr && S.menu === k.id ? '<div class="wk-menu">' + mehr + "</div>" : "");
+    }
+    if (S.melden === k.id) {
+      h += '<div class="wk-melden"><span class="wk-mu">Warum meldest du den Kommentar?</span><div class="wk-gr">' +
+        GRUENDE.map(function (g) { return '<button data-kaktion="meldegrund" data-kid="' + k.id + '" data-grund="' + g[0] + '">' + g[1] + "</button>"; }).join("") +
+        '</div><button class="wk-link" data-kaktion="melden-zu">Abbrechen</button></div>';
+    }
+    return h + "</div>";
+  }
+  function zeichnen() {
+    var box = el();
+    if (!box || !AKTIV) return;
+    var alle = S.liste.filter(function (k) { return !STUMM[k.autor]; });
+    var haupt = alle.filter(function (k) { return !k.eltern; });
+    var kinder = {};
+    alle.forEach(function (k) { if (k.eltern) (kinder[k.eltern] = kinder[k.eltern] || []).push(k); });
+    if (S.sort === "top") haupt.sort(function (a, b) { return (b.likes - a.likes) || (new Date(b.erstellt) - new Date(a.erstellt)); });
+    haupt.sort(function (a, b) { return (b.angeheftet ? 1 : 0) - (a.angeheftet ? 1 : 0); });   // stabil: Angeheftetes nach oben
+    var sichtbar = alle.filter(function (k) { return k.status === "sichtbar"; }).length;
+    var h = '<section class="wk wk-c" aria-labelledby="wk-h"><div class="wk-karte"><div class="wk-top"><h2 id="wk-h"><span class="wk-ks">Fans sagen</span>' +
+      '<span class="wk-anz">' + (sichtbar ? (sichtbar === 1 ? "1 Kommentar" : sichtbar + " Kommentare") : "Noch keine Kommentare") + "</span></h2>" +
+      (haupt.length > 1 ? '<div class="wk-sort" role="group" aria-label="Sortierung">' +
+        '<button data-kaktion="sort" data-sort="neu" aria-pressed="' + (S.sort === "neu") + '">Neu</button>' +
+        '<button data-kaktion="sort" data-sort="top" aria-pressed="' + (S.sort === "top") + '">Top</button></div>' : "") +
+      "</div>";
+    if (S.fehler && S.fehlerAn === null) h += '<p class="wk-fehler" role="alert">' + esc(S.fehler) + "</p>";
+    if (!S.geladen) h += '<p class="wk-mu">Kommentare werden geladen …</p>';
+    haupt.slice(0, S.zeige).forEach(function (k) {
+      var subs = (kinder[k.id] || []).slice().sort(function (a, b) { return new Date(a.erstellt) - new Date(b.erstellt); });
+      if (k.status !== "sichtbar" && k.status !== "geloescht" && !(S.ich && k.autor === S.ich.id) && !istMod()) return;
+      h += '<div class="wk-faden">' + kommentar(k, false) + subs.map(function (s) { return kommentar(s, true); }).join("") +
+        (S.antwort === k.id ? formular(k.id) : "") + "</div>";
+    });
+    var stumm = Object.keys(STUMM).length;
+    if (stumm) h += '<p class="wk-mu wk-stumm">' + (stumm === 1 ? "1 Person" : stumm + " Personen") + ' stummgeschaltet · <button class="wk-link" data-kaktion="stumm-aus">Wieder anzeigen</button></p>';
+    if (haupt.length > S.zeige) h += '<button class="wk-mehr" data-kaktion="mehr">Weitere ' + Math.min(SEITE, haupt.length - S.zeige) + " Kommentare</button>";
+    h += '<div class="wk-eingabe">' + namensZeile() + formular(null) + "</div></div>";
+    h += '<p class="wk-mu wk-regelz">Mit dem Absenden gelten unsere <button class="wk-rl" data-legal="so-entsteht">Kommentarregeln</button>.</p>';
+    h += "</section>";
+    var fokus = document.activeElement && box.contains(document.activeElement) && document.activeElement.id;
+    var pos = fokus && document.activeElement.selectionStart;
+    box.innerHTML = h;
+    if (fokus) { var f = document.getElementById(fokus); if (f) { f.focus(); try { f.setSelectionRange(pos, pos); } catch (e) {} } }
+  }
+
+  // ---------- Aktionen ----------
+  function aktion(fn, wo) {
+    S.fehler = ""; S.fehlerAn = wo === undefined ? null : wo;
+    return sitzung().then(fn).then(function (r) { if (r && r.error) throw r.error; })
+      .catch(function (e) { S.fehler = fehlertext(e); S.fehlerAn = wo === undefined ? null : wo; })
+      .then(laden);
+  }
+  document.addEventListener("input", function (e) {
+    var t = e.target;
+    if (t.matches && t.matches("#kom input[data-kname]")) { ENTWURF.name = t.value; return; }
+    if (!t.closest || !t.closest("#kom form[data-kform]")) return;
+    var f = t.closest("form"), key = S.beitrag + "|" + f.dataset.kform;
+    ENTWURF[key] = t.value;
+    var z = f.querySelector("[data-kzahl]"); if (z) z.textContent = t.value.length;
+  });
+  document.addEventListener("submit", function (e) {
+    var f = e.target; if (!f.closest || !f.closest("#kom")) return;
+    if (f.matches("form[data-knamensform]")) {
+      e.preventDefault();
+      var neu = (f.querySelector("input").value || "").trim();
+      if (!neu || neu === S.ich.name) { S.nameForm = false; zeichnen(); return; }
+      if (!window.confirm("Name zu „" + neu + "“ ändern? Das geht nur ein einziges Mal.")) return;
+      S.fehler = ""; S.fehlerAn = null;
+      sb.rpc("name_aendern", { neu: neu }).then(function (r) {
+        if (r.error) { S.fehler = fehlertext(r.error); S.fehlerAn = "name"; return zeichnen(); }
+        S.nameForm = false; return profilLaden().then(laden);
+      });
+      return;
+    }
+    if (!f.matches("form[data-kform]")) return;
+    e.preventDefault();
+    if (S.sendet) return;
+    var eltern = f.dataset.kform || null, key = S.beitrag + "|" + (eltern || "");
+    var text = (f.querySelector("textarea").value || "").trim();
+    if (text.length < 2) { S.fehler = FEHLER.WI_KURZ; S.fehlerAn = eltern || "haupt"; zeichnen(); return; }
+    S.sendet = true; zeichnen();
+    S.fehler = ""; S.fehlerAn = null;
+    var nameInput = f.querySelector("input[data-kname]");
+    var wunsch = nameInput ? (nameInput.value || "").trim() : null;
+    sitzung()
+      .then(function () {
+        if (!nameFehlt()) return;
+        return sb.rpc("name_aendern", { neu: wunsch || S.ich.name }).then(function (r) {
+          if (r.error) throw r.error;
+          ENTWURF.name = null; return profilLaden();
+        });
+      })
+      .then(function () { return sb.from("kommentar").insert({ beitrag: S.beitrag, text: text, eltern: eltern }); })
+      .then(function (r) { if (r.error) throw r.error; ENTWURF[key] = ""; if (eltern) S.antwort = null; else S.offen = false; })
+      .catch(function (err) { S.fehler = fehlertext(err); S.fehlerAn = eltern || "haupt"; })
+      .then(function () { S.sendet = false; return laden(); });
+  });
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("#kom [data-kaktion]");
+    if (!b || b.disabled) return;
+    e.preventDefault(); e.stopPropagation();
+    var a = b.dataset.kaktion, id = b.dataset.kid;
+    if (a === "sort") { S.sort = b.dataset.sort; zeichnen(); return; }
+    if (a === "mehr") { S.zeige += SEITE; zeichnen(); return; }
+    if (a === "antworten") { S.antwort = S.antwort === id ? null : id; S.melden = null; zeichnen();
+      var t = document.getElementById("wk-t-" + id); if (t) t.focus(); return; }
+    if (a === "abbrechen") { S.antwort = null; zeichnen(); return; }
+    if (a === "schreiben") { S.offen = true; zeichnen(); var t = document.getElementById("wk-t-h"); if (t) t.focus(); return; }
+    if (a === "zuklappen") { S.offen = false; S.fehler = ""; ENTWURF[S.beitrag + "|"] = ""; zeichnen(); return; }
+    if (a === "menu") { S.menu = S.menu === id ? null : id; S.melden = null; zeichnen(); return; }
+    if (a === "melden") { S.melden = S.melden === id ? null : id; S.menu = null; zeichnen(); return; }
+    if (a === "melden-zu") { S.melden = null; zeichnen(); return; }
+    if (a === "meldegrund") {
+      S.melden = null;
+      aktion(function () { return sb.from("kommentar_meldung").insert({ kommentar: id, grund: b.dataset.grund }); })
+        .then(function () { if (!S.fehler) { S.fehler = "Danke, die Meldung ist angekommen. Die Redaktion prüft sie."; S.fehlerAn = null; zeichnen(); } });
+      return;
+    }
+    if (a === "like") {
+      var an = !S.likes[id];
+      S.likes[id] = an;
+      S.liste.forEach(function (k) { if (k.id === id) k.likes = Math.max(0, (k.likes || 0) + (an ? 1 : -1)); });
+      zeichnen();
+      aktion(function () {
+        return an ? sb.from("kommentar_like").insert({ kommentar: id })
+                  : sb.from("kommentar_like").delete().eq("kommentar", id).eq("nutzer", S.ich && S.ich.id);
+      });
+      return;
+    }
+    if (a === "stumm") {
+      var ks = S.liste.find(function (x) { return x.id === id; }); if (!ks) return;
+      if (!window.confirm((ks.profil ? ks.profil.name : "Diese Person") + " stummschalten? Du siehst ihre Kommentare dann auf diesem Gerät nicht mehr.")) return;
+      STUMM[ks.autor] = ks.profil ? ks.profil.name : ""; stummSpeichern(); zeichnen(); return;
+    }
+    if (a === "name-aendern") { S.nameForm = true; S.fehler = ""; zeichnen(); var ni = document.getElementById("wk-n-neu"); if (ni) ni.focus(); return; }
+    if (a === "name-zu") { S.nameForm = false; S.fehler = ""; zeichnen(); return; }
+    if (a === "stumm-aus") { STUMM = {}; stummSpeichern(); zeichnen(); return; }
+    if (a === "anheften") {
+      aktion(function () { return sb.rpc("anheften", { kid: id, an: b.dataset.an === "1" }); });
+      return;
+    }
+    if (a === "loeschen") {
+      if (!window.confirm("Kommentar wirklich löschen?")) return;
+      aktion(function () { return sb.rpc("kommentar_loeschen", { kid: id }); });
+      return;
+    }
+    if (a === "ausblenden" || a === "freigeben") {
+      var g = a === "ausblenden" ? window.prompt("Begründung (sieht die Person):", "Verstoß gegen die Kommentarregeln") : null;
+      if (a === "ausblenden" && g === null) return;
+      aktion(function () { return sb.rpc("moderieren", { kid: id, aktion: a, begruendung: g }); });
+      return;
+    }
+    if (a === "sperren") {
+      var k = S.liste.find(function (x) { return x.id === id; }); if (!k) return;
+      var grund = window.prompt("7 Tage sperren. Begründung (sieht die Person):", "Wiederholter Verstoß gegen die Kommentarregeln");
+      if (grund === null) return;
+      aktion(function () { return sb.rpc("nutzer_sperren", { uid: k.autor, tage: 7, begruendung: grund }); });
+    }
+  }, true);
+  document.addEventListener("toggle", function (e) {
+    if (e.target && e.target.classList && e.target.classList.contains("wk-regeln")) S.offenRegeln = e.target.open;
+  }, true);
+
+  // ---------- Einbau ----------
+  function mount(beitrag) {
+    if (!AKTIV) return;
+    var box = el(); if (!box) return;
+    if (S.beitrag !== beitrag) {
+      S.beitrag = beitrag; S.liste = []; S.likes = {}; S.zeige = SEITE; S.antwort = null; S.melden = null; S.offen = false;
+      S.fehler = ""; S.fehlerAn = null; S.geladen = false; S.offenRegeln = false;
+    }
+    zeichnen(); laden();
+    if (TIMER) clearInterval(TIMER);
+    TIMER = setInterval(function () {
+      var b = el();
+      if (!b || b.dataset.beitrag !== S.beitrag) { clearInterval(TIMER); TIMER = null; return; }
+      if (document.visibilityState === "visible" && !S.sendet && !(document.activeElement && b.contains(document.activeElement))) laden();
+    }, 60000);
+  }
+
+  var REGELN = '<div class="wk-rt">' +
+    "<p>Hier geht es um Fußball. Diskutiere fair, auch wenn es hitzig wird.</p><ul>" +
+    "<li>Keine Beleidigungen, keine Hetze, keine Drohungen. Das gilt besonders gegenüber Spielerinnen, Trainerinnen und Trainern, Schiedsrichterinnen und anderen Fans.</li>" +
+    "<li>Keine Kommentare über Aussehen, Körper oder Privatleben von Spielerinnen.</li>" +
+    "<li>Keine Werbung, kein Spam, keine Links zu fremden Angeboten.</li>" +
+    "<li>Keine Gerüchte als Tatsache. Verletzungs- oder Aufstellungsinfos gern als Hinweis an redaktion@wosoinsider.de.</li>" +
+    "<li>Nichts Rechtswidriges, keine persönlichen Daten anderer.</li></ul>" +
+    "<p>Ein Wortfilter hält manche Kommentare zurück, bis die Redaktion sie prüft. Kommentare, die mehrfach gemeldet werden, werden automatisch ausgeblendet und geprüft. Bei Verstößen können wir Kommentare ausblenden oder löschen und Profile zeitweise oder dauerhaft sperren. Den Grund siehst du bei deinem Kommentar.</p>" +
+    "<p>Rechtswidrige Inhalte bitte über „Melden“ oder an redaktion@wosoinsider.de. Für deine Kommentare bist du selbst verantwortlich. Mehr dazu in der Datenschutzerklärung.</p></div>";
+
+  var css = document.createElement("style");
+  css.textContent =
+    ".wk-rl{color:inherit;font:inherit;text-decoration:underline;text-underline-offset:2px;padding:0;background:none;border:0}" +
+    ".wk{display:grid;gap:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:4px}" +
+    ".wk-top{display:flex;justify-content:space-between;align-items:center}.wk-top h2{margin:0}" +
+    ".wk-sort{display:flex;gap:4px;background:var(--card);border-radius:9px;padding:3px}" +
+    ".wk-sort button{font-size:12px;padding:5px 10px;border-radius:7px;color:var(--muted)}" +
+    ".wk-sort button[aria-pressed=true]{background:var(--soft);color:var(--ink);font-weight:600}" +
+    ".wk-form{display:grid;gap:6px}" +
+    ".wk-form textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:64px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:15px/1.4 var(--f-body)}" +
+    ".wk-form textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}" +
+    ".wk-antw textarea{min-height:48px}" +
+    ".wk-fz{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}.wk-fz .wk-mu{margin-right:auto}" +
+    ".wk-zu{display:block;width:100%;text-align:left;background:var(--card);color:var(--muted);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:44px;font:15px/1.4 var(--f-body);cursor:text}" +
+    ".wk-senden{background:var(--accent);color:#fff;font-weight:600;font-size:14px;border-radius:10px;padding:8px 16px;min-height:36px}" +
+    ".wk-senden[disabled]{opacity:.6}" +
+    ".wk-mu{color:var(--muted);font-size:12.5px}" +
+    ".wk-link{color:var(--accent);font-size:13px;padding:6px 2px}" +
+    ".wk-fehler{margin:0;font-size:13px;color:var(--ink);background:var(--soft);border-left:3px solid var(--frag);border-radius:8px;padding:8px 10px}" +
+    ".wk-regeln{font-size:13px;color:var(--muted)}.wk-regeln summary{cursor:pointer;color:var(--muted);font-size:12.5px;padding:2px 0}" +
+    ".wk-rt{display:grid;gap:6px;padding:8px 0 2px}.wk-rt p,.wk-rt ul{margin:0}.wk-rt ul{padding-left:18px;display:grid;gap:4px}" +
+    ".wk-faden{display:grid;gap:8px;background:var(--card);border-radius:14px;padding:12px}" +
+    ".wk-k{display:grid;gap:4px}.wk-sub{margin-left:14px;padding-left:10px;border-left:2px solid var(--line)}" +
+    ".wk-verborgen{opacity:.75}" +
+    ".wk-kopf{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.wk-kopf b{font-size:13.5px}" +
+    ".wk-name-z{display:inline-flex;align-items:center;gap:4px}.wk-haken{width:15px;height:15px;flex:none}" +
+    ".wk-red{font:700 9.5px var(--f-mono);letter-spacing:.6px;text-transform:uppercase;background:rgba(47,91,255,.18);color:var(--hell);border-radius:99px;padding:2px 7px;margin-left:2px}" +
+    ".wk-text{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}" +
+    ".wk-hinweis{margin:0;font-size:12.5px;color:var(--frag)}" +
+    ".wk-akt{display:flex;gap:14px;flex-wrap:wrap}" +
+    ".wk-akt{gap:6px}.wk-akt button{font-size:12.5px;color:var(--muted);padding:8px 8px;min-height:40px;margin:-4px 0}" +
+    ".wk-akt button:first-child{margin-left:-8px}.wk-akt button[data-kaktion=like]{min-width:52px;font-size:14px;text-align:left}" +
+    ".wk-1z{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+    ".wk-akt button[aria-pressed=true]{color:var(--rot)}.wk-akt button[disabled]{opacity:.5}" +
+    ".wk-akt .wk-mod{color:var(--frag)}" +
+    ".wk-melden{display:grid;gap:6px;background:var(--soft);border-radius:10px;padding:10px}" +
+    ".wk-gr{display:flex;flex-wrap:wrap;gap:6px}.wk-gr button{font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 10px}" +
+    ".wk-name{display:grid;gap:4px}.wk-name label{font-size:12.5px;font-weight:600;color:var(--muted)}" +
+    ".wk-name input{box-sizing:border-box;width:100%;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font:15px var(--f-body)}" +
+    ".wk-name input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}" +
+    ".wk-nform{background:var(--card);border-radius:12px;padding:10px}" +
+    ".wk-klein{font-size:12.5px;padding:0}.wk-fz .wk-mu b{color:var(--ink);font-weight:600}" +
+    ".wk-pin{font:700 10px var(--f-mono);letter-spacing:.8px;text-transform:uppercase;color:var(--hell)}" +
+    ".wk-stumm{margin:0;text-align:center}.wk-stumm .wk-link{font-size:12.5px}" +
+    ".wk-zahl{display:inline-flex;align-items:center;gap:3px;flex:none;color:var(--muted);font-size:12px}.wk-zahl svg{width:13px;height:13px}" +
+    ".wk-mt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
+    ".nk .meta.wk-hatz,.pk .z.wk-hatz{display:flex;gap:8px;justify-content:space-between;align-items:center}" +
+    ".wk-mehr{justify-self:center;color:var(--accent);font-size:13px;font-weight:600;padding:8px 12px}" +
+    ".wk-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}" +
+    ".wk-c{border-top:0;padding-top:0;gap:8px}.wk-karte{background:var(--card);border-radius:16px;overflow:hidden}" +
+    ".wk-c .wk-top{padding:12px 16px;border-bottom:1px solid var(--line);gap:10px}.wk-c .wk-top h2{display:flex;align-items:baseline;gap:8px;font-size:inherit}" +
+    ".wk-ks{font:700 12px var(--f-mono);letter-spacing:.9px;text-transform:uppercase;color:var(--hell)}.wk-anz{font-size:12.5px;font-weight:400;color:var(--muted)}" +
+    ".wk-c .wk-sort{background:var(--bg)}" +
+    ".wk-c .wk-faden{background:none;border-radius:0;padding:12px 16px;border-bottom:1px solid var(--line)}" +
+    ".wk-c .wk-sub{margin-left:0;padding:10px 12px;border-left:0;border-radius:12px;background:rgba(255,255,255,.04)}" +
+    ".wk-c .wk-sub.wk-team,.wk-c .wk-team{background:rgba(47,91,255,.13);border-radius:12px;padding:10px 12px}" +
+    ".wk-c .wk-red{background:none;padding:0}" +
+    ".wk-dots{margin-left:auto!important;letter-spacing:1px}" +
+    ".wk-menu{display:flex;flex-wrap:wrap;gap:6px}.wk-menu button{font-size:12.5px;color:var(--muted);background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:6px 12px;min-height:36px}.wk-menu .wk-mod{color:var(--frag)}" +
+    ".wk-eingabe{padding:10px 12px 12px;display:grid;gap:8px}" +
+    ".wk-c .wk-zu{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:0;border-radius:22px;padding:0 16px;min-height:44px}" +
+    ".wk-c .wk-zu b{color:var(--hell);font-weight:600;font-size:14px}" +
+    ".wk-c .wk-form textarea{background:var(--bg);border:0}" +
+    ".wk-regelz{font-size:11.5px;margin:0;text-align:center}" +
+    ".wk-c .wk-mehr{padding:12px}";
+  document.head.appendChild(css);
+
+  // ---------- Kommentarzahl auf den Feed-Karten ----------
+  var ZAHLEN = {}, ZEIT = 0, LAEUFT = null;
+  var BLASE = '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v6a1.5 1.5 0 0 1-1.5 1.5H7l-3.2 2.6c-.33.27-.8.03-.8-.39V11h0A1.5 1.5 0 0 1 2 9.5z"/></svg>';
+  function feedZeichnen() {
+    document.querySelectorAll("#main .nk[data-id], #main .pk[data-id]").forEach(function (karte) {
+      var n = ZAHLEN[karte.dataset.id] || 0;
+      var ziel = karte.querySelector(".meta") || karte.querySelector(".pk-b .z");
+      if (!ziel) return;
+      var alt = ziel.querySelector(".wk-zahl");
+      if (!n) { if (alt) alt.remove(); return; }
+      if (!ziel.classList.contains("wk-hatz")) {
+        ziel.innerHTML = '<span class="wk-mt">' + ziel.innerHTML + "</span>"; ziel.classList.add("wk-hatz");
+      }
+      var html = BLASE + n;
+      if (alt) alt.innerHTML = html;
+      else ziel.insertAdjacentHTML("beforeend", '<span class="wk-zahl" aria-label="' + n + (n === 1 ? " Kommentar" : " Kommentare") + '">' + html + "</span>");
+    });
+    if (typeof window.wiMetaPassen === "function") window.wiMetaPassen();
+  }
+  function feed() {
+    if (!AKTIV) return;
+    feedZeichnen();
+    if (Date.now() - ZEIT < 60000 || LAEUFT) return;
+    var ids = Array.prototype.map.call(document.querySelectorAll("#main [data-id]"), function (x) { return x.dataset.id; });
+    if (!ids.length) return;
+    LAEUFT = sb.rpc("kommentar_zahlen", { ids: ids.filter(function (x, i) { return ids.indexOf(x) === i; }) }).then(function (r) {
+      LAEUFT = null; if (r.error) return;
+      ZEIT = Date.now(); ZAHLEN = {};
+      (r.data || []).forEach(function (z) { ZAHLEN[z.beitrag] = Number(z.anzahl) || 0; });
+      feedZeichnen();
+    }, function () { LAEUFT = null; });
+  }
+
+  window.WIKOM = { mount: mount, feed: feed, aktiv: AKTIV };
+  if (document.querySelector("#main .nk[data-id], #main .pk[data-id]")) feed();
+  // Falls der Artikel schon vor diesem Skript gezeichnet wurde (Direktlink)
+  var vorhanden = el(); if (vorhanden && vorhanden.dataset.beitrag) mount(vorhanden.dataset.beitrag);
+})();
