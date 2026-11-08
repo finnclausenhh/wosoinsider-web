@@ -2950,8 +2950,8 @@ details.dzb[open]{padding-bottom:10px}
     if (s) {
       const l3 = (s.spiele || []).slice(-3);
       if (l3.length) z.push(`<span class="z"><b>Letzte 3 Ligaspiele:</b> ${l3.map(e => (e.art === "S" ? "Startelf " : e.art === "E" ? "Joker " : e.art === "B" ? "Bank" : "fehlte") + (e.art === "S" || e.art === "E" ? e.min + "'" : "")).join(" · ")}</span>`);
-      const a = afSp(s.id), v = a && (a.no || []).filter(x => x[2] >= 46);
-      if (v && v.length >= 4) { const n = v.map(x => x[1]), l = n.slice(-3).reduce((x, y) => x + y, 0) / 3, o = n.slice(0, -3).reduce((x, y) => x + y, 0) / (n.length - 3), d = l - o;
+      const fo = formLage(s);
+      if (fo) { const l = fo.l, o = fo.o, d = l - o;
         z.push(`<span class="z"><b>Form:</b> Note ${dez(o)} → ${dez(l)} in den letzten 3${d <= -.6 ? ", im Formtief" : d >= .6 ? ", im Aufwind" : ", stabil"}</span>`); }
       const sp = s.spiele || [], to = sp.reduce((x, e) => x + (e.tore || []).length, 0), vo = sp.reduce((x, e) => x + (e.vorl || 0), 0);
       if (to || vo) z.push(`<span class="z"><b>Saison:</b> ${to} ${to === 1 ? "Tor" : "Tore"}, ${vo} ${vo === 1 ? "Vorlage" : "Vorlagen"}</span>`);
@@ -3495,6 +3495,14 @@ details.dzb[open]{padding-bottom:10px}
   const NFARBE = n => n >= 8 ? "#4ADE80" : n >= 7 ? "#A6E3B8" : n >= 6 ? "#F5C26B" : "#FF8A8A";
   const NOTE_ERKL = "Note: 0 bis 10, berechnet von API-Football aus den Spielwerten (Pässe, Zweikämpfe, Schüsse, Tore). Keine Kickbase-Punkte. Für Formkurve und Schnitt zählen nur Einsätze ab 46 Minuten.";
   const afSp = id => (AF && AF.sp && AF.sp[id]) || null;
+  // Form nur aus den letzten 3 Ligaspielen (Finn 08.11.2026): letztes Spiel und mind. 2 der letzten 3 mit 46+ Min., sonst kein Formurteil
+  function formLage(s) {
+    const a = (AF && AF.sp && AF.sp[s.id]) || null, sp = (s.spiele || []).slice(-3); if (!a || sp.length < 3) return null;
+    if ((sp[2].min || 0) < 46 || sp.filter(e => (e.min || 0) >= 46).length < 2) return null;
+    const md = sp.map(e => e.md), m0 = Math.min(...md), v = (a.no || []).filter(x => x[2] >= 46);
+    const j = v.filter(x => md.includes(x[0])), o = v.filter(x => !md.includes(x[0]) && x[0] < m0); if (j.length < 2 || o.length < 2) return null;
+    const av = L => L.reduce((x, y) => x + y[1], 0) / L.length; return { l: av(j), o: av(o), n: v.map(x => x[1]) };
+  }
   function spAus(k, s){ if (!SPN) return null; if (!SPIDX) spOrt(k, s); return SPIDX && (SPIDX[k + "|" + nNorm(s.voll || "")] || SPIDX[k + "|" + nNorm(nachN(s.voll || s.n))]) || null; }
   let AFNOTEN = null, AFBEST = null;
   const FLAGGE = {Deutschland:"DE",Österreich:"AT",Schweiz:"CH",Niederlande:"NL",Belgien:"BE",Polen:"PL",Japan:"JP",Frankreich:"FR",Norwegen:"NO",Ungarn:"HU",Dänemark:"DK",Schweden:"SE",Island:"IS",Spanien:"ES",Kanada:"CA",Australien:"AU",Kosovo:"XK",Serbien:"RS",Montenegro:"ME",Slowenien:"SI",Elfenbeinküste:"CI",Slowakei:"SK",Marokko:"MA",Aserbaidschan:"AZ",Tschechien:"CZ",USA:"US",Türkei:"TR",Kroatien:"HR",Israel:"IL",Portugal:"PT",Russland:"RU",Luxemburg:"LU",Italien:"IT",Philippinen:"PH",Finnland:"FI",Irland:"IE",Schottland:"",Wales:"",Brasilien:"BR",Mexiko:"MX",Südkorea:"KR",China:"CN",Nigeria:"NG",Ghana:"GH",Kolumbien:"CO",Argentinien:"AR",Neuseeland:"NZ",Albanien:"AL",Bosnien:"BA",Griechenland:"GR",Rumänien:"RO",Ukraine:"UA",Bulgarien:"BG",Litauen:"LT",Lettland:"LV",Estland:"EE"};
@@ -4260,8 +4268,8 @@ details.dzb[open]{padding-bottom:10px}
     const l5 = sp.slice(-5), s5 = l5.filter(e => e.art === "S"), aus5 = s5.filter(e => (e.min || 0) < 85 && !e.rot).length, e5 = l5.filter(e => e.art === "E").length;
     const kbz = l5.length ? `<div class="pf-kbz"><div><b>${s5.length}/${l5.length}</b><span>in der Startelf (letzte ${l5.length} Ligaspiele)${aus5 ? `, davon ${aus5}x vorzeitig ausgewechselt` : s5.length ? ", immer durchgespielt" : ""}${e5 ? `, ${e5}x eingewechselt` : ""}</span></div></div>` : "";
     const elf = (afSp(s.id) || {}).elf, elfC = elf ? `<span class="pf-std el">Elfmeter <i>${elf[0]} von ${elf[0] + elf[1]} verwandelt</i></span>` : "";
-    h += `<section class="pf-box pf-kb">${kap("Für Kickbase")}${pr ? `<p class="pf-w">${esc(warumSatz(s, pr))}</p>` : `<p class="pf-w">Für den nächsten Spieltag gibt es noch keine Prognose.</p>`}${(() => { const a = afSp(s.id), v = a && (a.no || []).filter(x => x[2] >= 46); if (!v || v.length < 4) return "";
-        const n = v.map(x => x[1]), l3 = n.slice(-3).reduce((x, y) => x + y, 0) / 3, vor = n.length > 3 ? n.slice(0, -3).reduce((x, y) => x + y, 0) / (n.length - 3) : l3, d = l3 - vor;
+    h += `<section class="pf-box pf-kb">${kap("Für Kickbase")}${pr ? `<p class="pf-w">${esc(warumSatz(s, pr))}</p>` : `<p class="pf-w">Für den nächsten Spieltag gibt es noch keine Prognose.</p>`}${(() => { const a = afSp(s.id), fo = formLage(s); if (!a || !fo) return "";
+        const n = fo.n, l3 = fo.l, vor = fo.o, d = l3 - vor;
         const g = d <= -.6 ? ["FORMTIEF", "#F59E0B"] : d >= .6 ? ["AUFWIND", "#4ADE80"] : ["STABIL", "#8FB0FF"], pg = programmVon(s.k);
         return `<div class="pf-fm"><span class="l"><b style="color:${g[1]}">${g[0]}</b><span>Note Ø Saison <span class="mu">${dez(a.avg != null ? a.avg : n.reduce((x, y) => x + y, 0) / n.length)}</span> → <b style="color:${g[1]}">${dez(l3)}</b> in den letzten 3</span>${pg && pg.ns && pg.ns !== "mittel" ? `<span style="font:700 10px var(--f-mono);color:${pg.ns === "schwer" ? "#FF8A8A" : "#4ADE80"}">${pg.ns === "schwer" ? "SCHWERES" : "LEICHTES"} PROGRAMM (Ø PLATZ ${Math.round(pg.nr)})</span>` : ""}</span>${spark(n.slice(-6), g[1])}</div>`; })()}
       ${std || elfC ? kap("Standards") + `<div class="pf-stds">${std}${elfC}</div>` : ""}
