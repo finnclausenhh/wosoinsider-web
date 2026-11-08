@@ -99,6 +99,6 @@ def html(s, alt=None, neu=None):
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    open(a[1], "w", encoding="utf-8").write(js(open(a[0], encoding="utf-8").read()))
+    t = js(open(a[0], encoding="utf-8").read()); open(a[1], "w", encoding="utf-8").write(t)
     if len(a) >= 4:
-        open(a[3], "w", encoding="utf-8").write(html(open(a[2], encoding="utf-8").read(), *(a[4:6] if len(a) >= 6 else [])))
+        t = html(open(a[2], encoding="utf-8").read(), *(a[4:6] if len(a) >= 6 else [])); open(a[3], "w", encoding="utf-8").write(t)

@@ -407,7 +407,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .mid{display:grid;justify-items:center;align-content:center;text-align:center;gap:2px;font-variant-numeric:tabular-nums;line-height:1}
 .mid .s{font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1}
 .mid .k{font-family:var(--f-display);font-weight:800;font-size:20px;line-height:1}
-.mid small{font-size:10px;font-weight:600;color:var(--muted);line-height:1.1}
+.mid small{font-size:10px;font-weight:600;color:var(--muted);line-height:1.1}.mid small.vs{color:#C9AEF7}
 .mid.live .s,.mid.live small{color:var(--inj)}
 .belh{display:grid;gap:2px;color:var(--frag);font-size:12px}
 .belh .kap{color:var(--frag);font-family:var(--f-body);font-weight:600;font-size:10px;letter-spacing:0}
@@ -2750,12 +2750,12 @@ details.dzb[open]{padding-bottom:10px}
       if (u.a2) { const n = 46 + ab(u.a2); if (n >= 46 && n <= 100) return n > 90 ? "90+" + (n - 90) + "'" : n + "'"; }
       else if (u.a1) { const n = 1 + ab(u.a1); if (n >= 1 && n <= 52) return n > 45 ? "45+" + (n - 45) + "'" : n + "'"; } }
     return !m ? "LIVE" : /^[0-9+]+$/.test(m) ? m + "'" : m; };
-  function mitte(p){
+  function mitte(p, vs){
     const e = erg(p), live = istLive(p);
     if (e) return `<span class="mid${live ? " live" : ""}"><span class="s">${esc(e)}</span><small${live ? ` data-lm="${esc(p.id)}"` : ""}>${live ? esc(liveText(p)) : "Ende"}</small></span>`;
     if (p.status === "abgesagt") return '<span class="mid"><small>abgesagt</small></span>';
     if (!terminiert(p)) return '<span class="mid"><span class="k mu" style="font-size:19px">offen</span><small>Termin</small></span>';
-    return `<span class="mid"><span class="k">${uhr(dt(p.anstoss))}</span><small>Uhr</small></span>`;
+    return `<span class="mid"><span class="k">${uhr(dt(p.anstoss))}</span>${vs ? '<small class="vs">Vorschau</small>' : "<small>Uhr</small>"}</span>`;
   }
   const belSeiten = p => p.status !== "beendet" && p.belastung ? [["heim", p.heim], ["gast", p.gast]].filter(([k]) => p.belastung[k]).map(([k, n]) => [n, p.belastung[k]]) : [];
   const meinK = p => SEL.has(p.heim_k) ? p.heim_k : SEL.has(p.gast_k) ? p.gast_k : null;
@@ -2777,10 +2777,10 @@ details.dzb[open]{padding-bottom:10px}
     return `<div class="af-hin">${heute ? `<span class="a">AUFSTELLUNG AB CA. ${uhr(new Date(d.getTime() - 3600000))}</span>` : '<span class="v">VORSCHAU</span>'}</div>`;
   }
   function partieZeile(p, mitTag){
-    const bs = belSeiten(p), mk = meinK(p), klein = SEL.size && !mk;
+    const bs = belSeiten(p), mk = meinK(p), klein = SEL.size && !mk, ah = p.status !== "beendet" && !istLive(p) ? afHin(p) : "", vsNur = ah.includes('class="v"');
     return `<button class="pr${mk ? " mein" : ""}" ${mk ? `style="--vc:${ring(mk)}" ` : ""}data-game="${esc(p.id)}">${mitTag ? `<div class="dat" style="font-size:11px">${esc(terminiert(p) ? wtLang(p.anstoss) : "Termin offen")}</div>` : ""}<div class="pr-z">
-      <span class="pr-t h"><span data-kname="${esc(KNAME[p.heim_k] || "")}" title="${esc(p.heim)}">${esc(KNAME[p.heim_k] || p.heim)}</span><span class="kd-l" data-kader="${esc(p.heim_k)}">${logo(p.heim_k, 30)}</span></span>${mitte(p)}<span class="pr-t"><span class="kd-l" data-kader="${esc(p.gast_k)}">${logo(p.gast_k, 30)}</span><span data-kname="${esc(KNAME[p.gast_k] || "")}" title="${esc(p.gast)}">${esc(KNAME[p.gast_k] || p.gast)}</span></span></div>
-      ${p.status !== "beendet" && !istLive(p) ? afHin(p) : ""}
+      <span class="pr-t h"><span data-kname="${esc(KNAME[p.heim_k] || "")}" title="${esc(p.heim)}">${esc(KNAME[p.heim_k] || p.heim)}</span><span class="kd-l" data-kader="${esc(p.heim_k)}">${logo(p.heim_k, 30)}</span></span>${mitte(p, vsNur)}<span class="pr-t"><span class="kd-l" data-kader="${esc(p.gast_k)}">${logo(p.gast_k, 30)}</span><span data-kname="${esc(KNAME[p.gast_k] || "")}" title="${esc(p.gast)}">${esc(KNAME[p.gast_k] || p.gast)}</span></span></div>
+      ${vsNur ? "" : ah}
       ${p.status !== "beendet" && !istLive(p) && einsehbar(p) ? `<div class="eins-z">${einsTag()}<span>Offizielle Aufstellung kommt, bevor Kickbase schließt</span></div>` : ""}${torZeile(p)}${bs.length && !istLive(p) ? (klein ? `<div class="belh klein"><span class="kap">ENGLISCHE WOCHE</span></div>` : `<div class="belh"><span class="kap">ENGLISCHE WOCHE</span>${bs.map(([n, b]) => `<span><b>${esc(n)}</b> ${esc(b.text)}</span>`).join("")}</div>`) : ""}</button>`;
   }
   const alleSpiele = () => { const g = new Set(); return (SP.spieltage || []).flatMap(t => t.partien.concat(t.nachholspiele || [])).filter(p => !g.has(p.id) && g.add(p.id)); };
@@ -3256,7 +3256,8 @@ details.dzb[open]{padding-bottom:10px}
   function inside(){
     if (!SPN) ladeSPN().then(() => { if (VIEW === "inside") { const y = window.scrollY; inside(); window.scrollTo(0, y); } }).catch(() => {});
     if (!IN){ $("#main").innerHTML = '<p class="leer">Inside wird geladen …</p>'; return; }
-    const ph = IN.punkt_hinweis, pm = ph && N.find(m => m.id === ph.id), A = IN.analyse && (!SEL.size || !IN.analyse.verein || SEL.has(IN.analyse.verein)) ? IN.analyse : null;
+    const ph = IN.punkt_hinweis, pm0 = ph && N.find(m => m.id === ph.id), pt = pm0 && SP && (SP.spieltage || []).find(t => t.nr === pm0.md),
+      pm = pt && pt.partien.filter(p => p.status === "beendet").length > pt.partien.length / 2 ? null : pm0, A = IN.analyse && (!SEL.size || !IN.analyse.verein || SEL.has(IN.analyse.verein)) ? IN.analyse : null;
     $("#main").innerHTML = vereinsZeile() + `<div class="iv">
       ${pm ? `<button class="phl" data-punkt="${esc(ph.id)}"><b>Keine Zeit?</b> ${esc(ph.text)} ›</button>` : ""}
       ${IN.ausgabe ? hero(IN.ausgabe) : ""}${bilanzSektion()}${formSektion()}${standardSektion()}${spieleSektion()}${IN.kalender ? kalenderSektion(IN.kalender) : ""}${schuetzenSektion()}
@@ -4605,7 +4606,9 @@ details.dzb[open]{padding-bottom:10px}
       m.querySelectorAll(SEL).forEach(el => { if (el.dataset.ik || el.closest(".ik")) return;
         if (getComputedStyle(el).display === "flex") return;
         const t = el.textContent.trim(); if (!el.classList.contains("pf-fuss") && t.length < 90) return;
-        el.dataset.ik = "1"; const w = document.createElement("div"); w.className = "ik";
+        el.dataset.ik = "1";
+        if (!el.classList.contains("pf-fuss")) { const da = m.querySelector(".ik.ik-s"); if (da) { da.appendChild(el); m.appendChild(da); return; } }
+        const w = document.createElement("div"); w.className = "ik" + (el.classList.contains("pf-fuss") ? "" : " ik-s");
         w.innerHTML = '<button type="button" class="ik-b" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>' + (el.classList.contains("pf-fuss") ? "Foto und Daten" : "Hinweise und Quellen") + '</button>';
         el.parentNode.insertBefore(w, el); w.appendChild(el); }); };
     document.addEventListener("click", e => { const b = e.target.closest(".ik-b"); if (!b) return; const w = b.parentElement; w.classList.toggle("auf"); b.setAttribute("aria-expanded", w.classList.contains("auf")); }, true);
