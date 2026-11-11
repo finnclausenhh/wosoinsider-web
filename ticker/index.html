@@ -3530,6 +3530,9 @@ details.dzb[open]{padding-bottom:10px}
     zk: ["Zweikämpfen", x => (x.stat || {}).zk_ges && TMIN(x) ? x.stat.zk_w / TMIN(x) * 90 : null],
     pass: ["Pässen", x => (x.stat || {}).p_ges && TMIN(x) ? x.stat.p_ok / TMIN(x) * 90 : null],
     bk: ["Ballkontakten", x => (x.stat || {}).bk && TMIN(x) ? x.stat.bk / TMIN(x) * 90 : null],
+    pq: ["Passquote", x => (x.stat || {}).p_ges >= 20 ? x.stat.p_ok / x.stat.p_ges * 100 : null],
+    zkq: ["Zweikampfquote", x => (x.stat || {}).zk_ges >= 10 ? x.stat.zk_w / x.stat.zk_ges * 100 : null],
+    zkv: ["Zweikämpfen", x => (x.stat || {}).zk_ges != null && TMIN(x) ? x.stat.zk_ges / TMIN(x) * 90 : null],
     kp: ["Schlüsselpässen", x => (afSp(x.id) || {}).kp90 ?? null],
     sch: ["Torschüssen", x => (x.stat || {}).sch != null && TMIN(x) ? x.stat.sch / TMIN(x) * 90 : null],
     drib: ["Dribblings", x => { const d = (afSp(x.id) || {}).drib; return d && TMIN(x) ? d[0] / TMIN(x) * 90 : null; }],
@@ -3542,8 +3545,10 @@ details.dzb[open]{padding-bottom:10px}
     zn: ["Spielen zu null", x => { const st = (x.spiele || []).filter(e => e.art === "S"); if (!st.length) return null;
       return st.filter(e => { const [a, b] = String(e.erg || "").split(":").map(Number); return !isNaN(a) && (e.ha === "H" ? b : a) === 0; }).length / st.length; }],
     gr: ["Größe", x => (afSp(x.id) || {}).gr || null]};
-  const TSET = {TW: ["par", "hq", "zn", "pass", "bk"], IV: ["zk", "abw", "pass", "bk", "sch", "tb"], AV: ["abw", "zk", "kp", "drib", "pass", "tb"], DM: ["abw", "zk", "pass", "bk", "kp", "sch"],
+  const TSET = {TW: ["hq", "zn", "pq"], IV: ["zk", "abw", "pass", "bk", "sch", "tb"], AV: ["abw", "zk", "kp", "drib", "pass", "tb"], DM: ["abw", "zk", "pass", "bk", "kp", "sch"],
     ZM: ["kp", "pass", "bk", "sch", "tb", "abw"], FL: ["sch", "tb", "drib", "kp", "zk", "bk"], ST: ["sch", "tb", "drib", "kp", "zk", "bk"]};
+  // nur zur Einordnung, nicht im Gesamtwert: Menge (Paraden, Pässe, Ballkontakte, Zweikämpfe) hängt vom Spiel der Mannschaft ab
+  const TINFO = {TW: ["par", "pass", "bk"], IV: ["pq", "zkq", "zkv"], AV: ["pq", "zkq", "zkv"], DM: ["pq", "zkq", "zkv"], ZM: ["pq", "zkq", "zkv"], FL: ["pq", "zkq", "zkv"], ST: ["pq", "zkq", "zkv"]};
   let TCACHE = null;
   const NOTE46 = x => { const v = ((afSp(x.id) || {}).no || []).filter(n => n[2] >= 46); return v.length >= 3 ? v.reduce((a, n) => a + n[1], 0) / v.length : null; };
   const EIN = x => { const l = (x.spiele || []).filter(e => e.erg && String(e.erg).includes(":")), n = l.length - .5 * l.filter(e => e.art === "X").length; return n > 0 ? Math.min(100, Math.round(TMIN(x) / (n * 90) * 100)) : null; };
@@ -3555,7 +3560,7 @@ details.dzb[open]{padding-bottom:10px}
     const L = (SPN.spielerinnen || []).filter(x => PGRP(x) && TMIN(x) >= 270), out = {};
     const gruppen = {}; L.forEach(x => (gruppen[PGRP(x)] = gruppen[PGRP(x)] || []).push(x));
     Object.entries(gruppen).forEach(([g, P]) => { if (P.length < 8) return;
-      const keys = TSET[g].concat(g === "IV" || g === "ST" ? ["gr"] : []), V = {}, NR = {};
+      const keys = TSET[g].concat(TINFO[g] || [], g === "IV" || g === "ST" ? ["gr"] : []), V = {}, NR = {};
       const nv = P.map(x => [x.id, NOTE46(x)]).filter(e => e[1] != null);
       nv.forEach(([id, w]) => { const eq = nv.filter(e => Math.abs(e[1] - w) < 1e-9).length; NR[id] = Math.round((nv.filter(e => e[1] < w - 1e-9).length + (eq - 1) / 2) / Math.max(1, nv.length - 1) * 100); });
       keys.forEach(k => V[k] = P.map(TMET[k][1]).filter(v => v != null));
@@ -3569,7 +3574,9 @@ details.dzb[open]{padding-bottom:10px}
   }
   function typBestimmen(g, p){
     const m = (...k) => { const v = k.map(x => p[x]).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : 0; };
-    if (g === "TW") { const par = m("par"), auf = m("pass", "bk"), zn = m("zn"); return zn >= 65 && zn >= par ? ["sicherer Rückhalt", "viele Spiele zu null"] : auf >= par && auf >= 55 ? ["mitspielende Torhüterin", "viel am Ball, spielt mit"] : ["Paraden-Torhüterin", "hat viel zu halten und hält viel"]; }
+    if (g === "TW") { const par = m("par"), auf = m("pass", "bk", "pq"), zn = m("zn"), hq = m("hq");
+      return (zn >= 65 || hq >= 70) && Math.max(zn, hq) >= par ? ["sicherer Rückhalt", "viele Spiele zu null"] : auf >= par && auf >= 55 ? ["mitspielende Torhüterin", "viel am Ball, spielt mit"]
+        : par >= 55 ? ["Paraden-Torhüterin", "hat viel zu halten und hält viel"] : ["solide Torhüterin", "ohne klaren Schwerpunkt"]; }
     if (g === "IV") { const bau = m("pass", "bk"), def = m("zk", "abw"), gr = p.gr;
       return bau >= 65 && def >= 65 ? ["Allrounderin", "stark im Aufbau und im Zweikampf"] : bau >= def + 10 ? ["Aufbauspielerin", "eröffnet das Spiel von hinten"] : def >= 60 && gr != null && gr >= 60 ? ["groß und zweikampfstark", "gewinnt viele Duelle"] : def > bau ? ["Zweikämpferin", "stark gegen den Ball"] : ["ausgewogene Innenverteidigerin", "solide im Aufbau und im Zweikampf"]; }
     if (g === "AV") { const off = m("kp", "drib", "tb"), def = m("abw", "zk");
@@ -3587,19 +3594,20 @@ details.dzb[open]{padding-bottom:10px}
   // Kurzform für Listen (Finn 05.11.2026: Umbrüche wie bei Kaut vermeiden)
   const typKurz = t => ({"ausgewogene Außenverteidigerin": "ausgewogen", "offensive Außenverteidigerin": "offensiv", "defensive Außenverteidigerin": "defensiv",
     "ausgewogene Innenverteidigerin": "ausgewogen", "groß und zweikampfstark": "groß, zweikampfstark", "torgefährliche Mittelfeldspielerin": "torgefährlich",
-    "arbeitet nach hinten mit": "defensiv stark", "mitspielende Torhüterin": "mitspielend", "mitspielende Stürmerin": "mitspielend"})[t] || t;
+    "arbeitet nach hinten mit": "defensiv stark", "mitspielende Torhüterin": "mitspielend", "solide Torhüterin": "solide", "mitspielende Stürmerin": "mitspielend"})[t] || t;
   const TYPFORM = {"defensive Sechserin": ["eine defensive Sechserin", "einer defensiven Sechserin"], "offensive Sechserin": ["eine offensive Sechserin", "einer offensiven Sechserin"],
     "Box-to-Box": ["eine Box-to-Box-Spielerin", "einer Box-to-Box-Spielerin"], "ausgewogene Außenverteidigerin": ["eine ausgewogene Außenverteidigerin", "einer ausgewogenen Außenverteidigerin"],
     "offensive Außenverteidigerin": ["eine offensive Außenverteidigerin", "einer offensiven Außenverteidigerin"], "defensive Außenverteidigerin": ["eine defensive Außenverteidigerin", "einer defensiven Außenverteidigerin"],
     "ausgewogene Innenverteidigerin": ["eine ausgewogene Innenverteidigerin", "einer ausgewogenen Innenverteidigerin"], "Allrounderin": ["eine Allrounderin", "einer Allrounderin"], "groß und zweikampfstark": ["groß und zweikampfstark", "einer großen, zweikampfstarken Innenverteidigerin"],
     "torgefährliche Mittelfeldspielerin": ["eine torgefährliche Mittelfeldspielerin", "einer torgefährlichen Mittelfeldspielerin"], "arbeitet nach hinten mit": ["eine defensiv starke Außenspielerin", "einer defensiv starken Außenspielerin"],
-    "mitspielende Torhüterin": ["eine mitspielende Torhüterin", "einer mitspielenden Torhüterin"], "sicherer Rückhalt": ["ein sicherer Rückhalt", "einem sicheren Rückhalt"], "mitspielende Stürmerin": ["eine mitspielende Stürmerin", "einer mitspielenden Stürmerin"]};
+    "mitspielende Torhüterin": ["eine mitspielende Torhüterin", "einer mitspielenden Torhüterin"], "solide Torhüterin": ["eine solide Torhüterin", "einer soliden Torhüterin"], "sicherer Rückhalt": ["ein sicherer Rückhalt", "einem sicheren Rückhalt"], "mitspielende Stürmerin": ["eine mitspielende Stürmerin", "einer mitspielenden Stürmerin"]};
   const typNom = t => (TYPFORM[t] || ["eine " + t])[0], typDat = t => (TYPFORM[t] || [null, "einer " + t])[1];
   const typVon = s => { const d = s && typDaten()[s.id]; return d && d.typ[0] ? d.typ[0] : null; };
 
-  const TYPERKL = {"sicherer Rückhalt": "Bleibt oft ohne Gegentor: viele Spiele zu null im Vergleich zu den anderen Torhüterinnen.",
+  const TYPERKL = {"sicherer Rückhalt": "Bleibt oft ohne Gegentor und hält einen hohen Anteil der Schüsse aufs Tor (Haltequote). Wenige Paraden sind kein Makel, wenn die Abwehr wenig zulässt.",
     "mitspielende Torhüterin": "Viele Ballkontakte und angekommene Pässe, spielt mit wie eine Feldspielerin.",
     "Paraden-Torhüterin": "Bekommt viele Schüsse aufs Tor und hält viele. Bei Kickbase bringt jede Parade Punkte.",
+    "solide Torhüterin": "Ohne klaren Ausschlag in den Werten: weder auffallend viele Paraden noch Spiele zu null.",
     "Allrounderin": "Im Aufbau (Pässe, Ballkontakte) und im Zweikampf (gewonnene Duelle, Abwehraktionen) beide stark.",
     "Aufbauspielerin": "Eröffnet das Spiel: deutlich stärker in Pässen und Ballkontakten als im Zweikampf.",
     "groß und zweikampfstark": "Gewinnt viele Duelle und ist größer als die meisten Innenverteidigerinnen.",
@@ -3629,11 +3637,34 @@ details.dzb[open]{padding-bottom:10px}
     if (an) return; c.classList.add("sel");
     const t = c.dataset.typerk; row.insertAdjacentHTML("afterend", `<span class="typ-i"><b>${esc(t[0].toUpperCase() + t.slice(1))}:</b> ${esc(TYPERKL[t] || "")} Bestimmt aus den Werten pro 90 Minuten im Vergleich zur eigenen Position, ab 270 Minuten.</span>`);
   }, true);
+  // Menge und Quote getrennt (Finn 11.11.2026): "wenige Zweikämpfe, aber mit hoher Quote", "wenige Paraden, aber sehr gute Haltequote"
+  const PCT = (k, s) => { const v = TMET[k][1](s); return v == null ? "" : Math.round(k === "hq" ? v * 100 : v) + " %"; };
+  const MIT = (k, s) => TMET[k][0] + (["hq", "pq", "zkq"].includes(k) && PCT(k, s) ? ` (${PCT(k, s)})` : "");
+  function quoten(d, s){
+    const p = d.p, o = {saetze: [], skip: []};
+    if (d.g === "TW") {
+      if (p.par != null && p.hq != null) {
+        if (p.par < 40 && p.hq >= 65) { o.saetze.push(`Wenige Paraden, aber eine sehr gute Haltequote (${PCT("hq", s)}).`); o.skip.push("hq"); }
+        else if (p.par >= 65 && p.hq < 35) { o.saetze.push(`Viele Paraden, aber eine schwache Haltequote (${PCT("hq", s)}).`); o.skip.push("hq"); }
+      }
+      return o;
+    }
+    if (p.zkv != null && p.zkq != null) {
+      const q = PCT("zkq", s);
+      if (p.zkv < 35) o.saetze.push(p.zkq >= 60 ? `Wenige Zweikämpfe, aber mit hoher Quote (${q} gewonnen).` : p.zkq < 35 ? `Wenige Zweikämpfe und mit schwacher Quote (${q} gewonnen).`
+        : `Wenige Zweikämpfe, die Quote liegt im Schnitt (${q} gewonnen).`);
+      else if (p.zkv >= 65) o.saetze.push(p.zkq >= 60 ? `Viele Zweikämpfe mit hoher Quote (${q} gewonnen).` : p.zkq < 35 ? `Viele Zweikämpfe, aber mit schwacher Quote (${q} gewonnen).`
+        : `Viele Zweikämpfe, die Quote liegt im Schnitt (${q} gewonnen).`);
+      if (o.saetze.length) o.skip.push("zk");
+    }
+    return o;
+  }
   function typZeile(s){
     const d = typDaten()[s.id]; if (!d || !d.typ[0]) { const mi = TMIN(s); return PGRP(s) && s.pos && mi < 270 ? `<div class="typ"><span class="typ-k">SPIELERTYP</span><span>Den Typ bestimmen wir ab 270 Minuten, sie hat erst ${mi}.</span></div>` : ""; }
-    const st = TSET[d.g].filter(k => d.p[k] != null).sort((a, b) => d.p[b] - d.p[a]), gut = st.filter(k => d.p[k] >= 60).slice(0, 2), sw = st.filter(k => d.p[k] < 35).slice(-1);
+    const ex = quoten(d, s), ok = k => !ex.skip.includes(k) && !(d.typ[0] === "sicherer Rückhalt" && k === "zn");
+    const st = TSET[d.g].filter(k => d.p[k] != null).sort((a, b) => d.p[b] - d.p[a]), gut = st.filter(k => d.p[k] >= 60 && ok(k)).slice(0, 2), sw = st.filter(k => d.p[k] < 35 && ok(k)).slice(-1);
     const tb = tabVon(d.g), L = Object.entries(typDaten()).filter(([, x]) => tabVon(x.g) === tb).sort((a, b) => b[1].wert - a[1].wert), pl = 1 + L.findIndex(([id]) => id === s.id);
-    return `<div class="typ"><span class="typ-k">SPIELERTYP</span><b data-typerk="${esc(d.typ[0])}" style="cursor:pointer">${esc(d.typ[0][0].toUpperCase() + d.typ[0].slice(1))} <small style="font:600 11px var(--f-body,inherit);color:#8FB0FF">ⓘ</small></b><span>${esc(d.typ[1])}${gut.length ? `. Stark in ${gut.map(k => TMET[k][0]).join(" und ")}` : ""}${sw.length ? `, weniger in ${TMET[sw[0]][0]}` : ""}.</span>
+    return `<div class="typ"><span class="typ-k">SPIELERTYP</span><b data-typerk="${esc(d.typ[0])}" style="cursor:pointer">${esc(d.typ[0][0].toUpperCase() + d.typ[0].slice(1))} <small style="font:600 11px var(--f-body,inherit);color:#8FB0FF">ⓘ</small></b><span>${esc(d.typ[1])}${gut.length ? `. Stark in ${gut.map(k => MIT(k, s)).join(" und ")}` : ""}${sw.length ? `, weniger in ${MIT(sw[0], s)}` : ""}.${ex.saetze.length ? " " + esc(ex.saetze.join(" ")) : ""}</span>
       <button class="typ-l" data-beste="${tb}">Platz ${pl} von ${L.length} im Reiter ${esc(BTAB[tb][0])} · Gesamtwert ${d.wert} ›</button></div>`;
   }
   let BESTE = "ALLE", BMEHR = false;
