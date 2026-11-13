@@ -652,8 +652,19 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .mx .c.V{background:rgba(226,74,74,.22)}
 .mx .c.V svg{width:11px;height:11px;stroke:var(--inj);stroke-width:3;fill:none;stroke-linecap:round}
 .mx .c.N{background:color-mix(in srgb,var(--soft) 60%,transparent);color:var(--muted)}
-.mx .c .t{position:absolute;right:2px;top:2px;width:7px;height:7px;border-radius:50%;background:var(--pokal)}
-.mx .c .r{position:absolute;right:2px;top:2px;width:5px;height:7px;background:var(--inj)}
+.mx .c.Sp{background:color-mix(in srgb,var(--soft) 80%,transparent)}
+.mx .c .mxt{position:absolute;right:1px;top:1px;display:flex;align-items:center;gap:1px;line-height:1}
+.mx .c .mxt .ball{width:9px;height:9px}
+.mx .c .mxt b{font:800 8px/1 var(--f-body);color:#fff;text-shadow:0 0 2px #000}
+.mx .c .mxv{position:absolute;right:1px;bottom:1px;line-height:1}
+.mx .c .mxv .vorl.vt{background:#8FB0FF;color:#0B1220;border-radius:2px;padding:0 2px;min-width:7px;font-size:7.5px;height:9px!important}
+.mx .c .mkk{position:absolute;left:2px;top:2px;line-height:0}
+.mk-k{display:inline-block;width:5px;height:7px;border-radius:1px;box-shadow:0 0 0 1px rgba(11,18,32,.6)}
+.mk-k.gr{width:9px;height:13px;border-radius:2px;transform:rotate(-8deg);box-shadow:0 0 0 1.5px #1C2333}
+.leg .mxl{gap:3px}
+.leg .mxl .ball{width:11px;height:11px}
+.leg .mxl .vorl.vt{background:#8FB0FF;color:#0B1220;border-radius:3px;padding:1px 3px;font-size:9px}
+.leg .mxl .mk-k.gr{width:7px;height:10px}
 .mx .c[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
 .ak-kurz{display:grid;gap:6px}.ak-kurz ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:14px}
 .ak-z.lnk{cursor:pointer;-webkit-tap-highlight-color:transparent}.ak-z.lnk:hover,.ak-z.lnk:focus-visible{outline:1.5px solid var(--accent)}.ak-go{display:block;margin-top:8px;font:600 12px var(--f-mono,inherit);color:var(--accent)}.pf-km.lnk{cursor:pointer}.pf-km.lnk:hover{background:rgba(47,91,255,.08)}.ak-aus{display:grid;gap:8px}.ak-z{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:start;background:var(--card);border-radius:12px;padding:10px 12px}
@@ -3234,12 +3245,23 @@ details.dzb[open]{padding-bottom:10px}
     const verf = Math.min(720, document.documentElement.clientWidth) - 24, w = Math.min(40, Math.max(22, Math.floor((verf - 92 - 3 * sp.length) / Math.max(sp.length, 1))));
     const cols = `92px repeat(${sp.length},${w}px)`;
     let mx = `<span></span>${sp.map((o, i) => `<span class="hc${A.cl_ab === i + 1 ? " cl" : ""}">${i + 1}<small>${esc(kz(o))}</small></span>`).join("")}`;
-    reihen.forEach(([name, md]) => { mx += `<span class="nm">${esc(name)}</span>` + sp.map((o, i) => { const m = md[String(i + 1)], art = m ? m[0] : "N", mi = m ? m[1] : 0, to = m ? Number(m[2]) || 0 : 0, no = m && m[3] ? String(m[3]) : "";
-      let t = `${name} · ${i + 1}. Spieltag gegen ${o}: ` + (art === "S" ? `Startelf, ${mi} Minuten` : art === "E" ? `eingewechselt, ${mi} Minuten` : art === "V" ? `fehlte (${no})` : "nicht eingesetzt");
-      if (to > 0) t += `, ${to} Tor${to > 1 ? "e" : ""}`; if (no && art !== "V") t += `, ${no}`;
-      return `<button class="c ${art}" data-mx="${esc(t)}" aria-label="${esc(t)}" aria-pressed="${MXINFO === t}">${art === "V" ? svg(P.plus) : art === "N" ? "·" : esc(mi)}${to > 0 ? '<i class="t"></i>' : ""}${no === "Rote Karte" ? '<i class="r"></i>' : ""}</button>`; }).join(""); });
+    const mxKarte = (f, gross) => `<span class="mk-k${gross ? " gr" : ""}" style="background:${f === "gr" ? "linear-gradient(135deg,#F5C518 50%,#E24A4A 50%)" : f === "rot" ? "#E24A4A" : "#F5C518"}" role="img" aria-label="${f === "gr" ? "Gelb-Rote Karte" : f === "rot" ? "Rote Karte" : "Gelbe Karte"}"></span>`;
+    reihen.forEach(([name, md]) => { const sx = SPN && A.verein ? findeSP(A.verein, name) : null, spMd = n => sx && (sx.spiele || []).find(z => z.md === n);
+      mx += `<span class="nm">${esc(name)}</span>` + sp.map((o, i) => { const m = md[String(i + 1)], z = spMd(i + 1) || {}, vz = spMd(i) || {};
+      let art = m ? m[0] : "N"; const mi = m ? m[1] : 0, no = m && m[3] ? String(m[3]) : "", to = m ? Number(m[2]) || 0 : (z.tore || []).length, vo = art === "S" || art === "E" ? Number(z.vorl) || 0 : 0;
+      // Sperre: Notiz nennt sie, oder Rot / Gelb-Rot im Spiel davor
+      let sperre = null; if (art === "V") { const nl = no.toLowerCase();
+        if (/gelb.?rot/.test(nl) && /sperre|gesperrt/.test(nl)) sperre = "gr"; else if (/rot/.test(nl) && /sperre|gesperrt/.test(nl)) sperre = "rot"; else if (/gelb/.test(nl) && /sperre|gesperrt/.test(nl)) sperre = "gelb";
+        else if (/sperre|gesperrt/.test(nl)) sperre = vz.gr ? "gr" : vz.rot ? "rot" : "gelb";
+        else if (!no && (vz.rot || vz.gr)) sperre = vz.gr ? "gr" : "rot"; }
+      const ka = art === "S" || art === "E" ? (z.gr ? "gr" : z.rot || no === "Rote Karte" ? "rot" : z.gelb || /gelbe karte/i.test(no) ? "gelb" : null) : null;
+      const kn = {gr: "Gelb-Rote Karte", rot: "Rote Karte", gelb: "Gelbe Karte"};
+      let t = `${name} · ${i + 1}. Spieltag gegen ${o}: ` + (art === "S" ? `Startelf, ${mi} Minuten` : art === "E" ? `eingewechselt, ${mi} Minuten` : sperre ? `gesperrt (${no || (sperre === "gelb" ? "Gelbsperre" : sperre === "gr" ? "Gelb-Rot-Sperre" : "Rotsperre")})` : art === "V" ? `fehlte (${no})` : "nicht eingesetzt");
+      if (to > 0) t += `, ${to} Tor${to > 1 ? "e" : ""}`; if (vo > 0) t += `, ${vo} ${vo > 1 ? "Vorlagen" : "Vorlage"}`; if (ka && !(no && no.toLowerCase().includes(kn[ka].toLowerCase()))) t += `, ${kn[ka]}${z[ka === "gr" ? "rot" : ka] && z[ka === "gr" ? "rot" : ka] !== true ? " (" + z[ka === "gr" ? "rot" : ka] + ".)" : ""}`; if (no && art !== "V") t += `, ${no}`;
+      return `<button class="c ${sperre ? "Sp" : art}" data-mx="${esc(t)}" aria-label="${esc(t)}" aria-pressed="${MXINFO === t}">${sperre ? mxKarte(sperre, true) : art === "V" ? svg(P.plus) : art === "N" ? "·" : esc(mi)}${to > 0 ? `<span class="mxt">${BALL}${to > 1 ? `<b>${to}</b>` : ""}</span>` : ""}${vo > 0 ? `<span class="mxv">${VORL}</span>` : ""}${ka ? `<span class="mkk">${mxKarte(ka)}</span>` : ""}</button>`; }).join(""); });
+    if (!SPN) ladeSPN().then(() => { const w = document.querySelector(".mxw"); if (w && VIEW === "inside") { const y = window.scrollY; inside(); window.scrollTo(0, y); } else if (w) { const y = window.scrollY; anaArticle(); window.scrollTo(0, y); } }).catch(() => {});
     return `<div class="mxw"><div class="mx" style="grid-template-columns:${cols}">${mx}</div></div>
-      <div class="leg"><span><i style="background:var(--accent)"></i>Startelf (Minuten)</span><span><i style="box-shadow:inset 0 0 0 1.5px var(--accent)"></i>eingewechselt</span><span><i style="background:rgba(226,74,74,.3)"></i>verletzt / Reha</span><span><i style="background:var(--pokal);border-radius:50%"></i>Tor</span>${A.cl_ab ? '<span><i style="background:var(--euro);width:3px"></i>Champions League läuft</span>' : ""}</div>
+      <div class="leg"><span><i style="background:var(--accent)"></i>Startelf (Minuten)</span><span><i style="box-shadow:inset 0 0 0 1.5px var(--accent)"></i>eingewechselt</span><span><i style="background:rgba(226,74,74,.3)"></i>verletzt / Reha</span><span class="mxl">${BALL}Tor</span><span class="mxl">${VORL}Vorlage</span><span class="mxl"><span class="mk-k" style="background:#F5C518"></span><span class="mk-k" style="background:#E24A4A"></span>Karte</span><span class="mxl"><span class="mk-k gr" style="background:#E24A4A"></span>gesperrt</span>${A.cl_ab ? '<span><i style="background:var(--euro);width:3px"></i>Champions League läuft</span>' : ""}</div>
       <div class="info${MXINFO ? " an" : ""}" id="mxinfo">${esc(MXINFO || "Feld antippen für Details.")}</div>
       ${A.kurz ? `<div class="ak-kurz">${kap("Kurz erklärt")}<ul>${A.kurz.map(p => `<li>${esc(p)}</li>`).join("")}</ul></div>` : ""}
       ${A.ausblick ? `<div class="ak-aus">${kap("Unsere Einschätzung")}${A.ausblick.map(x => { const d = new Date(x.datum + "T12:00"), pg = SP && alleSpiele().find(g => g.md === x.md && [g.heim_k, g.gast_k].includes(A.verein) && [g.heim_k, g.gast_k].includes(x.gk));
