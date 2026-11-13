@@ -2613,7 +2613,7 @@ details.dzb[open]{padding-bottom:10px}
     const p = alleSpiele().filter(q => (q.heim_k === k || q.gast_k === k) && q.status !== "beendet" && q.status !== "abgesagt").sort((x, y) => (dt(x.anstoss) || Infinity) - (dt(y.anstoss) || Infinity))[0];
     if (p && terminiert(p)) z.push(["Aufstellung", einsehbar(p) ? "Die offizielle Aufstellung kommt, bevor Kickbase schließt. Wer unsicher ist, kann abwarten." : "Kickbase schließt vor der offiziellen Aufstellung. Hier zählt unsere Prognose."]);
     if (z.length < 2) return "";
-    const KZE = /(Kurzeinsatz|ein paar Minuten|einige Minuten|wenige Minuten|Minuten sammeln|von der Bank kommen|Einsatz von der Bank)/i.test([m.headline, m.kickbase].concat(m.text || []).join(" "));
+    const TWP = s.pos === "TW", KZE = !TWP && /(Kurzeinsatz|ein paar Minuten|einige Minuten|wenige Minuten|Minuten sammeln|von der Bank kommen|Einsatz von der Bank)/i.test([m.headline, m.kickbase].concat(m.text || []).join(" "));
     let pst0 = (s.prognose || {}).st; if (KZE && ["sicher", "erwartet", "unsicher"].includes(pst0)) pst0 = "unwahrscheinlich";
     const vorher = (s.spiele || []).filter(e => e.art !== "X"), stV = vorher.filter(e => e.art === "S").length;
     const ausblick = zurueck && (KZE || pst0 === "unwahrscheinlich" || pst0 === "unsicher") && vorher.length >= 3 && stV / vorher.length >= .5
@@ -2631,11 +2631,11 @@ details.dzb[open]{padding-bottom:10px}
         const e = L.filter(x => x && typeof x === "object").find(x => normS(x.voll || "") === normS(s.n) || normS(x.n) === normS(nachN(s.n))); return e && e.st; };
       const st = [pst0];
       kom.slice(1).forEach((q, i) => { let r = stamm ? Math.min(ri(st[i]) + (i ? 2 : 1), 3) : Math.min(ri(st[i]) + (i ? 1 : 0), 2);
-        if (top(q)) r = Math.min(r, stamm ? 2 : 1);
+        if (top(q) && !(TWP && stamm)) r = Math.min(r, stamm ? 2 : 1);  // Nummer 1 im Tor wird vor Topspielen nicht rotiert
         const e = eng(q); if (e && e !== "ausgeschlossen" && ri(e) < r) r = ri(e); st.push(R[r]); });
       const gleich = st.every(x => x === st[0]);
       const FB = (x, i) => x === "unwahrscheinlich" && i ? "#FF7A6B" : {unwahrscheinlich: "#F59E0B", unsicher: "#F5C26B", erwartet: "#4ADE80", sicher: "#4ADE80"}[x] || "#8A95A8";
-      const lab = (x, i) => x === "unwahrscheinlich" ? (i === 0 ? (KZE ? ["Kurzeinsatz", "von der Bank"] : ["Bank", "Joker möglich"]) : ["Eher nicht", top(kom[i]) ? (stamm ? "Topspiel" : "Topspiel ohne Spielpraxis") : "noch ohne Rhythmus"])
+      const lab = (x, i) => x === "unwahrscheinlich" ? (i === 0 ? (KZE ? ["Kurzeinsatz", "von der Bank"] : TWP ? ["Bank", "nur bei Ausfall"] : ["Bank", "Joker möglich"]) : ["Eher nicht", top(kom[i]) ? (stamm ? "Topspiel" : "Topspiel ohne Spielpraxis") : "noch ohne Rhythmus"])
         : x === "unsicher" ? (i && !stamm ? ["Chance", "wenn rotiert wird"] : ["Unsicher", i && top(kom[i]) ? "Topspiel" : "Startelf offen"])
         : x === "erwartet" ? ["Startelf", i ? "wieder Kandidatin" : "erwartet"] : x === "sicher" ? ["Gesetzt", ""] : ["Fällt aus", ""];
       const tag = q => { const d = dt(q.anstoss); return `${WT[d.getDay()]} ${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.`; };
@@ -2651,7 +2651,7 @@ details.dzb[open]{padding-bottom:10px}
           return (i ? PF(0) : "") + `<div class="fp-st" style="--c:${FB(st[i], i)}">${i ? "" : `<span class="fp-j">JETZT</span>${eye}`}${logo(geg(q), 26)}<span class="d">${esc(tag(q))}</span><b>${esc(w)}</b>${sub ? `<span class="s">${esc(sub)}</span>` : ""}</div>`; }).join("")}</div>`;
       } else {
         const w0 = lab(st[0], 0), w1 = lab(st[1], 1), q1 = kom[1];
-        html = `<div class="fp-rows">${row(kom[0], jetztL, st[0] === "unwahrscheinlich" && KZE ? "Nur Kurzeinsatz" : w0[0] + (w0[0] === "Bank" ? ", Joker möglich" : ""), FB(st[0], 0), eye)}${PF(1)}${row(q1, `DANACH · AB ${tag(q1)} GEGEN ${kname(geg(q1)).toUpperCase()}`, st[1] === "erwartet" ? "Startelf-Kandidatin" : st[1] === "unsicher" && !stamm ? "Chance bei Rotation" : w1[0], FB(st[1], 1))}</div>`;
+        html = `<div class="fp-rows">${row(kom[0], jetztL, st[0] === "unwahrscheinlich" && KZE ? "Nur Kurzeinsatz" : w0[0] + (w0[0] === "Bank" ? (TWP ? ", spielt nur bei Ausfall" : ", Joker möglich") : ""), FB(st[0], 0), eye)}${PF(1)}${row(q1, `DANACH · AB ${tag(q1)} GEGEN ${kname(geg(q1)).toUpperCase()}`, st[1] === "erwartet" ? "Startelf-Kandidatin" : st[1] === "unsicher" && !stamm ? "Chance bei Rotation" : w1[0], FB(st[1], 1))}</div>`;
       }
       // Wer vor ihr steht oder sie vertritt, Rotation auf der Position
       const GORT = {TW: "im Tor", IV: "in der Innenverteidigung", AV: "auf den Außenverteidigerpositionen", DM: "auf der Sechs", ZM: "im zentralen Mittelfeld", FL: "auf den Flügeln", ST: "im Sturm"};
