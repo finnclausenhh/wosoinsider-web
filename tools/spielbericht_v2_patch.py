@@ -21,7 +21,11 @@ JS = r'''
       const tore = (p.tore || []).slice().sort((a, b) => mn(a.min) - mn(b.min));
       const hz = [0, 0]; tore.filter(t => halb(t.min)).forEach(t => hz[t.seite === "heim" ? 0 : 1]++);
       const karten = (p.karten || []).length ? p.karten : (p.platzverweise || []).map(x => ({...x, art: x.art || "rot"}));
-      const rot = karten.filter(c => c.art !== "gelb"), vs = p.elf_vs || [];
+      const rot = karten.filter(c => c.art !== "gelb");
+      // Verschossene Elfmeter: live_ergebnis.py schreibt "verschossen"; fehlt das Feld, aus dem Text des Spielberichts ("Elfmeter verschossen: Bremer (90+4.).")
+      let vs = p.verschossen || p.elf_vs || [];
+      if (!vs.length) (m.text || []).forEach(t => { const r = /Elfmeter verschossen: ([^(]+?) \((\d+(?:\+\d+)?)\.?\)/.exec(t); if (!r) return;
+        const seite = ["heim", "gast"].find(s => { const a = p[s + "_aufstellung"] || {}; return [...(a.startelf || []), ...(a.bank || [])].some(x => nk(x.n) === nk(r[1])); }); if (seite) vs = vs.concat({seite, n: r[1].trim(), min: r[2]}); });
       const chip = (s, n) => [...(s.startelf || []), ...(s.bank || [])].find(x => nk(x.n) === nk(n));
       const gelbVon = seite => { const L = karten.filter(c => c.art === "gelb" && c.seite === seite).map(c => nachN(c.n));
         if (L.length || (p.karten || []).length) return L; const a = p[seite + "_aufstellung"] || {};
