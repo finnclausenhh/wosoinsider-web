@@ -2646,7 +2646,9 @@ details.dzb[open]{padding-bottom:10px}
     const RANG = {sicher: 4, erwartet: 3, unsicher: 2, unwahrscheinlich: 1, ausgeschlossen: 0}, pst = x => (x.prognose || {}).st;
     const nm = x => nachN(x.n), btn = x => `<button class="eo-n" data-profil="${esc(x.id)}">${esc(nm(x))}</button>`;
     let kon = [];
-    if (aus) {
+    const stamm = st5 >= 2 || ((s.spiele || []).filter(e => e.art !== "X").slice(-1)[0] || {}).art === "S";
+    if (aus && !stamm) z.push(["Wer spielt für sie?", `Keine Lücke in der Startelf: ${esc(nm(s))} ${st5 ? `begann nur ${st5 === 1 ? "eines" : st5} der letzten ${l5.length} Ligaspiele` : `stand in den letzten ${l5.length} Ligaspielen nicht in der Startelf`}. Ihr Ausfall ändert an der Startelf voraussichtlich nichts.`]);
+    else if (aus) {
       const ers = (s.ersatz || []).map(r => mates.find(x => normS(nachN(x.n)) === normS(nachN(r.n)))).filter(Boolean).filter(fit);
       kon = ers.concat(mates.filter(fit).filter(x => !ers.includes(x) && q5(x) < 4 && ((x.spiele || []).slice(-1)[0] || {}).art !== "S").sort((x, y) => (RANG[pst(y)] ?? -1) - (RANG[pst(x)] ?? -1) || q5(y) - q5(x))).slice(0, 3);
       if (kon.length) z.push(["Wer spielt für sie?", kon.slice(0, 2).map((x, i) => { const r = (s.ersatz || []).find(e => normS(nachN(e.n)) === normS(nachN(x.n))), pr = pst(x) && STUFE[pst(x)] ? STUFE[pst(x)][2].toLowerCase() : "";
