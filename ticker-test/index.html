@@ -362,18 +362,18 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .fp-n > div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:2px}
 .fp-n b{display:flex;align-items:center;gap:6px;font:700 30px/1 var(--f-display)}
 .fp-n span{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
-.fp-n .da b{color:var(--gruen)}.fp-n .offen b{color:var(--gelb)}.fp-n .spaet b{color:var(--rot)}
+.fp-n .fpx-da b{color:var(--gruen)}.fp-n .fpx-offen b{color:var(--gelb)}.fp-n .fpx-spaet b{color:var(--rot)}
 .fp-ls{display:flex;gap:4px;width:100%}
 .fp-lz{flex:1;min-width:0;display:grid;justify-items:center;gap:5px}
 .fp-lz img{max-width:100%}
 .fp-lz i{width:100%;height:5px;border-radius:3px;background:#3F5075}
-.fp-lz.da i{background:var(--gruen)}.fp-lz.spaet i{background:var(--rot)}.fp-lz.ohne i{background:var(--line)}.fp-lz.ohne img{opacity:.45}
+.fp-lz.fpx-da i{background:var(--gruen)}.fp-lz.fpx-spaet i{background:var(--rot)}.fp-lz.fpx-ohne i{background:var(--line)}.fp-lz.fpx-ohne img{opacity:.45}
 .fp-g{display:grid;gap:8px}
 .fp-gh{display:flex;justify-content:space-between;align-items:baseline;font:700 12px var(--f-body);letter-spacing:.7px;text-transform:uppercase;white-space:nowrap;color:var(--muted)}
 .fp-gh span{font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)}
-.fp-g.spaet .fp-gh{color:var(--rot)}.fp-g.offen .fp-gh{color:var(--gelb)}.fp-g.da .fp-gh{color:var(--gruen)}
+.fp-g.fpx-spaet .fp-gh{color:var(--rot)}.fp-g.fpx-offen .fp-gh{color:var(--gelb)}.fp-g.fpx-da .fp-gh{color:var(--gruen)}
 .fp-z{display:block;background:var(--card);border:1.5px solid var(--gelb);border-radius:14px;overflow:hidden;color:var(--ink);text-decoration:none}
-.fp-z.spaet{border-color:var(--rot)}.fp-z.pkz{border-color:var(--line)}
+.fp-z.fpx-spaet{border-color:var(--rot)}.fp-z.fpx-pkz{border-color:var(--line)}
 .fp-zh{display:flex;align-items:center;gap:12px;padding:12px 10px 12px 12px}
 .fp-zh > .fp-ic{color:var(--muted)}
 .fp-zn{flex:1;min-width:0;display:grid;gap:4px}
@@ -381,7 +381,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .fp-zn small{font-size:12px;line-height:1;color:var(--muted);white-space:nowrap}
 .fp-zr{display:grid;justify-items:end;gap:3px;flex:none}
 .fp-zr em{display:flex;align-items:center;gap:4px;font:700 10.5px var(--f-body);font-style:normal;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;color:var(--gelb)}
-.fp-z.spaet .fp-zr em{color:var(--rot)}.fp-z.pkz .fp-zr em{color:var(--hell)}
+.fp-z.fpx-spaet .fp-zr em{color:var(--rot)}.fp-z.fpx-pkz .fp-zr em{color:var(--hell)}
 .fp-zr strong{font:700 22px/1 var(--f-display);white-space:nowrap}
 .fp-pk{display:flex;align-items:center;gap:8px;padding:9px 12px;border-top:1px solid var(--line);background:var(--soft);font-size:12px;white-space:nowrap}
 .fp-pk .fp-ic{color:var(--gelb)}.fp-pk b{font-weight:600}.fp-pk span{margin-left:auto;color:var(--muted)}
@@ -390,7 +390,7 @@ main{max-width:720px;margin:0 auto;padding:4px max(12px,env(safe-area-inset-righ
 .fp-c > span{flex:1;min-width:0;display:grid;gap:3px}
 .fp-c b{font:700 17px/1 var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fp-c small{font-size:11.5px;line-height:1;color:var(--muted);white-space:nowrap}
-.fp-c .fp-ic{color:var(--gruen)}.fp-c.ohne .fp-ic{color:var(--muted)}.fp-c.ohne img{opacity:.55}
+.fp-c .fp-ic{color:var(--gruen)}.fp-c.fpx-ohne .fp-ic{color:var(--muted)}.fp-c.fpx-ohne img{opacity:.55}
 .fp-info summary{display:flex;align-items:center;gap:8px;min-height:44px;font-size:12px;color:var(--muted);cursor:pointer;list-style:none}
 .fp-info summary::-webkit-details-marker{display:none}
 .fp-info p{margin:0;font-size:12px;line-height:1.5;color:var(--muted)}
@@ -1776,7 +1776,7 @@ details.dzb[open]{padding-bottom:10px}
   function fpZahl(m){ const z = {da: 0, offen: 0, spaet: 0, ohne: 0}; m.fahrplan.vereine.forEach(v => z[fpSt(v)]++); return z; }
   function fpLeiste(m, g){ const r = {da: 0, spaet: 1, offen: 2, ohne: 3};
     const vs = m.fahrplan.vereine.map((v, i) => [v, i, fpSt(v)]).sort((a, b) => r[a[2]] - r[b[2]] || a[1] - b[1]);
-    return `<span class="fp-ls" role="img" aria-label="${esc(vs.map(x => `${x[0].name} ${FP_LAB[x[2]]}`).join(", "))}">${vs.map(x => `<span class="fp-lz ${x[2]}">${logo(x[0].k, g)}<i></i></span>`).join("")}</span>`; }
+    return `<span class="fp-ls" role="img" aria-label="${esc(vs.map(x => `${x[0].name} ${FP_LAB[x[2]]}`).join(", "))}">${vs.map(x => `<span class="fp-lz fpx-${x[2]}">${logo(x[0].k, g)}<i></i></span>`).join("")}</span>`; }
   const fpTitel = m => { const z = fpZahl(m), n = m.fahrplan.vereine.length; return `${z.da} von ${n} Vorberichten da${z.spaet ? `, ${z.spaet} überfällig` : ""}`; };
   const fpPin = m => { const d = dt(m.fahrplan.pin_bis); return `<span class="fp-pin">${fpIc("pin", 13)}Angeheftet bis Anpfiff · ${WT[d.getDay()]} ${uhr(d)}</span>`; };
   const fpPkText = p => p.kurz || `${String(p.tag || "").split(" ")[0]}, ${p.bestaetigt ? "bestätigt" : "Uhrzeit offen"}`;
@@ -1789,21 +1789,21 @@ details.dzb[open]{padding-bottom:10px}
   }
   function fpZeile(v){
     const st = fpSt(v), e = v.erwartet, an = dt(v.anstoss), lab = st === "spaet" ? "Überfällig seit" : e ? "Erwartet bis" : "Erwartet", zt = e ? fpZeit(e.bis, e.uhr) : "offen";
-    return `<a class="fp-z ${st}" href="${esc(v.seite || "#")}" target="_blank" rel="noopener" aria-label="${esc(`${v.name}: ${lab} ${zt}, zur Vereinsseite`)}">
+    return `<a class="fp-z fpx-${st}" href="${esc(v.seite || "#")}" target="_blank" rel="noopener" aria-label="${esc(`${v.name}: ${lab} ${zt}, zur Vereinsseite`)}">
       <span class="fp-zh">${logo(v.k, 40)}<span class="fp-zn"><b>${esc(v.name)}</b><small>Anpfiff ${WT[an.getDay()]} ${uhr(an)}</small></span>
       <span class="fp-zr"><em>${fpIc(st, 12)}${lab}</em><strong>${esc(zt)}</strong></span>${fpIc("pfeil")}</span>
       ${v.pk ? `<span class="fp-pk">${fpIc("mic")}<b>Pressekonferenz</b><span>${esc(fpPkText(v.pk))}</span></span>` : ""}</a>`;
   }
   function fpPkZeile(v){ const an = dt(v.anstoss);
-    return `<a class="fp-z pkz" href="${esc(v.seite || "#")}" target="_blank" rel="noopener" aria-label="${esc(`${v.name}: Pressekonferenz ${fpPkText(v.pk)}`)}">
+    return `<a class="fp-z fpx-pkz" href="${esc(v.seite || "#")}" target="_blank" rel="noopener" aria-label="${esc(`${v.name}: Pressekonferenz ${fpPkText(v.pk)}`)}">
       <span class="fp-zh">${logo(v.k, 40)}<span class="fp-zn"><b>${esc(v.name)}</b><small>Anpfiff ${WT[an.getDay()]} ${uhr(an)}</small></span>
       <span class="fp-zr"><em>${fpIc("mic", 12)}${v.pk.bestaetigt ? "Bestätigt" : "Üblich am"}</em><strong>${esc(String(v.pk.tag || "").split(" ")[0])}</strong></span>${fpIc("pfeil")}</span></a>`; }
   function fpChip(v){ const da = !!v.vb, z = !da ? "kein Vorbericht" : v.vb.zeit ? "seit " + fpZeit(v.vb.zeit, !v.vb.zeit.endsWith("T00:00")) : "online";
-    return `<a class="fp-c${da ? "" : " ohne"}" href="${esc(da ? v.vb.url : v.seite || "#")}" target="_blank" rel="noopener" aria-label="${esc(da ? `${v.name}: Vorbericht lesen, ${z}` : `${v.name}: kein Vorbericht, zur Vereinsseite`)}">${logo(v.k, 28)}<span><b>${esc(kname(v.k))}</b><small>${esc(z)}</small></span>${fpIc(da ? "da" : "ohne", 15)}</a>`; }
+    return `<a class="fp-c${da ? "" : " fpx-ohne"}" href="${esc(da ? v.vb.url : v.seite || "#")}" target="_blank" rel="noopener" aria-label="${esc(da ? `${v.name}: Vorbericht lesen, ${z}` : `${v.name}: kein Vorbericht, zur Vereinsseite`)}">${logo(v.k, 28)}<span><b>${esc(kname(v.k))}</b><small>${esc(z)}</small></span>${fpIc(da ? "da" : "ohne", 15)}</a>`; }
   function fpArtikel(m){
     const fp = m.fahrplan, vs = fp.vereine, j = fpJetzt(), z = fpZahl(m), mt = d => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
     const von = st => vs.filter(v => fpSt(v) === st), gz = v => { const g = fpGrenze(v); return g ? g.getTime() : Infinity; };
-    const gruppe = (kl, t, rechts, inhalt) => `<section class="fp-g ${kl}"><div class="fp-gh">${esc(t)}${rechts ? `<span>${esc(rechts)}</span>` : ""}</div>${inhalt}</section>`;
+    const gruppe = (kl, t, rechts, inhalt) => `<section class="fp-g fpx-${kl}"><div class="fp-gh">${esc(t)}${rechts ? `<span>${esc(rechts)}</span>` : ""}</div>${inhalt}</section>`;
     const spaet = von("spaet").sort((a, b) => gz(a) - gz(b)), offen = von("offen").sort((a, b) => gz(a) - gz(b)), da = von("da").sort((a, b) => String(b.vb.zeit || "").localeCompare(String(a.vb.zeit || ""))), ohne = von("ohne");
     let h = spaet.length ? gruppe("spaet", `Überfällig · ${spaet.length}`, "", spaet.map(fpZeile).join("")) : "";
     const tage = new Map();
@@ -1817,7 +1817,7 @@ details.dzb[open]{padding-bottom:10px}
     const st = fp.stand ? dt(fp.stand) : null;
     return `<div class="fp"><div class="fp-kopf">${fpFest(m) ? fpPin(m) : ""}
       <div class="fp-k">${bild(m, 44, 44)}<div><div class="fp-kz">Pressekonferenzen · ${esc(String(fp.md))}. Spieltag</div><h1 class="disp" style="font-size:28px">Wann kommt was?</h1></div></div>
-      <div class="fp-n"><div class="da"><b>${fpIc("da", 16)}${z.da}</b><span>Schon da</span></div><div class="offen"><b>${fpIc("offen", 16)}${z.offen}</b><span>Erwartet</span></div><div class="spaet"><b>${fpIc("spaet", 16)}${z.spaet}</b><span>Überfällig</span></div></div>
+      <div class="fp-n"><div class="fpx-da"><b>${fpIc("da", 16)}${z.da}</b><span>Schon da</span></div><div class="fpx-offen"><b>${fpIc("offen", 16)}${z.offen}</b><span>Erwartet</span></div><div class="fpx-spaet"><b>${fpIc("spaet", 16)}${z.spaet}</b><span>Überfällig</span></div></div>
       ${fpLeiste(m, 20)}${st ? `<div class="dat">Stand ${WT[st.getDay()]} ${kurz(st)}, ${uhr(st)} Uhr</div>` : ""}</div>
       ${h}
       <details class="fp-info"><summary>${fpIc("info", 18)}Zeiten aus den letzten Spieltagen gelernt</summary><p>„Erwartet bis“ ist der späteste Zeitpunkt, zu dem der Verein seinen Vorbericht zuletzt gebracht hat, kein offizieller Termin. Die offiziellen Aufstellungen melden wir rund eine Stunde vor Anpfiff.</p></details>
