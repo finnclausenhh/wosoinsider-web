@@ -2805,7 +2805,9 @@ details.dzb[open]{padding-bottom:10px}
       <div class="an-sp"><span></span><em>WERT</em><span></span><strong>BESSER ALS</strong></div>
       ${(g.bl || []).map(b => `<div class="an-bl"><b>// ${esc(b.t)}</b>${b.z.map(z => `<div class="an-z"><span>${esc(z.l.replace(" %", "").replace(" Ø", ""))}${z.hb ? "" : " ▾"}</span><em>${esc(z.w)}</em><span class="an-bar"><i style="width:${Math.max(z.p, 3)}%;background:${AN_F(z.p)}"></i></span><strong style="color:${AN_F(z.p)}">${z.p} %</strong></div>`).join("")}</div>`).join("")}
       <div class="an-leg e">${leg}</div>
-      <div class="an-mini">Wert pro 90 Minuten, Quoten in %. „Besser als 45 %“ heißt: 45 % der ${g.vgl - 1} ${esc(g.gruppe || "Vergleichsspielerinnen")} liegen darunter.${(g.bl || []).some(b => b.z.some(z => !z.hb)) ? " ▾ weniger ist besser." : ""}${(g.bl || []).some(b => b.z.some(z => z.k === "bg")) ? " Ballgewinne = Tacklings + Interceptions." : ""}</div>${anFuss("Daten: API-Football")}</div>`;
+      <div class="an-mini">Wert pro 90 Minuten, Quoten in %. ${(() => { const z = (g.bl || []).flatMap(b => b.z).filter(z => z.hb && z.r).sort((a, b) => b.p - a.p)[0];
+        return z ? `Beispiel ${esc(z.l.replace(" %", "").replace(" Ø", ""))}: ${esc(z.w)}, besser als ${z.p} % der anderen ${g.vgl - 1} ${esc(g.gruppe || "Spielerinnen")}, also Platz ${z.r} von ${g.vgl}.`
+          : `„Besser als 45 %“ heißt: 45 % der ${g.vgl - 1} ${esc(g.gruppe || "Vergleichsspielerinnen")} liegen darunter.`; })()}${(g.bl || []).some(b => b.z.some(z => !z.hb)) ? " ▾ weniger ist besser." : ""}${(g.bl || []).some(b => b.z.some(z => z.k === "bg")) ? " Ballgewinne = Tacklings + Interceptions." : ""}</div>${anFuss("Daten: API-Football")}</div>`;
   }
   function anStreu(g){
     const P = g.p || []; if (!P.length) return "";
