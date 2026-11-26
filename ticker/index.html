@@ -1248,17 +1248,18 @@ details.dzb[open]{padding-bottom:10px}
 .an-fuss{display:flex;justify-content:space-between;align-items:center}.an-fuss b{font-size:15px;letter-spacing:.08em}.an-fuss b i{font-style:normal;color:#5D7BFF}.an-fuss small{font-size:10px;color:var(--muted)}
 .an-ini{display:inline-flex;align-items:center;justify-content:center;background:#2A3757;color:var(--muted);font-size:10px;font-weight:700}
 .an-kopf{display:flex;gap:10px;align-items:center}.an-kopf .f{width:52px;height:52px;border-radius:50%;object-fit:cover;background:#2A3757;flex:none}
-.an-kopf div{display:grid;gap:2px;flex:1;min-width:0}.an-kopf b{font:italic 800 22px/1 var(--f-display)}.an-kopf small{font-size:11px;color:var(--muted)}
+.an-kopf>div:not(.an-chips){display:grid;gap:3px;flex:1;min-width:0}.an-kopf .an-chips{flex:none}.an-kopf b{font:italic 800 22px/1 var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.an-kopf b.lang{font-size:18px}.an-kopf small{font-size:12px;color:#C9D2E8;font-weight:600}
+.an-sp{display:grid;grid-template-columns:minmax(0,1fr) 46px 64px 34px;gap:8px;font-size:9px;font-weight:700;letter-spacing:.04em;color:var(--muted);padding:0 12px;margin-bottom:-5px}.an-sp em,.an-sp strong{font-style:normal;text-align:right;white-space:nowrap}.an-sp strong{margin-left:-30px}
 .an-bl{background:#1B2747;border-radius:10px;padding:10px 12px;display:grid;gap:7px}.an-bl>b{font:italic 800 14px var(--f-display);letter-spacing:.06em;color:#C9D2E8}
-.an-z{display:grid;grid-template-columns:minmax(0,1fr) 46px 64px 26px;gap:8px;align-items:center;font-size:12px}.an-z em{font-style:normal;text-align:right;color:#C9D2E8}
+.an-z{display:grid;grid-template-columns:minmax(0,1fr) 46px 64px 34px;gap:8px;align-items:center;font-size:12px}.an-z em{font-style:normal;text-align:right;color:#C9D2E8}
 .an-bar{height:6px;background:#2A3757;border-radius:3px}.an-bar i{display:block;height:6px;border-radius:3px}.an-z strong{text-align:right}
-.an-leg{display:flex;flex-wrap:wrap;gap:8px;font-size:10px;color:var(--muted);justify-content:center}.an-leg span{display:flex;gap:4px;align-items:center}.an-leg i{width:8px;height:8px;border-radius:2px}
+.an-leg{display:flex;flex-wrap:wrap;gap:8px;font-size:10px;color:var(--muted);justify-content:center}.an-leg.e{flex-wrap:nowrap;gap:7px;white-space:nowrap}.an-leg span{display:flex;gap:4px;align-items:center}.an-leg i{width:8px;height:8px;border-radius:2px}
 .an-mini{font-size:10px;color:var(--muted);text-align:center}
 .an-plot{position:relative;height:300px;margin:6px 4px 22px 34px;border-left:1px solid #3A4A72;border-bottom:1px solid #3A4A72}
 .an-plot .pt{position:absolute;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#55617F}
 .an-plot .lb{position:absolute;display:flex;align-items:center;gap:5px;transform:translate(-14px,-14px);font-size:11px;font-weight:700;color:#C9D2E8;white-space:nowrap}
-.an-plot .lb.r{flex-direction:row-reverse;transform:translate(calc(-100% + 14px),-14px)}.an-plot .lb img,.an-plot .lb .an-ini{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid #C9D2E8;background:#2A3757}
-.an-plot .lb.ich{color:#fff}.an-plot .lb.ich img,.an-plot .lb.ich .an-ini{border-color:#5D7BFF}
+.an-plot .lb.r{flex-direction:row-reverse;transform:translate(calc(-100% + 14px),-14px)}.an-plot .lb img,.an-plot .lb .an-ini{width:28px;height:28px;border-radius:50%;object-fit:cover;border:3px solid var(--vf,#C9D2E8);background:#2A3757;box-sizing:border-box;flex:none}
+.an-plot .lb.ich{color:#fff;font-size:12px}.an-plot .lb.ich img,.an-plot .lb.ich .an-ini{width:32px;height:32px}
 .an-plot .mx{position:absolute;top:0;bottom:0;border-left:1px solid #3A4A72}.an-plot .my{position:absolute;left:0;right:0;border-top:1px solid #3A4A72}
 .an-plot .ec{position:absolute;right:4px;top:4px;font-size:9px;font-weight:700;color:#7B93FF;letter-spacing:.05em}
 .an-plot .ty{position:absolute;left:-32px;width:26px;text-align:right;font-size:10px;color:var(--muted);transform:translateY(-50%)}.an-plot .tx{position:absolute;bottom:-18px;font-size:10px;color:var(--muted);transform:translateX(-50%)}
@@ -2788,15 +2789,23 @@ details.dzb[open]{padding-bottom:10px}
     // ---------------- Moment-Analysen (Finn 26.11.2026): grafik.typ "analyse", Daten aus tools/moment_analyse.py
   const AN_F = p => p < 20 ? "#E5484D" : p < 40 ? "#F08A3C" : p < 60 ? "#E6C84A" : p < 80 ? "#9FD356" : p < 95 ? "#2FBF6B" : "#22D3C5";
   const anFoto = (n, cls = "") => { const f = FOTOS[n] || {}, s = f.portrait || f.datei; const ini = String(n || "").split(" ").map(w => w[0] || "").join("").slice(0, 2);
-    return s ? `<img class="${cls}" src="${esc(s)}" alt="" loading="lazy">` : `<span class="${cls} an-ini">${esc(ini)}</span>`; };
+    return s ? `<img class="${cls}" src="${esc(s)}" alt="">` : `<span class="${cls} an-ini">${esc(ini)}</span>`; };
+  const AN_VF = {HSV: "#2F6FDB", SGE: "#E1000F", SCF: "#E2001A"};   // dunkle Vereinsfarben auf dunklem Grund: Zweitfarbe
+  const anVF = k => { const h = (AN_VF[k] || KFARBE[k] || "#C9D2E8").replace("#", ""), c = [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16));
+    const l = (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255, m = l < 0.3 ? 0.45 : 0;   // dunkle Vereinsfarben (HSV, SGE, SCF) aufhellen
+    return "rgb(" + c.map(x => Math.round(x + (255 - x) * m)).join(",") + ")"; };
+  const anNach = n => String(n || "").split(" ").slice(-1)[0];
   const anKurz = n => { const t = String(n || "").split(" "); return t.length > 1 ? t[0][0] + ". " + t.slice(1).join(" ") : n; };
   const anChips = c => `<div class="an-chips">${(c || []).map(x => `<span>${esc(x)}</span>`).join("")}</div>`;
   const anFuss = q => `<div class="an-fuss"><b class="disp">WOSO<i>INSIDER</i></b><small>${esc(q)}</small></div>`;
   function anPerz(g){
-    const leg = [[0,"0–19"],[20,"20–39"],[40,"40–59"],[60,"60–79"],[80,"80–94"],[95,"95–100"]].map(([p, t]) => `<span><i style="background:${AN_F(p)}"></i>${t}</span>`).join("");
-    return `<div class="an-k"><div class="an-kopf">${anFoto(g.n, "f")}<div><b>${esc(anKurz(g.n).toUpperCase())}</b><small>${esc([g.hinweis, (g.vgl - 1) + " Vergleichsspielerinnen"].filter(Boolean).join(" · "))}</small></div>${anChips([g.pos, g.min + " Min."])}</div>
-      ${(g.bl || []).map(b => `<div class="an-bl"><b>// ${esc(b.t)}</b>${b.z.map(z => `<div class="an-z"><span>${esc(z.l)}${z.hb ? "" : " ▾"}</span><em>${esc(z.w)}</em><span class="an-bar"><i style="width:${Math.max(z.p, 3)}%;background:${AN_F(z.p)}"></i></span><strong style="color:${AN_F(z.p)}">${z.p}</strong></div>`).join("")}</div>`).join("")}
-      <div class="an-leg">${leg}</div><div class="an-mini">Perzentil · Werte pro 90 Min. · ▾ weniger ist besser · Ballgewinne = Tacklings + Interceptions</div>${anFuss("Daten: API-Football")}</div>`;
+    const leg = [[0,"schwach"],[20,"unter Ø"],[40,"Ø"],[60,"über Ø"],[80,"stark"],[95,"Elite"]].map(([p, t]) => `<span><i style="background:${AN_F(p)}"></i>${t}</span>`).join("");
+    const name = String(g.n || "").toUpperCase(), sub = [g.verein, g.posname].filter(Boolean).join(" · ");
+    return `<div class="an-k"><div class="an-kopf">${anFoto(g.n, "f")}<div><b class="${name.length > 16 ? "lang" : ""}">${esc(name)}</b><small>${esc(sub)}</small></div>${anChips([g.min + " Min."])}</div>
+      <div class="an-sp"><span></span><em>WERT</em><span></span><strong>BESSER ALS</strong></div>
+      ${(g.bl || []).map(b => `<div class="an-bl"><b>// ${esc(b.t)}</b>${b.z.map(z => `<div class="an-z"><span>${esc(z.l.replace(" %", "").replace(" Ø", ""))}${z.hb ? "" : " ▾"}</span><em>${esc(z.w)}</em><span class="an-bar"><i style="width:${Math.max(z.p, 3)}%;background:${AN_F(z.p)}"></i></span><strong style="color:${AN_F(z.p)}">${z.p} %</strong></div>`).join("")}</div>`).join("")}
+      <div class="an-leg e">${leg}</div>
+      <div class="an-mini">Wert pro 90 Minuten, Quoten in %. „Besser als 45 %“ heißt: 45 % der ${g.vgl - 1} ${esc(g.gruppe || "Vergleichsspielerinnen")} liegen darunter.${(g.bl || []).some(b => b.z.some(z => !z.hb)) ? " ▾ weniger ist besser." : ""}${(g.bl || []).some(b => b.z.some(z => z.k === "bg")) ? " Ballgewinne = Tacklings + Interceptions." : ""}</div>${anFuss("Daten: API-Football")}</div>`;
   }
   function anStreu(g){
     const P = g.p || []; if (!P.length) return "";
@@ -2809,7 +2818,7 @@ details.dzb[open]{padding-bottom:10px}
     // Beschriftungen, die sich überdecken würden, senkrecht auseinanderschieben
     const L = P.filter(p => p.l).map(p => ({p, x: +X(p.x), y: +Y(p.y)})).sort((a, b) => a.y - b.y);
     L.forEach((a, i) => L.slice(0, i).forEach(b => { if (Math.abs(a.x - b.x) < 40 && a.y - b.y < 11) a.y = b.y + 11; }));
-    const lbs = L.sort((a, b) => a.p.ich - b.p.ich).map(({p, x, y}) => `<span class="lb${p.ich ? " ich" : ""}${x > 62 ? " r" : ""}" style="left:${x}%;top:${Math.min(y, 97)}%">${anFoto(p.n)}<span>${esc(anKurz(p.n))}</span></span>`).join("");
+    const lbs = L.sort((a, b) => a.p.ich - b.p.ich).map(({p, x, y}) => `<span class="lb${p.ich ? " ich" : ""}${x > 62 ? " r" : ""}" style="left:${x}%;top:${Math.min(y, 97)}%;--vf:${anVF(p.k)}">${anFoto(p.n)}<span>${esc(p.ich ? p.n : anNach(p.n))}</span></span>`).join("");
     return `<div class="an-k"><span class="an-t">// ${esc(g.titel)}</span>${anChips(g.chips)}
       <div style="position:relative"><span class="an-ya">${esc(g.y)}</span><div class="an-plot">
         ${tick(y0, y1).map(v => `<span class="ty" style="top:${Y(v)}%">${dez(v, v % 1 ? 1 : 0)}</span>`).join("")}${tick(x0, x1).map(v => `<span class="tx" style="left:${X(v)}%">${dez(v, v % 1 ? 1 : 0)}</span>`).join("")}
